@@ -38,26 +38,24 @@ const App = () => {
     );
   }
 
+  const configuredDate = `${config.date} ${config.time}`;
+  moment.tz.setDefault(config.timeZone);
+  // const configuredTimezone = config.timeZone;
+  // console.log(`${configuredDate}, ${configuredTimezone}`);
+  const originalDate = moment(configuredDate, 'YYYY-MM-DD h:mma');
+
+  let date = originalDate;
+
   if (typeof timeZone === 'string') {
-    const configuredDate = `${config.date} ${config.time}`;
-    moment.tz.setDefault(config.timeZone);
-    const configuredTimezone = config.timeZone;
-    console.log(`${configuredDate}, ${configuredTimezone}`);
-    const originalDate = moment(configuredDate, 'YYYY-MM-DD h:mma');
-    const date = originalDate.tz(timeZone);
+    date = originalDate.tz(timeZone);
     // Tag element is not wide enough :( : https://developer.atlassian.com/platform/forge/ui-kit-components/tag/
-    return (
-      <Fragment>
-        {/* <Text>{date.format('ddd, MMM DD, YYYY h:mma z')}</Text> */}
-        {/* <Tag text={date.format('ddd, MMM DD, YYYY h:mma z')} /> */}
-        <Badge text={date.format('ddd, MMM DD, YYYY h:mma z')} />
-      </Fragment>
-    );
   }
 
   return (
     <Fragment>
-      <Text>User timezone not found.</Text>
+      {/* <Text>{date.format('ddd, MMM DD, YYYY h:mma z')}</Text> */}
+      {/* <Tag text={date.format('ddd, MMM DD, YYYY h:mma z')} /> */}
+      <Badge text={date.format('ddd, MMM DD, YYYY h:mma z')} />
     </Fragment>
   );
 };
