@@ -1,11 +1,21 @@
 modules:
   macro:
-    - key: localised-date-macro-for-confluence-hello-world
+    - key: localised-date-macro-for-confluence
       function: main
-      title: Localised Date Macro for Confluence
-      description: Inserts Hello world!
+      title: Localised Date Macro
+      description: Provide a date and time in a specific time zone and viewers will see it in their local timezone.
+      layout: inline
+      config:
+        function: config
   function:
     - key: main
       handler: index.run
+    - key: config
+      handler: index.config
+permissions:
+  scopes:
+    - read:confluence-user
 app:
   id: ari:cloud:ecosystem::app/a3a5055d-08d6-4444-ba0f-49ac27f2150a
+  features:
+    autoUserConsent: true
