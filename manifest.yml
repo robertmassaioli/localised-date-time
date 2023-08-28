@@ -1,0 +1,11 @@
+modules:
+  macro:
+    - key: localised-date-macro-for-confluence-hello-world
+      function: main
+      title: Localised Date Macro for Confluence
+      description: Inserts Hello world!
+  function:
+    - key: main
+      handler: index.run
+app:
+  id: ari:cloud:ecosystem::app/a3a5055d-08d6-4444-ba0f-49ac27f2150a
