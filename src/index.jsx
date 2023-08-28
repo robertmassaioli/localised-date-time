@@ -3,6 +3,7 @@ import api, { route } from "@forge/api";
 //import moment from 'moment';
 import moment from 'moment-timezone';
 import { TimeZones } from "./timezones";
+import { isPresent } from 'ts-is-present';
 
 async function getUserTimezone(accountId) {
   const response = await api.asUser().requestConfluence(route`/wiki/rest/api/user?accountId=${accountId}`, {
@@ -30,7 +31,31 @@ const App = () => {
     }
   }, [timeZone]);
 
-  if(config.timeZone === undefined || config.timeZone === null) {
+  if (!isPresent(config)) {
+    return (
+      <Fragment>
+        <Text>Macro not configured. Please configure it in the Macro Configuration.</Text>
+      </Fragment>
+    );
+  }
+
+  if (!isPresent(config.date)) {
+    return (
+      <Fragment>
+        <Text>Date not configured. Please configure it in the Macro Configuration.</Text>
+      </Fragment>
+    );
+  }
+
+  if (!isPresent(config.time)) {
+    return (
+      <Fragment>
+        <Text>Time not configured. Please configure it in the Macro Configuration.</Text>
+      </Fragment>
+    );
+  }
+
+  if(!isPresent(config.timeZone)) {
     return (
       <Fragment>
         <Text>Time Zone not configured. Please configure it in the Macro Configuration.</Text>
@@ -78,7 +103,7 @@ const Config = () => {
         name="time"
         label="Time"
         description="The Time, in your local time in the following format: hh:mm am/pm"
-        placeholder="9:00am"
+        placeholder="12:00am"
         />
       <Select name="timeZone" label="Time Zone" isRequired>
         {TimeZones.map(tz => <Option label={tz} value={tz} />)}
