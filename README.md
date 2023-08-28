@@ -35,3 +35,7 @@ forge tunnel
 ## Support
 
 See [Get help](https://developer.atlassian.com/platform/forge/get-help/) for how to get help and provide feedback.
+
+## Logo Attribution
+
+[Time zone icons created by Freepik - Flaticon](https://www.flaticon.com/free-icons/time-zone)
