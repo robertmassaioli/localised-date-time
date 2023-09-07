@@ -28,12 +28,11 @@ function displayText(displayOption, date) {
   }
 
   if (displayOption === FORMAT_NASA_COUNTDOWN) {
-    let d = moment.duration(date.diff(moment()));
+    const originalDiff = moment().diff(date);
+    const d = moment.duration(Math.abs(originalDiff));
 
     let result = 'T';
-    result = result + (d.milliseconds() < 0 ? '+' : '-');
-
-    d = d.abs();
+    result = result + (originalDiff < 0 ? '-' : '+');
 
     const years = d.years();
     if(years > 0) {
