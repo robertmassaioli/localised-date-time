@@ -112,6 +112,21 @@ const App = () => {
     );
   }
 
+  const rawTime = config.time;
+  const timeMatch = /^(?<time>\d{1,2}:\d{2})\s?(?<meridiem>am|pm)$/;
+
+  let matchResult;
+  if ((matchResult = timeMatch.exec(rawTime)) === null) {
+    return (
+      <Fragment>
+        <Text>Time "{rawTime}" not in the "XX:XX (am|pm)" format! Example, valid values are: "9:00 am" or "12:45 pm".</Text>
+      </Fragment>
+    );
+  }
+
+  const {time, meridiem} = matchResult.groups;
+  let parsedTime = `${time} ${meridiem}`;
+
   if(!isPresent(config.timeZone)) {
     return (
       <Fragment>
@@ -120,7 +135,7 @@ const App = () => {
     );
   }
 
-  const configuredDate = `${config.date} ${config.time}`;
+  const configuredDate = `${config.date} ${parsedTime}`;
   moment.tz.setDefault(config.timeZone);
   // const configuredTimezone = config.timeZone;
   // console.log(`${configuredDate}, ${configuredTimezone}`);
