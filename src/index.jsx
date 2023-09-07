@@ -135,7 +135,7 @@ const App = () => {
     if (config.displayOption === FORMAT_DEFAULT_AND_ORIGINAL) {
       return (
         <Fragment>
-          <Text><Badge text={displayText('default', date)} /> (originally <Badge text={displayText('default', originalDate)} />)</Text>
+          <Text><Badge text={displayText('default', date)} /> (<Badge text={displayText('default', originalDate)} />)</Text>
         </Fragment>
       );
     }
