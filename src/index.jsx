@@ -1,4 +1,4 @@
-import ForgeUI, { render, Fragment, Macro, Text, useState, useEffect, useProductContext, MacroConfig, TextField, DatePicker, useConfig, Select, Option, Tag, Badge } from "@forge/ui";
+import ForgeUI, { render, Fragment, Macro, Text, useState, useEffect, useProductContext, MacroConfig, TextField, DatePicker, useConfig, Select, Option, Badge, Toggle } from "@forge/ui";
 import api, { route } from "@forge/api";
 //import moment from 'moment';
 import moment from 'moment-timezone';
@@ -14,9 +14,15 @@ async function getUserTimezone(accountId) {
 
   const data =  await response.json();
 
-  console.log(JSON.stringify(data, null, 2));
-
   return data.timeZone;
+}
+
+function displayText(displayOption, date) {
+  if (displayOption === 'countdownUnbounded') {
+    return date.fromNow();
+  }
+
+  return date.format('ddd, MMM DD, YYYY h:mma z');
 }
 
 const App = () => {
@@ -79,8 +85,9 @@ const App = () => {
   return (
     <Fragment>
       {/* <Text>{date.format('ddd, MMM DD, YYYY h:mma z')}</Text> */}
-      {/* <Tag text={date.format('ddd, MMM DD, YYYY h:mma z')} /> */}
-      <Badge text={date.format('ddd, MMM DD, YYYY h:mma z')} />
+      {/* <Tag
+       text={date.format('ddd, MMM DD, YYYY h:mma z')} /> */}
+      <Badge text={displayText(config.displayOption, date)} />
     </Fragment>
   );
 };
@@ -105,8 +112,20 @@ const Config = () => {
         description="The Time, in your local time in the following format: hh:mm am/pm"
         placeholder="12:00am"
         />
-      <Select name="timeZone" label="Time Zone" isRequired>
+      <Select
+        name="timeZone"
+        label="Timezone"
+        isRequired
+        description="The timezone that the Date Time above is configured for. If you have written the above in your local time then select your local timezone.">
         {TimeZones.map(tz => <Option label={tz} value={tz} />)}
+      </Select>
+      <Select
+        name="displayOption"
+        label="Display format"
+        isRequired
+        description="How your date will be displayed to the viewer.">
+        <Option label="Exact Date/Time with Timezone (Default)" value="default" defaultSelected />
+        <Option label="Countdown / Time since" value="countdownUnbounded" />
       </Select>
     </MacroConfig>
   );
