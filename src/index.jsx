@@ -5,6 +5,11 @@ import moment from 'moment-timezone';
 import { TimeZones } from "./timezones";
 import { isPresent } from 'ts-is-present';
 
+const FORMAT_DEFAULT = 'default';
+const FORMAT_DEFAULT_AND_ORIGINAL = 'localisedAndConfigured';
+const FORMAT_HUMAN_COUNTDOWN = 'countdownUnbounded';
+const FORMAT_NASA_COUNTDOWN = 'countdownTPlusMinus';
+
 async function getUserTimezone(accountId) {
   const response = await api.asUser().requestConfluence(route`/wiki/rest/api/user?accountId=${accountId}`, {
     headers: {
@@ -18,8 +23,55 @@ async function getUserTimezone(accountId) {
 }
 
 function displayText(displayOption, date) {
-  if (displayOption === 'countdownUnbounded') {
+  if (displayOption === FORMAT_HUMAN_COUNTDOWN) {
     return date.fromNow();
+  }
+
+  if (displayOption === FORMAT_NASA_COUNTDOWN) {
+    let d = moment.duration(date.diff(moment()));
+
+    let result = 'T';
+    result = result + (d.milliseconds() < 0 ? '+' : '-');
+
+    d = d.abs();
+
+    const years = d.years();
+    if(years > 0) {
+      result = `${result}${years}y`;
+      d.subtract(years, 'years');
+    }
+
+    const months = d.months();
+    if(months > 0) {
+      result = `${result}${months}m`;
+      d.subtract(months, 'months');
+    }
+
+    const days = d.days();
+    if(days > 0) {
+      result = `${result}${days}d`;
+      d.subtract(days, 'days');
+    }
+
+    const hours = d.hours();
+    if(hours > 0) {
+      result = `${result}${hours}h`;
+      d.subtract(hours, 'h');
+    }
+
+    const minutes = d.minutes();
+    if(minutes > 0) {
+      result = `${result}${minutes}m`;
+      d.subtract(minutes, 'minutes');
+    }
+
+    const seconds = d.seconds();
+    if(seconds > 0) {
+      result = `${result}${seconds}s`;
+      d.subtract(seconds, 'seconds');
+    }
+
+    return result;
   }
 
   return date.format('ddd, MMM DD, YYYY h:mma z');
@@ -78,8 +130,16 @@ const App = () => {
   let date = originalDate;
 
   if (typeof timeZone === 'string') {
-    date = originalDate.tz(timeZone);
+    date = originalDate.clone().tz(timeZone);
     // Tag element is not wide enough :( : https://developer.atlassian.com/platform/forge/ui-kit-components/tag/
+
+    if (config.displayOption === FORMAT_DEFAULT_AND_ORIGINAL) {
+      return (
+        <Fragment>
+          <Text><Badge text={displayText('default', date)} /> (originally <Badge text={displayText('default', originalDate)} />)</Text>
+        </Fragment>
+      );
+    }
   }
 
   return (
@@ -124,8 +184,10 @@ const Config = () => {
         label="Display format"
         isRequired
         description="How your date will be displayed to the viewer.">
-        <Option label="Exact Date/Time with Timezone (Default)" value="default" defaultSelected />
-        <Option label="Countdown / Time since" value="countdownUnbounded" />
+        <Option label="Localised Date/Time (Default)" value={FORMAT_DEFAULT} defaultSelected />
+        <Option label="Localised Date/Time (With configured timezone)" value={FORMAT_DEFAULT_AND_ORIGINAL} />
+        <Option label="Countdown / Time since" value={FORMAT_HUMAN_COUNTDOWN} />
+        <Option label="Countdown T-(plus/minus)" value={FORMAT_NASA_COUNTDOWN} />
       </Select>
     </MacroConfig>
   );
