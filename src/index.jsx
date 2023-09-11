@@ -113,7 +113,7 @@ const App = () => {
   }
 
   const rawTime = config.time;
-  const timeMatch = /^(?<time>\d{1,2}:\d{2})\s?(?<meridiem>am|pm)$/;
+  const timeMatch = /^(?<time>(1[012]|0?[1-9]):[0-5][0-9])\s?(?<meridiem>([aApP][mM]))$/;
 
   let matchResult;
   if ((matchResult = timeMatch.exec(rawTime)) === null) {
