@@ -1,21 +1,25 @@
 modules:
   macro:
     - key: localised-date-macro-for-confluence
-      function: main
+      resource: main
+      render: native
       title: Localised Date Macro
       description: Provide a date and time in a specific time zone and viewers will see it in their local timezone.
       layout: inline
       config:
         function: config
   function:
-    - key: main
-      handler: index.run
     - key: config
       handler: index.config
+resources:
+  - key: main
+    path: src/frontend/index.jsx
 permissions:
   scopes:
     - read:confluence-user
 app:
   id: ari:cloud:ecosystem::app/a3a5055d-08d6-4444-ba0f-49ac27f2150a
+  runtime:
+    name: nodejs18.x
   features:
     autoUserConsent: true
