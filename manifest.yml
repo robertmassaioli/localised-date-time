@@ -14,9 +14,6 @@ modules:
 resources:
   - key: main
     path: src/frontend/index.jsx
-permissions:
-  scopes:
-    - read:confluence-user
 app:
   id: ari:cloud:ecosystem::app/a3a5055d-08d6-4444-ba0f-49ac27f2150a
   runtime:

@@ -30,7 +30,7 @@ const Config = () => {
         description="How your date will be displayed to the viewer.">
         <Option label="Localised Date/Time (Default)" value={FORMAT_DEFAULT} defaultSelected />
         <Option label="Localised Date/Time (With configured timezone)" value={FORMAT_DEFAULT_AND_ORIGINAL} />
-        <Option label="Localised Date/Time (With UTC)" value={FORMAT_DEFAULT_AND_UTC} />
+        <Option label="UTC (With Localised Date/Time)" value={FORMAT_DEFAULT_AND_UTC} />
         <Option label="Countdown / Time since" value={FORMAT_HUMAN_COUNTDOWN} />
         <Option label="Countdown T-(plus/minus)" value={FORMAT_NASA_COUNTDOWN} />
       </Select>

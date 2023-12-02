@@ -99,9 +99,10 @@ const App = () => {
         </>
       );
     } else if (config.displayOption === FORMAT_DEFAULT_AND_UTC) {
+      const utcDate = originalDate.clone().tz('UTC');
       return (
         <>
-          <Text><Badge text={displayText('default', date)} /> (<Badge text={displayText('default', originalDate)} />)</Text>
+          <Text><Badge text={displayText('default', utcDate)} /> (<Badge text={displayText('default', date)} />)</Text>
         </>
       )
     }
