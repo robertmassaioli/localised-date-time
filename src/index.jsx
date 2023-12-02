@@ -9,13 +9,13 @@ const Config = () => {
   return (
     <MacroConfig>
       {/* Form components */}
-      <DatePicker name="date" label="Date" description="The Date, in your local time." />
       <TextField
         name="time"
         label="Time"
         description="The Time, in your local time in the following format: hh:mm am/pm"
         placeholder="12:00am"
         />
+      <DatePicker name="date" label="Date" description="The Date, in your local time." />
       <Select
         name="timeZone"
         label="Timezone"
