@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ForgeReconciler, { Text, Badge } from '@forge/react';
+import ForgeReconciler, { Text, Badge, Tooltip } from '@forge/react';
 import { view } from '@forge/bridge';
 import { useEffectAsync } from '../useEffectAsync';
 import moment from 'moment-timezone';
@@ -101,12 +101,23 @@ const App = () => {
     date = originalDate.clone().tz(timeZone);
     // Tag element is not wide enough :( : https://developer.atlassian.com/platform/forge/ui-kit-components/tag/
 
+    const configuredTimezoneSameAsUserTimezone = config.timeZone === timeZone;
     if (config.displayOption === FORMAT_DEFAULT_AND_ORIGINAL) {
-      return (
-        <>
-          <Text><Badge text={displayText('default', date)} /> (<Badge text={displayText('default', originalDate)} />)</Text>
-        </>
-      );
+      if (!configuredTimezoneSameAsUserTimezone) {
+        return (
+          <>
+            <Text><Badge text={displayText('default', date)} /> (<Badge text={displayText('default', originalDate)} />)</Text>
+          </>
+        );
+      } else {
+        return (
+          <>
+             <Tooltip text="Co-located: You are viewing this date-time from the same timezone it was configured for.">
+                <Badge text={displayText(config.displayOption, date)} />
+             </Tooltip>
+          </>
+        );
+      }
     } else if (config.displayOption === FORMAT_DEFAULT_AND_UTC) {
       const utcDate = originalDate.clone().tz('UTC');
       return (
@@ -119,9 +130,6 @@ const App = () => {
 
   return (
     <>
-      {/* <Text>{date.format('ddd, MMM DD, YYYY h:mma z')}</Text> */}
-      {/* <Tag
-       text={date.format('ddd, MMM DD, YYYY h:mma z')} /> */}
       <Badge text={displayText(config.displayOption, date)} />
     </>
   );
