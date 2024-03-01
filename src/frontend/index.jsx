@@ -41,6 +41,15 @@ const App = () => {
 
   const { config, timeZone } = details;
 
+  if (!isPresent(config)) {
+    return (
+      <>
+        <Text>Macro not configured. Please configure it in the Macro Configuration.</Text>
+      </>
+    );
+  }
+
+
   if (!isPresent(config.date)) {
     return (
       <>
