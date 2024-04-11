@@ -15,7 +15,10 @@
   },
   "dependencies": {
     "@forge/api": "^2.18.4",
-    "@forge/ui": "1.9.0",
+    "@forge/bridge": "^3.0.0",
+    "@forge/react": "^8.1.7",
+    "@forge/resolver": "^1.5.21",
+    "@forge/ui": "^1.9.10",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "ts-is-present": "^1.2.2"
