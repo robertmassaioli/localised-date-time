@@ -100,7 +100,7 @@ const App = () => {
 
   if (formatRequiresLiveUpdates(config.displayOption)) {
     // Force a state change and thus a refesh
-    setInterval(() => setNow(new Date().getUTCMilliseconds()), 1000);
+    setTimeout(() => setNow(new Date().getUTCMilliseconds()), 1000);
   }
 
   if (typeof timeZone === 'string') {
