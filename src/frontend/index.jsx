@@ -4,7 +4,7 @@ import { view } from '@forge/bridge';
 import { useEffectAsync } from '../useEffectAsync';
 import moment from 'moment-timezone';
 import { isPresent } from 'ts-is-present';
-import { FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, displayText } from '../displayOptions';
+import { FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, displayText, formatRequiresLiveUpdates } from '../displayOptions';
 
 /*
 Details structure:
@@ -22,6 +22,7 @@ Details structure:
 
 const App = () => {
   const [details, setDetails] = useState(undefined);
+  const [now, setNow] = useState(new Date().getUTCMilliseconds());
 
   useEffectAsync(async () => {
     const context = await view.getContext();
@@ -97,6 +98,11 @@ const App = () => {
 
   let date = originalDate;
 
+  if (formatRequiresLiveUpdates(config.displayOption)) {
+    // Force a state change and thus a refesh
+    setInterval(() => setNow(new Date().getUTCMilliseconds()), 1000);
+  }
+
   if (typeof timeZone === 'string') {
     date = originalDate.clone().tz(timeZone);
     // Tag element is not wide enough :( : https://developer.atlassian.com/platform/forge/ui-kit-components/tag/
@@ -106,14 +112,14 @@ const App = () => {
       if (!configuredTimezoneSameAsUserTimezone) {
         return (
           <>
-            <Text><Badge text={displayText('default', date)} /> (<Badge text={displayText('default', originalDate)} />)</Text>
+            <Text><Badge key={`badge-${now}`} text={displayText('default', date)} /> (<Badge text={displayText('default', originalDate)} />)</Text>
           </>
         );
       } else {
         return (
           <>
              <Tooltip text="Co-located: You are viewing this date-time from the same timezone it was configured for.">
-                <Badge text={displayText(config.displayOption, date)} />
+                <Badge key={`badge-${now}`} text={displayText(config.displayOption, date)} />
              </Tooltip>
           </>
         );
@@ -122,7 +128,7 @@ const App = () => {
       const utcDate = originalDate.clone().tz('UTC');
       return (
         <>
-          <Text><Badge text={displayText('default', utcDate)} /> (<Badge text={displayText('default', date)} />)</Text>
+          <Text><Badge key={`badge-${now}`} text={displayText('default', utcDate)} /> (<Badge text={displayText('default', date)} />)</Text>
         </>
       )
     }
@@ -130,7 +136,7 @@ const App = () => {
 
   return (
     <>
-      <Badge text={displayText(config.displayOption, date)} />
+      <Badge key={`badge-${now}`} text={displayText(config.displayOption, date)} />
     </>
   );
 };

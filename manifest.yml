@@ -18,5 +18,3 @@ app:
   id: ari:cloud:ecosystem::app/a3a5055d-08d6-4444-ba0f-49ac27f2150a
   runtime:
     name: nodejs18.x
-  features:
-    autoUserConsent: true
