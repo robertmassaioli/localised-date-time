@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ForgeReconciler, { Text, Badge, Tooltip } from '@forge/react';
 import { view } from '@forge/bridge';
 import { useEffectAsync } from '../useEffectAsync';
@@ -22,7 +22,10 @@ Details structure:
 
 const App = () => {
   const [details, setDetails] = useState(undefined);
-  const [now, setNow] = useState(new Date().getUTCMilliseconds());
+  const [now, setNow] = useState(new Date());
+
+  const config = details?.config;
+  const timeZone = details?.timeZone;
 
   useEffectAsync(async () => {
     const context = await view.getContext();
@@ -32,6 +35,17 @@ const App = () => {
     });
   }, details);
 
+  useEffect(() => {
+    if (config && formatRequiresLiveUpdates(config.displayOption)) {
+      const interval = setInterval(() => setNow(Date.now()), 1000);
+      return () => {
+        clearInterval(interval);
+      };
+    }
+
+    return undefined;
+  }, [details]);
+
   if (!isPresent(details)) {
     return (
       <>
@@ -39,8 +53,6 @@ const App = () => {
       </>
     );
   }
-
-  const { config, timeZone } = details;
 
   if (!isPresent(config)) {
     return (
@@ -97,11 +109,6 @@ const App = () => {
   const originalDate = moment(configuredDate, 'YYYY-MM-DD h:mma');
 
   let date = originalDate;
-
-  if (formatRequiresLiveUpdates(config.displayOption)) {
-    // Force a state change and thus a refesh
-    setTimeout(() => setNow(new Date().getUTCMilliseconds()), 1000);
-  }
 
   if (typeof timeZone === 'string') {
     date = originalDate.clone().tz(timeZone);
