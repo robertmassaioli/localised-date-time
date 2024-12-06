@@ -27,30 +27,24 @@ const App = () => {
   const config = details?.config;
   const timeZone = details?.timeZone;
 
-  // useEffectAsync(async () => {
-  //   const context = await view.getContext();
-  //   setDetails({
-  //     timeZone: context.timezone,
-  //     config: context.extension.config
-  //   });
-  // }, details);
+  useEffectAsync(async () => {
+    const context = await view.getContext();
+    setDetails({
+      timeZone: context.timezone,
+      config: context.extension.config
+    });
+  }, details);
 
-  // useEffect(() => {
-  //   if (config && formatRequiresLiveUpdates(config.displayOption)) {
-  //     const interval = setInterval(() => setNow(Date.now()), 1000);
-  //     return () => {
-  //       clearInterval(interval);
-  //     };
-  //   }
+  useEffect(() => {
+    if (config && formatRequiresLiveUpdates(config.displayOption)) {
+      const interval = setInterval(() => setNow(Date.now()), 1000);
+      return () => {
+        clearInterval(interval);
+      };
+    }
 
-  //   return undefined;
-  // }, [details]);
-
-  return (
-    <>
-      <Text>Macro not configured. Please configure it in the Macro Configuration.</Text>
-    </>
-  );
+    return undefined;
+  }, [details]);
 
   if (!isPresent(details)) {
     return (
