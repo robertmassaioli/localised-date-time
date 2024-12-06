@@ -46,6 +46,12 @@ const App = () => {
   //   return undefined;
   // }, [details]);
 
+  return (
+    <>
+      <Text>Macro not configured. Please configure it in the Macro Configuration.</Text>
+    </>
+  );
+
   if (!isPresent(details)) {
     return (
       <>
