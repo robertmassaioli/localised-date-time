@@ -14,13 +14,13 @@
     "eslint-plugin-react-hooks": "^4.2.0"
   },
   "dependencies": {
-    "@forge/api": "^2.18.4",
-    "@forge/bridge": "^3.0.0",
-    "@forge/react": "^8.1.7",
-    "@forge/resolver": "^1.5.21",
-    "@forge/ui": "^1.9.10",
-    "moment": "^2.29.4",
-    "moment-timezone": "^0.5.43",
+    "@forge/api": "^4.1.1",
+    "@forge/bridge": "^4.1.1",
+    "@forge/react": "^10.0.0",
+    "@forge/resolver": "^1.6.2",
+    "@forge/ui": "^1.11.1",
+    "moment": "^2.30.1",
+    "moment-timezone": "^0.5.46",
     "ts-is-present": "^1.2.2"
   }
 }

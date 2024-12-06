@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ForgeReconciler, { Text, Badge, Tooltip } from '@forge/react';
+import ForgeReconciler, { Text, Lozenge, Tooltip } from '@forge/react';
 import { view } from '@forge/bridge';
 import { useEffectAsync } from '../useEffectAsync';
 import moment from 'moment-timezone';
@@ -27,24 +27,24 @@ const App = () => {
   const config = details?.config;
   const timeZone = details?.timeZone;
 
-  useEffectAsync(async () => {
-    const context = await view.getContext();
-    setDetails({
-      timeZone: context.timezone,
-      config: context.extension.config
-    });
-  }, details);
+  // useEffectAsync(async () => {
+  //   const context = await view.getContext();
+  //   setDetails({
+  //     timeZone: context.timezone,
+  //     config: context.extension.config
+  //   });
+  // }, details);
 
-  useEffect(() => {
-    if (config && formatRequiresLiveUpdates(config.displayOption)) {
-      const interval = setInterval(() => setNow(Date.now()), 1000);
-      return () => {
-        clearInterval(interval);
-      };
-    }
+  // useEffect(() => {
+  //   if (config && formatRequiresLiveUpdates(config.displayOption)) {
+  //     const interval = setInterval(() => setNow(Date.now()), 1000);
+  //     return () => {
+  //       clearInterval(interval);
+  //     };
+  //   }
 
-    return undefined;
-  }, [details]);
+  //   return undefined;
+  // }, [details]);
 
   if (!isPresent(details)) {
     return (
@@ -119,14 +119,14 @@ const App = () => {
       if (!configuredTimezoneSameAsUserTimezone) {
         return (
           <>
-            <Text><Badge key={`badge-${now}`} text={displayText('default', date)} /> (<Badge text={displayText('default', originalDate)} />)</Text>
+            <Text><Lozenge key={`badge-${now}`}>{displayText('default', date)}</Lozenge> (<Lozenge>{displayText('default', originalDate)}</Lozenge>)</Text>
           </>
         );
       } else {
         return (
           <>
-             <Tooltip text="Co-located: You are viewing this date-time from the same timezone it was configured for.">
-                <Badge key={`badge-${now}`} text={displayText(config.displayOption, date)} />
+             <Tooltip content="Co-located: You are viewing this date-time from the same timezone it was configured for.">
+                <Lozenge key={`badge-${now}`}>{displayText(config.displayOption, date)}</Lozenge>
              </Tooltip>
           </>
         );
@@ -135,7 +135,7 @@ const App = () => {
       const utcDate = originalDate.clone().tz('UTC');
       return (
         <>
-          <Text><Badge key={`badge-${now}`} text={displayText('default', utcDate)} /> (<Badge text={displayText('default', date)} />)</Text>
+          <Text><Lozenge key={`badge-${now}`}>{displayText('default', utcDate)}</Lozenge> (<Lozenge>{displayText('default', date)}</Lozenge>)</Text>
         </>
       )
     }
@@ -143,7 +143,7 @@ const App = () => {
 
   return (
     <>
-      <Badge key={`badge-${now}`} text={displayText(config.displayOption, date)} />
+      <Lozenge key={`badge-${now}`}>{displayText(config.displayOption, date)}</Lozenge>
     </>
   );
 };
