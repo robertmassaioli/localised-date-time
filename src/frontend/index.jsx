@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import ForgeReconciler, { Text, Lozenge, Tooltip } from '@forge/react';
+import React, { useEffect, useState } from 'react';
 import { view } from '@forge/bridge';
-import { useEffectAsync } from '../useEffectAsync';
+import ForgeReconciler, { DatePicker, Label, Lozenge, Select, Text, Textfield, Tooltip } from '@forge/react';
 import moment from 'moment-timezone';
 import { isPresent } from 'ts-is-present';
-import { FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, displayText, formatRequiresLiveUpdates } from '../displayOptions';
-
+import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN, FORMAT_NASA_COUNTDOWN, displayText, formatRequiresLiveUpdates } from "../displayOptions";
+import { TimeZones } from "../timezones";
+import { useEffectAsync } from '../useEffectAsync';
 /*
 Details structure:
 
@@ -153,3 +153,40 @@ ForgeReconciler.render(
     <App />
   </React.StrictMode>
 );
+
+const Config = () => {
+  return (
+    <>
+      <Label labelFor='time'>Time</Label>
+      <Textfield
+              name="time"
+              description="The Time, in your local time in the following format: hh:mm am/pm"
+              placeholder="12:00am"
+              />
+      <Label>Date</Label>
+      <DatePicker name="date" description="The Date, in your local time." />
+      <Label>Timezone</Label>
+      <Select
+        name="timeZone"
+        isRequired
+        description="The timezone that the Date Time above is configured for. If you have written the above in your local time then select your local timezone."
+        options={TimeZones.map(tz => ({ label: tz, value: tz }))}
+        />
+      <Label>Display format</Label>
+      <Select
+        name="displayOption"
+        isRequired
+        description="How your date will be displayed to the viewer."
+        options={[
+          { label: 'Localised Date/Time (Default)', value: FORMAT_DEFAULT },
+          { label: 'Localised Date/Time (With configured timezone)', value: FORMAT_DEFAULT_AND_ORIGINAL },
+          { label: 'UTC (With Localised Date/Time)', value: FORMAT_DEFAULT_AND_UTC },
+          { label: 'Countdown / Time since', value: FORMAT_HUMAN_COUNTDOWN },
+          { label: 'Countdown T-(plus/minus)', value: FORMAT_NASA_COUNTDOWN }
+        ]}
+        />
+    </>
+  );
+};
+
+ForgeReconciler.addConfig(<Config />);
