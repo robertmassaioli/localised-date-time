@@ -28,23 +28,6 @@ export function parseTime(rawTime) {
   return matchResult.groups;
 }
 
-/**
- * Renders the display text for the given displayOption.
- */
-export function getDisplayText(config, date, originalDate, timeZone) {
-  const configuredTimezoneSameAsUserTimezone = config.timeZone === timeZone;
-  if (config.displayOption === FORMAT_DEFAULT_AND_ORIGINAL) {
-    if (!configuredTimezoneSameAsUserTimezone) {
-      return `${displayText('default', date)} (${displayText('default', originalDate)})`;
-    }
-    return displayText(config.displayOption, date);
-  } else if (config.displayOption === FORMAT_DEFAULT_AND_UTC) {
-    const utcDate = originalDate.clone().tz('UTC');
-    return `${displayText('default', utcDate)} (${displayText('default', date)})`;
-  }
-  return displayText(config.displayOption, date);
-}
-
 export function renderDateLozenge({
   originalDate,
   timeZone,
