@@ -7,6 +7,7 @@ import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FO
 import { TimeZones } from "../timezones";
 import { useEffectAsync } from '../useEffectAsync';
 import { nextRepeatDate, REPEAT_ANNUALLY, REPEAT_DAILY, REPEAT_HOURLY, REPEAT_WEEKLY, repetitionToUnits } from '../repetition';
+import { parseTime, renderDateLozenge, validateConfig } from './common';
 /*
 Details structure:
 
@@ -47,52 +48,15 @@ const App = () => {
     return undefined;
   }, [details]);
 
-  if (!isPresent(details)) {
-    return (
-      <>
-        <Text>Macro not configured. Please configure it in the Macro Configuration.</Text>
-      </>
-    );
-  }
+  // Shared validation
+  const error = validateConfig(details, config);
+  if (error) return <>{error}</>;
 
-  if (!isPresent(config)) {
-    return (
-      <>
-        <Text>Macro not configured. Please configure it in the Macro Configuration.</Text>
-      </>
-    );
-  }
+  // Shared time parsing
+  const parsed = parseTime(config.time);
+  if (parsed.error) return <>{parsed.error}</>;
 
-
-  if (!isPresent(config.date)) {
-    return (
-      <>
-        <Text>Date not configured. Please configure it in the Macro Configuration.</Text>
-      </>
-    );
-  }
-
-  if (!isPresent(config.time)) {
-    return (
-      <>
-        <Text>Time not configured. Please configure it in the Macro Configuration.</Text>
-      </>
-    );
-  }
-
-  const rawTime = config.time;
-  const timeMatch = /^(?<time>(1[012]|0?[1-9]):[0-5][0-9])\s?(?<meridiem>([aApP][mM]))$/;
-
-  let matchResult;
-  if ((matchResult = timeMatch.exec(rawTime)) === null) {
-    return (
-      <>
-        <Text>Time "{rawTime}" not in the "XX:XX (am|pm)" format! Example, valid values are: "9:00 am" or "12:45 pm".</Text>
-      </>
-    );
-  }
-
-  const {time, meridiem} = matchResult.groups;
+  const {time, meridiem} = parsed;
   let parsedTime = `${time} ${meridiem}`;
 
   if(!isPresent(config.timeZone)) {
@@ -133,44 +97,7 @@ const App = () => {
   // console.log(`${configuredDate}, ${configuredTimezone}`);
   const originalDate = nextRepeatDate(moment(configuredDate, 'YYYY-MM-DD h:mma'), repetitionPeriod, repetitionToUnits(repetitionUnit));
 
-  let date = originalDate;
-
-  if (typeof timeZone === 'string') {
-    date = originalDate.clone().tz(timeZone);
-    // Tag element is not wide enough :( : https://developer.atlassian.com/platform/forge/ui-kit-components/tag/
-
-    const configuredTimezoneSameAsUserTimezone = config.timeZone === timeZone;
-    if (config.displayOption === FORMAT_DEFAULT_AND_ORIGINAL) {
-      if (!configuredTimezoneSameAsUserTimezone) {
-        return (
-          <>
-            <Text><Lozenge key={`badge-${now}`}>{displayText('default', date)}</Lozenge> (<Lozenge>{displayText('default', originalDate)}</Lozenge>)</Text>
-          </>
-        );
-      } else {
-        return (
-          <>
-             <Tooltip content="Co-located: You are viewing this date-time from the same timezone it was configured for.">
-                <Lozenge key={`badge-${now}`}>{displayText(config.displayOption, date)}</Lozenge>
-             </Tooltip>
-          </>
-        );
-      }
-    } else if (config.displayOption === FORMAT_DEFAULT_AND_UTC) {
-      const utcDate = originalDate.clone().tz('UTC');
-      return (
-        <>
-          <Text><Lozenge key={`badge-${now}`}>{displayText('default', utcDate)}</Lozenge> (<Lozenge>{displayText('default', date)}</Lozenge>)</Text>
-        </>
-      )
-    }
-  }
-
-  return (
-    <>
-      <Lozenge key={`badge-${now}`}>{displayText(config.displayOption, date)}</Lozenge>
-    </>
-  );
+  return renderDateLozenge({ originalDate, timeZone, config });
 };
 
 ForgeReconciler.render(
