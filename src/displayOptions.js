@@ -6,6 +6,8 @@ export const FORMAT_DEFAULT_AND_UTC = 'localisedAndUtc';
 export const FORMAT_HUMAN_COUNTDOWN = 'countdownUnbounded';
 export const FORMAT_NASA_COUNTDOWN = 'countdownTPlusMinus';
 
+//export type RepeatType = REPEAT_NONE | REPEAT_HOURLY | REPEAT_DAILY | REPEAT_WEEKLY | REPEAT_ANNUALLY;
+
 export function formatRequiresLiveUpdates(displayOption) {
   return displayOption === FORMAT_HUMAN_COUNTDOWN || displayOption === FORMAT_NASA_COUNTDOWN;
 }

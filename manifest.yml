@@ -1,7 +1,7 @@
 modules:
   macro:
     - key: localised-date-macro-for-confluence
-      resource: main
+      resource: main-nonrepeating
       render: native
       resolver:
         function: resolver
@@ -9,12 +9,23 @@ modules:
       description: Provide a date and time in a specific time zone and viewers will see it in their local timezone.
       layout: inline
       config: true
+    - key: repeating-localised-date-macro-for-confluence
+      resource: main-repeating
+      render: native
+      resolver:
+        function: resolver
+      title: Repeating Localised Date Macro
+      description: Provide a date and time in a specific time zone, with a repetition period, and viewers will see it in their local timezone in a way that keeps repeating every period.
+      layout: inline
+      config: true
   function:
     - key: resolver
       handler: index.handler
 resources:
-  - key: main
-    path: src/frontend/index.jsx
+  - key: main-nonrepeating
+    path: src/frontend/non-repeating.jsx
+  - key: main-repeating
+    path: src/frontend/repeating.jsx
 app:
   id: ari:cloud:ecosystem::app/a3a5055d-08d6-4444-ba0f-49ac27f2150a
   runtime:
