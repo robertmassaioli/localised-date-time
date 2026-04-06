@@ -5,6 +5,8 @@ modules:
       render: native
       resolver:
         function: resolver
+      adfExport:
+        function: adf-export-nonrepeating
       title: Localised Date Macro
       description: Provide a date and time in a specific time zone and viewers will see it in their local timezone.
       layout: inline
@@ -14,6 +16,8 @@ modules:
       render: native
       resolver:
         function: resolver
+      adfExport:
+        function: adf-export-repeating
       title: Repeating Localised Date Macro
       description: Provide a date and time in a specific time zone, with a repetition period, and viewers will see it in their local timezone in a way that keeps repeating every period.
       layout: inline
@@ -21,6 +25,10 @@ modules:
   function:
     - key: resolver
       handler: index.handler
+    - key: adf-export-nonrepeating
+      handler: src/adfExport.handleNonRepeating
+    - key: adf-export-repeating
+      handler: src/adfExport.handleRepeating
 resources:
   - key: main-nonrepeating
     path: src/frontend/non-repeating.jsx
