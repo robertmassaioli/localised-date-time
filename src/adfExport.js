@@ -46,9 +46,13 @@ function diagnosticAdf(label, payload, context) {
 }
 
 export async function handleNonRepeating(payload, context) {
+  console.log("[adfExport] Localised Date Macro payload:", JSON.stringify(payload, null, 2));
+  console.log("[adfExport] Localised Date Macro context:", JSON.stringify(context, null, 2));
   return diagnosticAdf("Localised Date Macro", payload, context);
 }
 
 export async function handleRepeating(payload, context) {
+  console.log("[adfExport] Repeating Localised Date Macro payload:", JSON.stringify(payload, null, 2));
+  console.log("[adfExport] Repeating Localised Date Macro context:", JSON.stringify(context, null, 2));
   return diagnosticAdf("Repeating Localised Date Macro", payload, context);
 }
