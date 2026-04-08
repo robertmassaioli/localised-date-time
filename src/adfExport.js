@@ -24,7 +24,7 @@ async function getUserTimezone(accountId, configuredTimezone) {
       body: JSON.stringify({ accountIds: [accountId] })
     });
     const data = await response.json();
-    console.info('[adfExport] getUserTimezone: API response status =', response.status, 'data =', JSON.stringify(data));
+    // console.info('[adfExport] getUserTimezone: API response status =', response.status, 'data =', JSON.stringify(data));
     const user = data?.results?.[0];
     console.info('[adfExport] getUserTimezone: user =', JSON.stringify(user), 'user.timeZone =', user?.timeZone);
     const resolved = user?.timeZone ?? configuredTimezone;
