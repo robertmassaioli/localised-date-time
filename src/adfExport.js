@@ -51,8 +51,20 @@ function paragraph(inlineNodes) {
   return { type: 'paragraph', content: inlineNodes };
 }
 
-function boldText(text) {
-  return { type: 'text', text, marks: [{ type: 'strong' }] };
+/**
+ * Builds an ADF status node (renders like a Lozenge).
+ * color: 'neutral' | 'purple' | 'blue' | 'red' | 'yellow' | 'green'
+ */
+function statusNode(text, color = 'neutral') {
+  return {
+    type: 'status',
+    attrs: {
+      text,
+      color,
+      localId: '',
+      style: ''
+    }
+  };
 }
 
 function plainText(text) {
@@ -69,7 +81,7 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
   if (formatRequiresLiveUpdates(displayOption)) {
     return [
       paragraph([
-        boldText(displayText('default', displayDate)),
+        statusNode(displayText('default', displayDate)),
         plainText(' (countdown not available in export)')
       ])
     ];
@@ -78,13 +90,13 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
   if (displayOption === FORMAT_DEFAULT_AND_ORIGINAL) {
     const sameTimezone = displayDate.tz() === originalDate.tz();
     if (sameTimezone) {
-      return [paragraph([boldText(displayText('default', displayDate))])];
+      return [paragraph([statusNode(displayText('default', displayDate))])];
     }
     return [
       paragraph([
-        boldText(displayText('default', displayDate)),
+        statusNode(displayText('default', displayDate)),
         plainText(' ('),
-        plainText(displayText('default', originalDate)),
+        statusNode(displayText('default', originalDate)),
         plainText(')')
       ])
     ];
@@ -94,16 +106,16 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
     const utcDate = originalDate.clone().tz('UTC');
     return [
       paragraph([
-        boldText(displayText('default', utcDate)),
+        statusNode(displayText('default', utcDate)),
         plainText(' ('),
-        plainText(displayText('default', displayDate)),
+        statusNode(displayText('default', displayDate)),
         plainText(')')
       ])
     ];
   }
 
-  // Default: just the formatted date in bold
-  return [paragraph([boldText(displayText(displayOption, displayDate))])];
+  // Default: just the formatted date as a status node
+  return [paragraph([statusNode(displayText(displayOption, displayDate))])];
 }
 
 /**
