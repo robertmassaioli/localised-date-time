@@ -59,10 +59,9 @@ function statusNode(text, color = 'neutral') {
   return {
     type: 'status',
     attrs: {
+      localId: crypto.randomUUID(),
       text,
-      color,
-      localId: '',
-      style: ''
+      color
     }
   };
 }
