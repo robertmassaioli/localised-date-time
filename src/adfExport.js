@@ -1,6 +1,6 @@
 import api, { route } from '@forge/api';
 import moment from 'moment-timezone';
-import { validateConfig, parseTime } from './common';
+import { validateConfig, parseTime } from './configHelpers';
 import { displayText, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, formatRequiresLiveUpdates } from './displayOptions';
 import { nextRepeatDate, repetitionToUnits } from './repetition';
 

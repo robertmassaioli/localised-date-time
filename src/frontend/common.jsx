@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment-timezone';
 import { displayText, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC } from "../displayOptions";
 import { Lozenge, Tooltip, Text } from '@forge/react';
-export { validateConfig, parseTime } from '../common';
+export { validateConfig, parseTime } from '../configHelpers';
 
 export function renderDateLozenge({
   originalDate,
