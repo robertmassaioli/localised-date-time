@@ -9,7 +9,11 @@ import { nextRepeatDate, repetitionToUnits } from './repetition';
  * Falls back to the configured timezone if accountId is absent or the API call fails.
  */
 async function getUserTimezone(accountId, configuredTimezone) {
-  if (!accountId) return configuredTimezone;
+  console.info('[adfExport] getUserTimezone: accountId =', accountId, 'configuredTimezone =', configuredTimezone);
+  if (!accountId) {
+    console.info('[adfExport] getUserTimezone: no accountId, using configuredTimezone =', configuredTimezone);
+    return configuredTimezone;
+  }
   try {
     const response = await requestConfluence(route`/wiki/api/v2/users-bulk`, {
       method: 'POST',
@@ -20,10 +24,14 @@ async function getUserTimezone(accountId, configuredTimezone) {
       body: JSON.stringify({ accountIds: [accountId] })
     });
     const data = await response.json();
+    console.info('[adfExport] getUserTimezone: API response status =', response.status, 'data =', JSON.stringify(data));
     const user = data?.results?.[0];
-    return user?.timeZone ?? configuredTimezone;
+    console.info('[adfExport] getUserTimezone: user =', JSON.stringify(user), 'user.timeZone =', user?.timeZone);
+    const resolved = user?.timeZone ?? configuredTimezone;
+    console.info('[adfExport] getUserTimezone: resolved timezone =', resolved);
+    return resolved;
   } catch (e) {
-    console.warn('[adfExport] Failed to get user timezone, falling back to configured timezone:', e);
+    console.warn('[adfExport] getUserTimezone: failed, falling back to configuredTimezone:', e);
     return configuredTimezone;
   }
 }
@@ -76,8 +84,13 @@ function plainText(text) {
  * since exports are static snapshots.
  */
 function buildAdfContent(displayOption, displayDate, originalDate) {
+  console.info('[adfExport] buildAdfContent: displayOption =', displayOption,
+    'displayDate =', displayDate.format(), 'displayDate.tz() =', displayDate.tz(),
+    'originalDate =', originalDate.format(), 'originalDate.tz() =', originalDate.tz());
+
   // Countdown formats don't make sense in a static export — show absolute date with a note
   if (formatRequiresLiveUpdates(displayOption)) {
+    console.info('[adfExport] buildAdfContent: countdown format, showing absolute date with note');
     return [
       paragraph([
         statusNode(displayText('default', displayDate)),
@@ -88,6 +101,7 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
 
   if (displayOption === FORMAT_DEFAULT_AND_ORIGINAL) {
     const sameTimezone = displayDate.tz() === originalDate.tz();
+    console.info('[adfExport] buildAdfContent: FORMAT_DEFAULT_AND_ORIGINAL, sameTimezone =', sameTimezone);
     if (sameTimezone) {
       return [paragraph([statusNode(displayText('default', displayDate))])];
     }
@@ -103,6 +117,7 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
 
   if (displayOption === FORMAT_DEFAULT_AND_UTC) {
     const utcDate = originalDate.clone().tz('UTC');
+    console.info('[adfExport] buildAdfContent: FORMAT_DEFAULT_AND_UTC, utcDate =', utcDate.format());
     return [
       paragraph([
         statusNode(displayText('default', utcDate)),
@@ -114,6 +129,7 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
   }
 
   // Default: just the formatted date as a status node
+  console.info('[adfExport] buildAdfContent: default format');
   return [paragraph([statusNode(displayText(displayOption, displayDate))])];
 }
 
@@ -121,7 +137,10 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
  * Shared logic for computing the ADF output given a config and viewer timezone.
  */
 function buildAdf(originalDate, viewerTimezone, config) {
+  console.info('[adfExport] buildAdf: originalDate =', originalDate.format(), 'originalDate.tz() =', originalDate.tz(),
+    'viewerTimezone =', viewerTimezone, 'displayOption =', config.displayOption);
   const displayDate = originalDate.clone().tz(viewerTimezone);
+  console.info('[adfExport] buildAdf: displayDate =', displayDate.format(), 'displayDate.tz() =', displayDate.tz());
   const content = buildAdfContent(config.displayOption, displayDate, originalDate);
   return { version: 1, type: 'doc', content };
 }
@@ -129,6 +148,7 @@ function buildAdf(originalDate, viewerTimezone, config) {
 export async function handleNonRepeating(payload) {
   const config = payload?.extensionPayload?.config;
   const accountId = payload?.context?.accountId;
+  console.info('[adfExport] handleNonRepeating: config =', JSON.stringify(config), 'accountId =', accountId);
 
   const validationError = validateConfig(config, config, ['date', 'time', 'timeZone']);
   if (validationError) {
@@ -141,9 +161,11 @@ export async function handleNonRepeating(payload) {
     console.warn('[adfExport] handleNonRepeating: invalid time:', parsedTime.error);
     return errorAdf(parsedTime.error);
   }
+  console.info('[adfExport] handleNonRepeating: parsedTime =', JSON.stringify(parsedTime));
 
   const viewerTimezone = await getUserTimezone(accountId, config.timeZone);
   const originalDate = moment.tz(`${config.date} ${parsedTime.time} ${parsedTime.meridiem}`, 'YYYY-MM-DD h:mm a', config.timeZone);
+  console.info('[adfExport] handleNonRepeating: viewerTimezone =', viewerTimezone, 'originalDate =', originalDate.format(), 'originalDate.tz() =', originalDate.tz());
 
   return buildAdf(originalDate, viewerTimezone, config);
 }
@@ -151,6 +173,7 @@ export async function handleNonRepeating(payload) {
 export async function handleRepeating(payload) {
   const config = payload?.extensionPayload?.config;
   const accountId = payload?.context?.accountId;
+  console.info('[adfExport] handleRepeating: config =', JSON.stringify(config), 'accountId =', accountId);
 
   const validationError = validateConfig(config, config, ['date', 'time', 'timeZone', 'repetitionUnit', 'repetitionPeriod']);
   if (validationError) {
@@ -163,11 +186,13 @@ export async function handleRepeating(payload) {
     console.warn('[adfExport] handleRepeating: invalid time:', parsedTime.error);
     return errorAdf(parsedTime.error);
   }
+  console.info('[adfExport] handleRepeating: parsedTime =', JSON.stringify(parsedTime));
 
   const viewerTimezone = await getUserTimezone(accountId, config.timeZone);
   const startDate = moment.tz(`${config.date} ${parsedTime.time} ${parsedTime.meridiem}`, 'YYYY-MM-DD h:mm a', config.timeZone);
   const unit = repetitionToUnits(config.repetitionUnit);
   const originalDate = nextRepeatDate(startDate, config.repetitionPeriod, unit);
+  console.info('[adfExport] handleRepeating: viewerTimezone =', viewerTimezone, 'startDate =', startDate.format(), 'unit =', unit, 'originalDate =', originalDate.format(), 'originalDate.tz() =', originalDate.tz());
 
   return buildAdf(originalDate, viewerTimezone, config);
 }
