@@ -2,3 +2,7 @@
 /dist/
 /.vscode/
 .idea
+
+# Downloaded documentation files
+Node - status.html
+Node - status_files/
