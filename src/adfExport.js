@@ -1,4 +1,4 @@
-import { requestConfluence, route } from '@forge/api';
+import api, { route } from '@forge/api';
 import moment from 'moment-timezone';
 import { validateConfig, parseTime } from './common';
 import { displayText, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, formatRequiresLiveUpdates } from './displayOptions';
@@ -15,7 +15,7 @@ async function getUserTimezone(accountId, configuredTimezone) {
     return configuredTimezone;
   }
   try {
-    const response = await requestConfluence(route`/wiki/api/v2/users-bulk`, {
+    const response = await api.asApp().requestConfluence(route`/wiki/api/v2/users-bulk`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
