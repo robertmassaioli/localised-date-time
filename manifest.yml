@@ -26,9 +26,9 @@ modules:
     - key: resolver
       handler: index.handler
     - key: adf-export-nonrepeating
-      handler: src/adfExport.handleNonRepeating
+      handler: index.handleNonRepeating
     - key: adf-export-repeating
-      handler: src/adfExport.handleRepeating
+      handler: index.handleRepeating
 resources:
   - key: main-nonrepeating
     path: src/frontend/non-repeating.jsx
