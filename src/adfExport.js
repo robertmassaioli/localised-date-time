@@ -15,19 +15,13 @@ async function getUserTimezone(accountId, configuredTimezone) {
     return configuredTimezone;
   }
   try {
-    const response = await requestConfluence(route`/wiki/api/v2/users-bulk`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ accountIds: [accountId] })
+    const response = await requestConfluence(route`/wiki/rest/api/user?accountId=${accountId}&expand=personalSpace`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
     });
     const data = await response.json();
     console.info('[adfExport] getUserTimezone: API response status =', response.status, 'data =', JSON.stringify(data));
-    const user = data?.results?.[0];
-    console.info('[adfExport] getUserTimezone: user =', JSON.stringify(user), 'user.timeZone =', user?.timeZone);
-    const resolved = user?.timeZone ?? configuredTimezone;
+    const resolved = data?.timeZone ?? configuredTimezone;
     console.info('[adfExport] getUserTimezone: resolved timezone =', resolved);
     return resolved;
   } catch (e) {
@@ -100,11 +94,7 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
   }
 
   if (displayOption === FORMAT_DEFAULT_AND_ORIGINAL) {
-    const sameTimezone = displayDate.tz() === originalDate.tz();
-    console.info('[adfExport] buildAdfContent: FORMAT_DEFAULT_AND_ORIGINAL, sameTimezone =', sameTimezone);
-    if (sameTimezone) {
-      return [paragraph([statusNode(displayText('default', displayDate))])];
-    }
+    console.info('[adfExport] buildAdfContent: FORMAT_DEFAULT_AND_ORIGINAL, always showing both timezones');
     return [
       paragraph([
         statusNode(displayText('default', displayDate)),
