@@ -10,22 +10,36 @@ Currently the macros render entirely client-side via `@forge/react`. Exports (PD
 
 ### What the adfExport function receives
 
-The function is called with a `payload` object:
+The function is called with a `payload` object (confirmed via Step 0 diagnostic):
 
 ```js
 {
-  config: { date, time, timeZone, displayOption, ... },  // macro config values
   context: {
-    accountId: "...",     // current user's Atlassian account ID (if authenticated)
-    cloudId: "...",
-    contentId: "...",
+    accountId: "...",     // current user's Atlassian account ID (confirmed present for PDF exports)
     localId: "...",
+    cloudId: "...",
+    moduleKey: "...",
+    environmentId: "...",
+    environmentType: "...",
     siteUrl: "...",
-    spaceKey: "..."
+    appVersion: "...",
+    extension: {
+      content: { id: "...", type: "page" },
+      space: { id: "...", key: "..." },
+      type: "macro"
+    },
+    userAccess: { enabled: false, hasAccess: true }
   },
-  exportType: "pdf" | "word" | "other"
+  extensionPayload: {
+    config: { date, time, timeZone, displayOption, repetitionUnit, repetitionPeriod, ... },
+    isEditing: false
+  },
+  exportType: "pdf" | "word" | "other",
+  contextToken: "..."   // JWT token
 }
 ```
+
+Note: the macro config is nested under `extensionPayload.config`, **not** at the top-level `config`.
 
 ### The timezone problem
 
@@ -103,14 +117,14 @@ modules:
 Create a helper that attempts to get the viewer's timezone:
 
 ```
-getUserTimezone(accountId, siteUrl, configuredTimezone):
+getUserTimezone(accountId, configuredTimezone):
   1. If accountId is present:
      - Call Confluence REST API to get user's timezone preference
      - If successful, return that timezone
   2. Fall back to configuredTimezone from macro config
 ```
 
-The REST API call would use `@forge/api`'s `requestConfluence` to call the modern v2 bulk users endpoint:
+The REST API call would use `@forge/api`'s `requestConfluence` to call the modern v2 bulk users endpoint. No `siteUrl` is needed — `requestConfluence` already knows which Confluence instance to talk to based on the app's installation context.
 
 ```js
 import { requestConfluence } from '@forge/api';
@@ -135,7 +149,7 @@ async function getUserTimezone(accountId, configuredTimezone) {
 }
 ```
 
-Note: It's not yet confirmed that `/wiki/api/v2/users-bulk` returns a `timeZone` field — this needs to be verified against the actual API response. **This is the part we need to validate experimentally** in Step 0 — whether `accountId` is available and whether the users-bulk endpoint includes timezone data.
+Note: It's not yet confirmed that `/wiki/api/v2/users-bulk` returns a `timeZone` field — this needs to be verified against the actual API response.
 
 ### Step 3: Implement the export functions
 
@@ -145,10 +159,10 @@ Both functions follow the same pattern, differing only in repetition handling:
 
 ```
 handleNonRepeating(payload):
-  config = payload.config
+  config = payload.extensionPayload.config
   if config is missing required fields -> return error ADF
   
-  viewerTimezone = await getUserTimezone(payload.context.accountId, ...)
+  viewerTimezone = await getUserTimezone(payload.context.accountId, config.timeZone)
   
   originalDate = moment.tz(config.date + " " + config.time, config.timeZone)
   displayDate = originalDate.clone().tz(viewerTimezone)
@@ -160,10 +174,10 @@ handleNonRepeating(payload):
 
 ```
 handleRepeating(payload):
-  config = payload.config
+  config = payload.extensionPayload.config
   if config is missing required fields -> return error ADF
   
-  viewerTimezone = await getUserTimezone(payload.context.accountId, ...)
+  viewerTimezone = await getUserTimezone(payload.context.accountId, config.timeZone)
   
   startDate = moment.tz(config.date + " " + config.time, config.timeZone)
   originalDate = nextRepeatDate(startDate, config.repetitionPeriod, repetitionToUnits(config.repetitionUnit))
@@ -226,7 +240,7 @@ The app may need `read:confluence-user` OAuth scope to fetch user timezone. Chec
 
 ## Open Questions
 
-1. **Is `accountId` present in the adfExport payload?** Step 0 will answer this. If not, we always fall back to the configured timezone.
+1. ~~**Is `accountId` present in the adfExport payload?**~~ ✅ Confirmed present in `payload.context.accountId` for PDF exports.
 2. **Does `/wiki/api/v2/users-bulk` return timezone data?** The modern v2 endpoint is the correct one to use, but we need to confirm its response schema includes a `timeZone` field. If not, we may need the Atlassian account profile API instead.
 3. **Should countdown formats show the countdown value at export time, or fall back to absolute date?** Countdowns in a static PDF are of limited value since they're immediately stale.
 4. **Word export bug (FRGE-1583):** Config may be empty for Word exports. If so, we can only render a "configuration unavailable" message for Word.
