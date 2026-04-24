@@ -1,52 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { view } from '@forge/bridge';
+import React from 'react';
 import ForgeReconciler, { DatePicker, Label, Select, Text, Textfield } from '@forge/react';
 import moment from 'moment-timezone';
 import { isPresent } from 'ts-is-present';
-import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN, FORMAT_NASA_COUNTDOWN, formatRequiresLiveUpdates } from "../displayOptions";
+import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN, FORMAT_NASA_COUNTDOWN } from "../displayOptions";
 import { TimeZones } from "../timezones";
-import { useEffectAsync } from '../useEffectAsync';
 import { nextRepeatDate, REPEAT_ANNUALLY, REPEAT_DAILY, REPEAT_HOURLY, REPEAT_WEEKLY, repetitionToUnits } from '../repetition';
 import { parseTime, renderDateLozenge, validateConfig } from './common';
-/*
-Details structure:
-
-{
-  userTimezone,
-  config: {
-    date,
-    time,
-    timeZone,
-    displayOption
-  }
-}
-*/
+import { useDateMacroContext } from './useDateMacroContext';
 
 const App = () => {
-  const [details, setDetails] = useState(undefined);
-  const [now, setNow] = useState(Date.now());
-
-  const config = details?.config;
-  const timeZone = details?.timeZone;
-
-  useEffectAsync(async () => {
-    const context = await view.getContext();
-    setDetails({
-      timeZone: context.timezone,
-      config: context.extension.config
-    });
-  }, details);
-
-  useEffect(() => {
-    if (config && formatRequiresLiveUpdates(config.displayOption)) {
-      const interval = setInterval(() => setNow(Date.now()), 1000);
-      return () => {
-        clearInterval(interval);
-      };
-    }
-
-    return undefined;
-  }, [details]);
+  const { details, config, timeZone } = useDateMacroContext();
 
   // Shared validation
   const error = validateConfig(details, config);

@@ -365,6 +365,6 @@ This also fixes the `now` state bug noted in Improvement #2 — the countdown ke
 | 7 | Improve config form label associations and required fields | Accessibility | S | ⬜ Pending |
 | 8 | Pin dependency versions and update ESLint | Developer Experience | S | ⬜ Pending |
 | 9 | Add monthly repetition option | Functional | XS | ⬜ Pending |
-| 10 | Refactor duplicated App component logic into a shared hook | Maintainability | M | ⬜ Pending |
+| 10 | Refactor duplicated App component logic into a shared hook | Maintainability | M | ✅ Implemented |
 
 **Recommended implementation order:** 1 → 6 → 9 → 2 → 10 → 5 → 7 → 4 → 3 → 8
