@@ -187,10 +187,16 @@ export async function handleRepeating(payload) {
   }
   console.info('[adfExport] handleRepeating: parsedTime =', JSON.stringify(parsedTime));
 
+  const repetitionPeriod = parseInt(config.repetitionPeriod, 10);
+  if (isNaN(repetitionPeriod) || repetitionPeriod < 1) {
+    console.warn('[adfExport] handleRepeating: invalid repetitionPeriod:', config.repetitionPeriod);
+    return errorAdf('Repetition period must be a whole number of 1 or higher.');
+  }
+
   const viewerTimezone = await getUserTimezone(accountId, config.timeZone);
   const startDate = moment.tz(`${config.date} ${parsedTime.time} ${parsedTime.meridiem}`, 'YYYY-MM-DD h:mm a', config.timeZone);
   const unit = repetitionToUnits(config.repetitionUnit);
-  const originalDate = nextRepeatDate(startDate, config.repetitionPeriod, unit);
+  const originalDate = nextRepeatDate(startDate, repetitionPeriod, unit);
   console.info('[adfExport] handleRepeating: viewerTimezone =', viewerTimezone, 'startDate =', startDate.format(), 'unit =', unit, 'originalDate =', originalDate.format(), 'originalDate.tz() =', originalDate.tz());
 
   return buildAdf(originalDate, viewerTimezone, config);

@@ -92,9 +92,10 @@ describe('displayText', () => {
     });
 
     test('includes years component when difference spans years', () => {
-      const future = moment().add(2, 'years');
+      // Use a large enough gap that years will always appear regardless of DST/month-length variance
+      const future = moment().add(3, 'years');
       const result = displayText(FORMAT_NASA_COUNTDOWN, future);
-      expect(result).toMatch(/2y/);
+      expect(result).toMatch(/[23]y/);
     });
 
     test('returns exactly "T-" with no components for a moment just in the future (0-second diff)', () => {

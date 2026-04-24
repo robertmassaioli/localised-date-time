@@ -73,17 +73,10 @@ const App = () => {
     );
   }
 
-  let repetitionPeriod = undefined;
-  try {
-    repetitionPeriod = parseInt(repetitionPeriodRaw);
-  } catch (e) {
-
-  }
-  if (!isPresent(repetitionPeriod) || repetitionPeriod < 1) {
+  const repetitionPeriod = parseInt(repetitionPeriodRaw, 10);
+  if (isNaN(repetitionPeriod) || repetitionPeriod < 1) {
     return (
-      <>
-        <Text>Repetition period must be one or higher. Please configure it in the Macro Configuration.</Text>
-      </>
+      <Text>Repetition period must be a whole number of 1 or higher. Please configure it in the Macro Configuration.</Text>
     );
   }
 
