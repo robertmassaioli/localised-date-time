@@ -29,12 +29,10 @@ export function nextRepeatDate(startDate, period, unit) {
   var now = moment();
   // If the start date is in the future, just return it
   if (start.isAfter(now)) {
-    //console.log("after now");
     return start;
   }
   // Calculate the difference in the chosen unit
   var diff = now.diff(start, unit, true);
-  //console.log('diff', diff);
   // Calculate how many periods have passed since the start
   var periodsPassed = Math.ceil(diff / period);
   // Calculate the next occurrence
@@ -45,7 +43,3 @@ export function nextRepeatDate(startDate, period, unit) {
   }
   return next;
 }
-
-// Example usage:
-// nextRepeatDate("2024-05-01", 2, "weeks") // Every 2 weeks
-// nextRepeatDate("2023-01-01", 1, "years")  // Every year

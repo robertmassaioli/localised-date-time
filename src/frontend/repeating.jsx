@@ -24,7 +24,7 @@ Details structure:
 
 const App = () => {
   const [details, setDetails] = useState(undefined);
-  const [now, setNow] = useState(new Date());
+  const [now, setNow] = useState(Date.now());
 
   const config = details?.config;
   const timeZone = details?.timeZone;
@@ -88,10 +88,7 @@ const App = () => {
   }
 
   const configuredDate = `${config.date} ${parsedTime}`;
-  moment.tz.setDefault(config.timeZone);
-  // const configuredTimezone = config.timeZone;
-  // console.log(`${configuredDate}, ${configuredTimezone}`);
-  const originalDate = nextRepeatDate(moment(configuredDate, 'YYYY-MM-DD h:mma'), repetitionPeriod, repetitionToUnits(repetitionUnit));
+  const originalDate = nextRepeatDate(moment.tz(configuredDate, 'YYYY-MM-DD h:mma', config.timeZone), repetitionPeriod, repetitionToUnits(repetitionUnit));
 
   return renderDateLozenge({ originalDate, timeZone, config });
 };

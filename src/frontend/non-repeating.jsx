@@ -23,7 +23,7 @@ Details structure:
 
 const App = () => {
   const [details, setDetails] = useState(undefined);
-  const [now, setNow] = useState(new Date());
+  const [now, setNow] = useState(Date.now());
 
   const config = details?.config;
   const timeZone = details?.timeZone;
@@ -65,10 +65,7 @@ const App = () => {
   }
 
   const configuredDate = `${config.date} ${parsedTime}`;
-  moment.tz.setDefault(config.timeZone);
-  // const configuredTimezone = config.timeZone;
-  // console.log(`${configuredDate}, ${configuredTimezone}`);
-  const originalDate = moment(configuredDate, 'YYYY-MM-DD h:mma');
+  const originalDate = moment.tz(configuredDate, 'YYYY-MM-DD h:mma', config.timeZone);
 
   return renderDateLozenge({ originalDate, timeZone, config });
 };
