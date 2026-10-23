@@ -7,9 +7,10 @@ modules:
         function: resolver
       adfExport:
         function: adf-export-nonrepeating
-      title: Localised Date Macro
-      description: Provide a date and time in a specific time zone and viewers will
-        see it in their local timezone.
+      title:
+        i18n: macro.nonrepeating.title
+      description:
+        i18n: macro.nonrepeating.description
       layout: inline
       config: true
     - key: repeating-localised-date-macro-for-confluence
@@ -19,10 +20,10 @@ modules:
         function: resolver
       adfExport:
         function: adf-export-repeating
-      title: Repeating Localised Date Macro
-      description: Provide a date and time in a specific time zone, with a repetition
-        period, and viewers will see it in their local timezone in a way that
-        keeps repeating every period.
+      title:
+        i18n: macro.repeating.title
+      description:
+        i18n: macro.repeating.description
       layout: inline
       config: true
   function:
@@ -32,6 +33,14 @@ modules:
       handler: index.handleNonRepeating
     - key: adf-export-repeating
       handler: index.handleRepeating
+translations:
+  resources:
+    - key: en-US
+      path: locales/en-US.json
+    - key: en-GB
+      path: locales/en-GB.json
+  fallback:
+    default: en-GB
 resources:
   - key: main-nonrepeating
     path: src/frontend/non-repeating.jsx

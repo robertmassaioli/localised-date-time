@@ -1,0 +1,12 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Localized date macro",
+      "description": "Display times in each viewer’s time zone"
+    },
+    "repeating": {
+      "title": "Repeating localized date macro",
+      "description": "Display recurring times in viewers’ time zones"
+    }
+  }
+}

@@ -4,13 +4,13 @@ A [Forge](https://developer.atlassian.com/platform/forge/) app for Confluence th
 
 ## Macros
 
-### Localised Date Macro
+### Localized date macro
 
 Displays a single, fixed date and time. You configure the date, time, and the timezone you wrote it in — viewers see it converted to their own timezone.
 
 **Example use case:** "The release is at 3:00 pm AEST on Friday" — viewers in New York see "Thu, Nov 14, 2024 11:00pm EST" automatically.
 
-### Repeating Localised Date Macro
+### Repeating localized date macro
 
 Displays the **next upcoming occurrence** of a recurring event, always converting to the viewer's timezone. Supports hourly, daily, weekly, and annual recurrence with a configurable period.
 
