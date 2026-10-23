@@ -8,6 +8,8 @@
     "lint": "./node_modules/.bin/eslint src/**/* || npm run --silent hook-errors",
     "gen-options": "node ./generate-options.js",
     "test": "jest",
+    "deploy:dev": "forge deploy -e development",
+    "deploy:prod": "forge deploy -e production",
     "hook-errors": "echo '\\x1b[31mThe build failed because a Forge UI hook is being used incorrectly. Forge UI hooks follow the same rules as React Hooks but have their own API definitions. See the Forge documentation for details on how to use Forge UI hooks.\\n' && exit 1"
   },
   "jest": {
