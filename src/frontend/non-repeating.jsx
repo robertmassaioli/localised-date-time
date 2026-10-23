@@ -4,7 +4,7 @@ import moment from 'moment-timezone';
 import { isPresent } from 'ts-is-present';
 import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN, FORMAT_NASA_COUNTDOWN } from "../displayOptions";
 import { TimeZones } from "../timezones";
-import { parseTime, renderDateLozenge, renderValidationError, validateConfig } from './common';
+import { parseTime, renderDateLozenge, validateConfig } from './common';
 import { useDateMacroContext } from './useDateMacroContext';
 
 const App = () => {
@@ -12,7 +12,7 @@ const App = () => {
 
   // Shared validation
   const error = validateConfig(details, config);
-  if (error) return renderValidationError(error, { details, config, timeZone });
+  if (error) return <Text>{error}</Text>;
 
   // Shared time parsing
   const parsed = parseTime(config.time);
