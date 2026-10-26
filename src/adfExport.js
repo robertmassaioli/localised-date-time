@@ -2,7 +2,7 @@ import api, { route } from '@forge/api';
 import moment from 'moment-timezone';
 import { validateConfig, parseTime } from './configHelpers';
 import { displayText, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, formatRequiresLiveUpdates } from './displayOptions';
-import { nextRepeatDate, repetitionToUnits } from './repetition';
+import { nextRepeatDate, repetitionToUnits, REPEAT_WEEKLY } from './repetition';
 
 /**
  * Attempts to resolve the viewer's timezone via the Confluence users-bulk API.
@@ -174,7 +174,7 @@ export async function handleRepeating(payload) {
   const accountId = payload?.context?.accountId;
   console.info('[adfExport] handleRepeating: config =', JSON.stringify(config), 'accountId =', accountId);
 
-  const validationError = validateConfig(config, config, ['date', 'time', 'timeZone', 'repetitionUnit', 'repetitionPeriod']);
+  const validationError = validateConfig(config, config, ['date', 'time', 'timeZone', 'repetitionPeriod']);
   if (validationError) {
     console.warn('[adfExport] handleRepeating: invalid config:', validationError);
     return errorAdf(validationError);
@@ -195,7 +195,7 @@ export async function handleRepeating(payload) {
 
   const viewerTimezone = await getUserTimezone(accountId, config.timeZone);
   const startDate = moment.tz(`${config.date} ${parsedTime.time} ${parsedTime.meridiem}`, 'YYYY-MM-DD h:mm a', config.timeZone);
-  const unit = repetitionToUnits(config.repetitionUnit);
+  const unit = repetitionToUnits(config.repetitionUnit ?? REPEAT_WEEKLY);
   const originalDate = nextRepeatDate(startDate, repetitionPeriod, unit);
   console.info('[adfExport] handleRepeating: viewerTimezone =', viewerTimezone, 'startDate =', startDate.format(), 'unit =', unit, 'originalDate =', originalDate.format(), 'originalDate.tz() =', originalDate.tz());
 

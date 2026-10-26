@@ -28,9 +28,9 @@ const App = () => {
     );
   }
 
-  const { repetitionUnit } = config;
+  const repetitionUnit = config.repetitionUnit ?? REPEAT_WEEKLY;
   const repetitionPeriodRaw = config.repetitionPeriod;
-  if (!isPresent(repetitionUnit) || !isPresent(repetitionPeriodRaw)) {
+  if (!isPresent(repetitionPeriodRaw)) {
     return (
       <Text>Repetition period not configured. Please configure it in the Macro Configuration.</Text>
     );
@@ -61,11 +61,11 @@ const Config = () => {
       <Label labelFor='time'>Time</Label>
       <Textfield
               name="time"
-              description="The Time, in your local time in the following format: hh:mm am/pm"
+              description="The time, in the timezone selected below, in the format hh:mm am/pm"
               placeholder="12:00am"
               />
       <Label labelFor="date">Start Date</Label>
-      <DatePicker name="date" description="The start Date, in your local time for repeating events." />
+      <DatePicker name="date" description="The start date, in the timezone selected below." />
       <Label labelFor='timeZone'>Timezone</Label>
       <Select
         name="timeZone"
@@ -77,6 +77,7 @@ const Config = () => {
       <Select
         name="repetitionUnit"
         isRequired
+        defaultValue={{ label: 'Week (Default)', value: REPEAT_WEEKLY }}
         description="What unit of time to use for the repetitions."
         options={[
           { label: 'Week (Default)', value: REPEAT_WEEKLY },
@@ -95,6 +96,7 @@ const Config = () => {
       <Select
         name="displayOption"
         isRequired
+        defaultValue={{ label: 'Localised Date/Time (Default)', value: FORMAT_DEFAULT }}
         description="How your date will be displayed to the viewer."
         options={[
           { label: 'Localised Date/Time (Default)', value: FORMAT_DEFAULT },

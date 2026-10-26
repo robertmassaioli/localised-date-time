@@ -45,11 +45,11 @@ const Config = () => {
       <Label labelFor='time'>Time</Label>
       <Textfield
               name="time"
-              description="The Time, in your local time in the following format: hh:mm am/pm"
+              description="The time, in the timezone selected below, in the format hh:mm am/pm"
               placeholder="12:00am"
               />
       <Label labelFor="date">Date</Label>
-      <DatePicker name="date" description="The Date, in your local time. Or starting date for repeating events." />
+      <DatePicker name="date" description="The date, in the timezone selected below." />
       <Label labelFor='timeZone'>Timezone</Label>
       <Select
         name="timeZone"
@@ -61,6 +61,7 @@ const Config = () => {
       <Select
         name="displayOption"
         isRequired
+        defaultValue={{ label: 'Localised Date/Time (Default)', value: FORMAT_DEFAULT }}
         description="How your date will be displayed to the viewer."
         options={[
           { label: 'Localised Date/Time (Default)', value: FORMAT_DEFAULT },

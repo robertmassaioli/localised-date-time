@@ -1,5 +1,4 @@
 import React from 'react';
-import moment from 'moment-timezone';
 import { displayText, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC } from "../displayOptions";
 import { Lozenge, Tooltip, Text } from '@forge/react';
 export { validateConfig, parseTime } from '../configHelpers';
@@ -10,7 +9,6 @@ export function renderDateLozenge({
   config
 }) {
   let date = originalDate;
-  const now = moment();
 
   if (typeof timeZone === 'string') {
     date = originalDate.clone().tz(timeZone);
@@ -21,7 +19,7 @@ export function renderDateLozenge({
         return (
           <>
             <Text>
-              <Lozenge key={`badge-${now}`}>{displayText('default', date)}</Lozenge>
+              <Lozenge>{displayText('default', date)}</Lozenge>
               {' '}
               (<Lozenge>{displayText('default', originalDate)}</Lozenge>)
             </Text>
@@ -31,7 +29,7 @@ export function renderDateLozenge({
         return (
           <>
             <Tooltip content="Co-located: You are viewing this date-time from the same timezone it was configured for.">
-              <Lozenge key={`badge-${now}`}>{displayText(config.displayOption, date)}</Lozenge>
+              <Lozenge>{displayText(config.displayOption, date)}</Lozenge>
             </Tooltip>
           </>
         );
@@ -41,7 +39,7 @@ export function renderDateLozenge({
       return (
         <>
           <Text>
-            <Lozenge key={`badge-${now}`}>{displayText('default', utcDate)}</Lozenge>
+            <Lozenge>{displayText('default', utcDate)}</Lozenge>
             {' '}
             (<Lozenge>{displayText('default', date)}</Lozenge>)
           </Text>
@@ -52,7 +50,7 @@ export function renderDateLozenge({
 
   return (
     <>
-      <Lozenge key={`badge-${now}`}>{displayText(config.displayOption, date)}</Lozenge>
+      <Lozenge>{displayText(config.displayOption, date)}</Lozenge>
     </>
   );
 }

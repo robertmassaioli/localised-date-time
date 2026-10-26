@@ -6,3 +6,6 @@
 # Downloaded documentation files
 Node - status.html
 Node - status_files/
+
+# Forge CLI local state (tunnel output)
+/.forge/
