@@ -1,6 +1,6 @@
 import api, { route } from '@forge/api';
-import moment from 'moment-timezone';
 import { validateConfig, parseTime } from './configHelpers';
+import { inZone, parseConfiguredDate } from './dateTime';
 import { displayText, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, formatRequiresLiveUpdates } from './displayOptions';
 import { nextRepeatDate, repetitionToUnits, REPEAT_WEEKLY } from './repetition';
 
@@ -98,7 +98,7 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
   }
 
   if (displayOption === FORMAT_DEFAULT_AND_ORIGINAL) {
-    const sameTimezone = displayDate.tz() === originalDate.tz();
+    const sameTimezone = displayDate.zoneName === originalDate.zoneName;
     if (sameTimezone) {
       return [paragraph([statusNode(displayText('default', displayDate))])];
     }
@@ -113,7 +113,7 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
   }
 
   if (displayOption === FORMAT_DEFAULT_AND_UTC) {
-    const utcDate = originalDate.clone().tz('UTC');
+    const utcDate = originalDate.setZone('UTC');
     return [
       paragraph([
         statusNode(displayText('default', utcDate)),
@@ -132,7 +132,7 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
  * Shared logic for computing the ADF output given a config and viewer timezone.
  */
 function buildAdf(originalDate, viewerTimezone, config) {
-  const displayDate = originalDate.clone().tz(viewerTimezone);
+  const displayDate = inZone(originalDate, viewerTimezone);
   const content = buildAdfContent(config.displayOption, displayDate, originalDate);
   return { version: 1, type: 'doc', content };
 }
@@ -154,7 +154,7 @@ export async function handleNonRepeating(payload) {
   }
 
   const viewerTimezone = await getUserTimezone(accountId, config.timeZone);
-  const originalDate = moment.tz(`${config.date} ${parsedTime.time} ${parsedTime.meridiem}`, 'YYYY-MM-DD h:mm a', config.timeZone);
+  const originalDate = parseConfiguredDate(config.date, parsedTime.time, parsedTime.meridiem, config.timeZone);
 
   return buildAdf(originalDate, viewerTimezone, config);
 }
@@ -182,7 +182,7 @@ export async function handleRepeating(payload) {
   }
 
   const viewerTimezone = await getUserTimezone(accountId, config.timeZone);
-  const startDate = moment.tz(`${config.date} ${parsedTime.time} ${parsedTime.meridiem}`, 'YYYY-MM-DD h:mm a', config.timeZone);
+  const startDate = parseConfiguredDate(config.date, parsedTime.time, parsedTime.meridiem, config.timeZone);
   const unit = repetitionToUnits(config.repetitionUnit ?? REPEAT_WEEKLY);
   const originalDate = nextRepeatDate(startDate, repetitionPeriod, unit);
 
