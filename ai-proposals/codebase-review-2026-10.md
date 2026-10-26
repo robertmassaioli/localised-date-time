@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status as of 2026-10-26:** section 1 is done and in PR #10. Section 2 is done except 2.6 (the `npm audit` review, deferred on request) and is on the branch `codebase-review-batch-2`. Sections 3 and 4 are pending, except 3.1, which is won't do for now. Status values: ✅ done, ⬜ pending or open, ⛔ won't do.
+**Status as of 2026-10-26:** section 1 is done (PR #10). Section 2 is done except 2.6, the `npm audit` review, which is deferred on request (PR #11). 4.3, the Luxon migration, is done (PR #13). 3.1 and 4.2 are won't do for now. The rest of sections 3 and 4 are pending. Status values: ✅ done, ⬜ pending or open, ⛔ won't do.
 
 A full read of the Localised Date Macro codebase after the Forge dependency upgrade (`@forge/react` 12, `@forge/bridge` 7, `@forge/api` 8, `@forge/resolver` 2) and the `useConfig` fix. This document lists what is broken, what is risky, and what we could add. It continues `improvements.md`, which still has four pending items (#5, #7, #8, #9). Where an item here overlaps one of those, the table says so.
 
@@ -59,7 +59,7 @@ These are the first batch to fix. They are small, and the branch `codebase-revie
 | # | Problem | Fix | Effort | Status |
 |---|---------|-----|--------|--------|
 | 4.1 | Both macros duplicate their Config forms and the display option lists. Only the hook was shared. | Pull the shared fields (Time, Date, Timezone, Display format) into one component. | M | ⬜ Pending |
-| 4.2 | `src/timezones.js` is a 600-line generated file that includes legacy aliases such as `Africa/Asmera` next to `Africa/Asmara`. | Use `Intl.supportedValuesOf('timeZone')` or `moment.tz.names()` and remove the file and `generate-options.js`. | S | ⬜ Pending |
+| 4.2 | `src/timezones.js` is a 600-line generated file that includes legacy aliases such as `Africa/Asmera` next to `Africa/Asmara`. | Use `Intl.supportedValuesOf('timeZone')` or `moment.tz.names()` and remove the file and `generate-options.js`. | S | ⛔ Won't do (for now). Re-evaluated on `main` after the Luxon migration: `Intl.supportedValuesOf('timeZone')` has 418 names, lacks `UTC`, `Asia/Kolkata`, `Europe/Kyiv` and `Asia/Kathmandu`, and uses the older CLDR names. A curated `timezones.js` would hide the 152 duplicate aliases, but that needs a check of how the config `Select` treats saved aliases first. |
 | 4.3 | `moment` is in maintenance mode. | Move to `Intl` or Luxon. Best done together with 3.2. | M | ✅ Done on branch `luxon-migration` (Luxon, see `luxon-migration.md`). 3.2 is still open |
 | 4.4 | Label associations on the config form (`improvements.md` #7). | See that document. | S | ⬜ Pending |
 
