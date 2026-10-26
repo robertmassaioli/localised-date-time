@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Fjölvi fyrir staðfærða dagsetningu",
+      "description": "Sýnir tíma á tímabelti hvers áhorfanda"
+    },
+    "repeating": {
+      "title": "Fjölvi fyrir endurtekna staðfærða dagsetningu",
+      "description": "Sýnir endurtekna tíma á tímabeltum áhorfenda"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Tími",
+      "description": "Tíminn á tímabeltinu sem er valið hér fyrir neðan, á sniðinu hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Dagsetning",
+      "description": "Dagsetningin á tímabeltinu sem er valið hér fyrir neðan."
+    },
+    "startDate": {
+      "label": "Upphafsdagsetning",
+      "description": "Upphafsdagsetningin á tímabeltinu sem er valið hér fyrir neðan."
+    },
+    "timeZone": {
+      "label": "Tímabelti",
+      "description": "Tímabeltið sem dagsetningin og tíminn hér að ofan eru stillt fyrir. Ef þú skrifaðir þau á staðartíma skaltu velja þitt staðartímabelti."
+    },
+    "repetitionUnit": {
+      "label": "Endurtekningareining",
+      "description": "Hvaða tímaeining er notuð fyrir endurtekningarnar.",
+      "week": "Vika (sjálfgefið)",
+      "day": "Dagur",
+      "year": "Ár",
+      "hour": "Klukkustund"
+    },
+    "repetitionPeriod": {
+      "label": "Tímabil",
+      "description": "Fjöldi eininga (vikna, daga o.s.frv.) áður en atburðurinn endurtekur sig. Verður að vera 1 eða hærra."
+    },
+    "displayOption": {
+      "label": "Birtingarsnið",
+      "description": "Hvernig dagsetningin birtist áhorfandanum.",
+      "default": "Staðfærð dagsetning/tími (sjálfgefið)",
+      "defaultAndOriginal": "Staðfærð dagsetning/tími (með stillta tímabeltinu)",
+      "defaultAndUtc": "UTC (með staðfærðri dagsetningu/tíma)",
+      "humanCountdown": "Niðurtalning / tími liðinn",
+      "nasaCountdown": "Niðurtalning T-(plús/mínus)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Fjölvi er ekki stilltur. Stilltu það í stillingum fjölvans.",
+      "date": "Dagsetning er ekki stillt. Stilltu það í stillingum fjölvans.",
+      "time": "Tími er ekki stilltur. Stilltu það í stillingum fjölvans.",
+      "timeZone": "Tímabelti er ekki stillt. Stilltu það í stillingum fjölvans.",
+      "repetitionPeriod": "Endurtekningartímabil er ekki stillt. Stilltu það í stillingum fjölvans.",
+      "field": "{field} er ekki stillt. Stilltu það í stillingum fjölvans."
+    },
+    "repetitionPeriodInvalid": "Endurtekningartímabil verður að vera heiltala sem er 1 eða hærri.",
+    "repetitionPeriodInvalidWithHint": "Endurtekningartímabil verður að vera heiltala sem er 1 eða hærri. Stilltu það í stillingum fjölvans.",
+    "invalidTime": "Tíminn \"{time}\" er ekki á sniðinu \"XX:XX (am|pm)\"! Gild dæmi eru: \"9:00 am\" eða \"12:45 pm\"."
+  },
+  "tooltip": {
+    "colocated": "Sama staðsetning: Þú skoðar þessa dagsetningu og tíma frá sama tímabelti og hún var stillt fyrir."
+  },
+  "export": {
+    "countdownNote": "(niðurtalning er ekki í boði í útflutningi)"
+  }
+}

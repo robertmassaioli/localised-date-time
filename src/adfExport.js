@@ -1,7 +1,8 @@
-import api, { route } from '@forge/api';
+import api, { i18n, route } from '@forge/api';
 import { validateConfig, parseTime } from './configHelpers';
 import { inZone, parseConfiguredDate } from './dateTime';
 import { displayText, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, formatRequiresLiveUpdates } from './displayOptions';
+import { DEFAULT_LOCALE, makeTranslate } from './i18n';
 import { nextRepeatDate, repetitionToUnits, REPEAT_WEEKLY } from './repetition';
 
 /**
@@ -37,6 +38,24 @@ async function getUserTimezone(accountId, configuredTimezone) {
     console.warn('[adfExport] users-bulk request threw, using the configured timezone:', e);
     return configuredTimezone;
   }
+}
+
+/**
+ * Builds the translate function for the export.
+ * Forge does not send the viewer's locale to adfExport, so this uses payload.context.locale when it is present
+ * and the default locale otherwise. A translation failure never breaks an export.
+ * https://developer.atlassian.com/platform/forge/runtime-reference/i18n/
+ */
+async function getTranslate(payload) {
+  const candidates = [payload?.context?.locale, DEFAULT_LOCALE].filter(locale => typeof locale === 'string' && locale);
+  for (const locale of candidates) {
+    try {
+      return makeTranslate(await i18n.createTranslationFunction(locale));
+    } catch (e) {
+      console.warn(`[adfExport] could not load translations for ${locale}:`, e);
+    }
+  }
+  return makeTranslate(key => key);
 }
 
 /**
@@ -86,13 +105,13 @@ function plainText(text) {
  * For countdown formats (which are inherently dynamic), falls back to the absolute date display
  * since exports are static snapshots.
  */
-function buildAdfContent(displayOption, displayDate, originalDate) {
+function buildAdfContent(displayOption, displayDate, originalDate, t) {
   // Countdown formats don't make sense in a static export, so show the absolute date with a note
   if (formatRequiresLiveUpdates(displayOption)) {
     return [
       paragraph([
         statusNode(displayText('default', displayDate)),
-        plainText(' (countdown not available in export)')
+        plainText(` ${t('export.countdownNote')}`)
       ])
     ];
   }
@@ -131,23 +150,24 @@ function buildAdfContent(displayOption, displayDate, originalDate) {
 /**
  * Shared logic for computing the ADF output given a config and viewer timezone.
  */
-function buildAdf(originalDate, viewerTimezone, config) {
+function buildAdf(originalDate, viewerTimezone, config, t) {
   const displayDate = inZone(originalDate, viewerTimezone);
-  const content = buildAdfContent(config.displayOption, displayDate, originalDate);
+  const content = buildAdfContent(config.displayOption, displayDate, originalDate, t);
   return { version: 1, type: 'doc', content };
 }
 
 export async function handleNonRepeating(payload) {
   const config = payload?.extensionPayload?.config;
   const accountId = payload?.context?.accountId;
+  const t = await getTranslate(payload);
 
-  const validationError = validateConfig(config, config, ['date', 'time', 'timeZone']);
+  const validationError = validateConfig(config, config, t, ['date', 'time', 'timeZone']);
   if (validationError) {
     console.warn('[adfExport] handleNonRepeating: invalid config:', validationError);
     return errorAdf(validationError);
   }
 
-  const parsedTime = parseTime(config.time);
+  const parsedTime = parseTime(config.time, t);
   if (parsedTime.error) {
     console.warn('[adfExport] handleNonRepeating: invalid time:', parsedTime.error);
     return errorAdf(parsedTime.error);
@@ -156,20 +176,21 @@ export async function handleNonRepeating(payload) {
   const viewerTimezone = await getUserTimezone(accountId, config.timeZone);
   const originalDate = parseConfiguredDate(config.date, parsedTime.time, parsedTime.meridiem, config.timeZone);
 
-  return buildAdf(originalDate, viewerTimezone, config);
+  return buildAdf(originalDate, viewerTimezone, config, t);
 }
 
 export async function handleRepeating(payload) {
   const config = payload?.extensionPayload?.config;
   const accountId = payload?.context?.accountId;
+  const t = await getTranslate(payload);
 
-  const validationError = validateConfig(config, config, ['date', 'time', 'timeZone', 'repetitionPeriod']);
+  const validationError = validateConfig(config, config, t, ['date', 'time', 'timeZone', 'repetitionPeriod']);
   if (validationError) {
     console.warn('[adfExport] handleRepeating: invalid config:', validationError);
     return errorAdf(validationError);
   }
 
-  const parsedTime = parseTime(config.time);
+  const parsedTime = parseTime(config.time, t);
   if (parsedTime.error) {
     console.warn('[adfExport] handleRepeating: invalid time:', parsedTime.error);
     return errorAdf(parsedTime.error);
@@ -178,7 +199,7 @@ export async function handleRepeating(payload) {
   const repetitionPeriod = parseInt(config.repetitionPeriod, 10);
   if (isNaN(repetitionPeriod) || repetitionPeriod < 1) {
     console.warn('[adfExport] handleRepeating: invalid repetitionPeriod:', config.repetitionPeriod);
-    return errorAdf('Repetition period must be a whole number of 1 or higher.');
+    return errorAdf(t('error.repetitionPeriodInvalid'));
   }
 
   const viewerTimezone = await getUserTimezone(accountId, config.timeZone);
@@ -186,5 +207,5 @@ export async function handleRepeating(payload) {
   const unit = repetitionToUnits(config.repetitionUnit ?? REPEAT_WEEKLY);
   const originalDate = nextRepeatDate(startDate, repetitionPeriod, unit);
 
-  return buildAdf(originalDate, viewerTimezone, config);
+  return buildAdf(originalDate, viewerTimezone, config, t);
 }

@@ -23,6 +23,9 @@ jest.mock('@forge/react', () => ({
   Textfield: 'Textfield',
   Lozenge: 'Lozenge',
   Tooltip: 'Tooltip',
+  // Translations are ready at once and return the key, so the tests do not depend on wording.
+  I18nProvider: ({ children }) => children,
+  useTranslation: () => ({ ready: true, t: key => key }),
   useConfig: () => undefined,
   useProductContext: () => mockContext
 }));
@@ -31,7 +34,8 @@ function loadConfig(modulePath) {
   jest.isolateModules(() => {
     require(modulePath);
   });
-  return mockConfigElement.type;
+  // addConfig receives <I18nProvider><Config /></I18nProvider>, so the config component is its child.
+  return mockConfigElement.props.children.type;
 }
 
 function findSelect(node, name) {

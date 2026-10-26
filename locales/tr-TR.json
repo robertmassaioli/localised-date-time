@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Yerelleştirilmiş tarih makrosu",
+      "description": "Saatleri her görüntüleyenin saat diliminde gösterir"
+    },
+    "repeating": {
+      "title": "Yinelenen yerelleştirilmiş tarih makrosu",
+      "description": "Yinelenen saatleri görüntüleyenlerin saat dilimlerinde gösterir"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Saat",
+      "description": "Aşağıda seçilen saat dilimindeki saat, hh:mm am/pm biçiminde",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Tarih",
+      "description": "Aşağıda seçilen saat dilimindeki tarih."
+    },
+    "startDate": {
+      "label": "Başlangıç tarihi",
+      "description": "Aşağıda seçilen saat dilimindeki başlangıç tarihi."
+    },
+    "timeZone": {
+      "label": "Saat dilimi",
+      "description": "Yukarıdaki tarih ve saatin yapılandırıldığı saat dilimi. Bunları yerel saatinize göre yazdıysanız yerel saat diliminizi seçin."
+    },
+    "repetitionUnit": {
+      "label": "Yineleme birimi",
+      "description": "Yinelemeler için kullanılacak zaman birimi.",
+      "week": "Hafta (varsayılan)",
+      "day": "Gün",
+      "year": "Yıl",
+      "hour": "Saat"
+    },
+    "repetitionPeriod": {
+      "label": "Dönem",
+      "description": "Bu etkinlik yinelenmeden önceki birim sayısı (hafta, gün vb.). 1 veya daha yüksek olmalıdır."
+    },
+    "displayOption": {
+      "label": "Görüntüleme biçimi",
+      "description": "Tarihin görüntüleyene nasıl gösterileceği.",
+      "default": "Yerelleştirilmiş tarih/saat (varsayılan)",
+      "defaultAndOriginal": "Yerelleştirilmiş tarih/saat (yapılandırılan saat dilimiyle)",
+      "defaultAndUtc": "UTC (yerelleştirilmiş tarih/saatle)",
+      "humanCountdown": "Geri sayım / geçen süre",
+      "nasaCountdown": "Geri sayım T-(artı/eksi)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Makro yapılandırılmadı. Lütfen bunu makro yapılandırmasında yapılandırın.",
+      "date": "Tarih yapılandırılmadı. Lütfen bunu makro yapılandırmasında yapılandırın.",
+      "time": "Saat yapılandırılmadı. Lütfen bunu makro yapılandırmasında yapılandırın.",
+      "timeZone": "Saat dilimi yapılandırılmadı. Lütfen bunu makro yapılandırmasında yapılandırın.",
+      "repetitionPeriod": "Yineleme dönemi yapılandırılmadı. Lütfen bunu makro yapılandırmasında yapılandırın.",
+      "field": "{field} yapılandırılmadı. Lütfen bunu makro yapılandırmasında yapılandırın."
+    },
+    "repetitionPeriodInvalid": "Yineleme dönemi 1 veya daha yüksek bir tam sayı olmalıdır.",
+    "repetitionPeriodInvalidWithHint": "Yineleme dönemi 1 veya daha yüksek bir tam sayı olmalıdır. Lütfen bunu makro yapılandırmasında yapılandırın.",
+    "invalidTime": "\"{time}\" saati \"XX:XX (am|pm)\" biçiminde değil! Geçerli değer örnekleri: \"9:00 am\" veya \"12:45 pm\"."
+  },
+  "tooltip": {
+    "colocated": "Aynı konum: Bu tarih ve saati, yapılandırıldığı saat diliminden görüntülüyorsunuz."
+  },
+  "export": {
+    "countdownNote": "(geri sayım dışa aktarmada kullanılamaz)"
+  }
+}

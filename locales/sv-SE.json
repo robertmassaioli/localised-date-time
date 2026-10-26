@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Makro för lokaliserat datum",
+      "description": "Visar tider i varje läsares tidszon"
+    },
+    "repeating": {
+      "title": "Makro för återkommande lokaliserat datum",
+      "description": "Visar återkommande tider i läsarnas tidszoner"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Tid",
+      "description": "Tiden i tidszonen som valts nedan, i formatet hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Datum",
+      "description": "Datumet i tidszonen som valts nedan."
+    },
+    "startDate": {
+      "label": "Startdatum",
+      "description": "Startdatumet i tidszonen som valts nedan."
+    },
+    "timeZone": {
+      "label": "Tidszon",
+      "description": "Tidszonen som datumet och tiden ovan är konfigurerade för. Om du har skrivit dem i din lokala tid väljer du din lokala tidszon."
+    },
+    "repetitionUnit": {
+      "label": "Upprepningsenhet",
+      "description": "Vilken tidsenhet som används för upprepningarna.",
+      "week": "Vecka (standard)",
+      "day": "Dag",
+      "year": "År",
+      "hour": "Timme"
+    },
+    "repetitionPeriod": {
+      "label": "Period",
+      "description": "Antalet enheter (veckor, dagar osv.) innan händelsen upprepas. Måste vara 1 eller högre."
+    },
+    "displayOption": {
+      "label": "Visningsformat",
+      "description": "Hur datumet visas för läsaren.",
+      "default": "Lokaliserat datum/tid (standard)",
+      "defaultAndOriginal": "Lokaliserat datum/tid (med konfigurerad tidszon)",
+      "defaultAndUtc": "UTC (med lokaliserat datum/tid)",
+      "humanCountdown": "Nedräkning / tid sedan",
+      "nasaCountdown": "Nedräkning T-(plus/minus)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Makrot är inte konfigurerat. Konfigurera det i makrokonfigurationen.",
+      "date": "Datumet är inte konfigurerat. Konfigurera det i makrokonfigurationen.",
+      "time": "Tiden är inte konfigurerad. Konfigurera det i makrokonfigurationen.",
+      "timeZone": "Tidszonen är inte konfigurerad. Konfigurera det i makrokonfigurationen.",
+      "repetitionPeriod": "Upprepningsperioden är inte konfigurerad. Konfigurera det i makrokonfigurationen.",
+      "field": "{field} är inte konfigurerat. Konfigurera det i makrokonfigurationen."
+    },
+    "repetitionPeriodInvalid": "Upprepningsperioden måste vara ett heltal som är 1 eller högre.",
+    "repetitionPeriodInvalidWithHint": "Upprepningsperioden måste vara ett heltal som är 1 eller högre. Konfigurera det i makrokonfigurationen.",
+    "invalidTime": "Tiden \"{time}\" har inte formatet \"XX:XX (am|pm)\"! Giltiga exempel är: \"9:00 am\" eller \"12:45 pm\"."
+  },
+  "tooltip": {
+    "colocated": "Samma plats: Du visar det här datumet och den här tiden från samma tidszon som den konfigurerades för."
+  },
+  "export": {
+    "countdownNote": "(nedräkning är inte tillgänglig i export)"
+  }
+}

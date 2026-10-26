@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Macro de data localizada",
+      "description": "Apresenta as horas no fuso horário de cada leitor"
+    },
+    "repeating": {
+      "title": "Macro de data localizada recorrente",
+      "description": "Apresenta as horas recorrentes nos fusos horários dos leitores"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Hora",
+      "description": "A hora, no fuso horário selecionado abaixo, no formato hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Data",
+      "description": "A data, no fuso horário selecionado abaixo."
+    },
+    "startDate": {
+      "label": "Data de início",
+      "description": "A data de início, no fuso horário selecionado abaixo."
+    },
+    "timeZone": {
+      "label": "Fuso horário",
+      "description": "O fuso horário para o qual a data e a hora acima estão configuradas. Se as escreveu na sua hora local, selecione o seu fuso horário local."
+    },
+    "repetitionUnit": {
+      "label": "Unidade de repetição",
+      "description": "Que unidade de tempo utilizar nas repetições.",
+      "week": "Semana (predefinição)",
+      "day": "Dia",
+      "year": "Ano",
+      "hour": "Hora"
+    },
+    "repetitionPeriod": {
+      "label": "Período",
+      "description": "O número de unidades (semanas, dias, etc.) antes de o evento se repetir. Tem de ser 1 ou superior."
+    },
+    "displayOption": {
+      "label": "Formato de apresentação",
+      "description": "Como a data será apresentada ao leitor.",
+      "default": "Data/hora localizada (predefinição)",
+      "defaultAndOriginal": "Data/hora localizada (com o fuso horário configurado)",
+      "defaultAndUtc": "UTC (com data/hora localizada)",
+      "humanCountdown": "Contagem decrescente / tempo decorrido",
+      "nasaCountdown": "Contagem decrescente T-(mais/menos)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "A macro não está configurada. Configure-o na configuração da macro.",
+      "date": "A data não está configurada. Configure-o na configuração da macro.",
+      "time": "A hora não está configurada. Configure-o na configuração da macro.",
+      "timeZone": "O fuso horário não está configurado. Configure-o na configuração da macro.",
+      "repetitionPeriod": "O período de repetição não está configurado. Configure-o na configuração da macro.",
+      "field": "{field} não está configurado. Configure-o na configuração da macro."
+    },
+    "repetitionPeriodInvalid": "O período de repetição tem de ser um número inteiro igual ou superior a 1.",
+    "repetitionPeriodInvalidWithHint": "O período de repetição tem de ser um número inteiro igual ou superior a 1. Configure-o na configuração da macro.",
+    "invalidTime": "A hora \"{time}\" não está no formato \"XX:XX (am|pm)\"! Exemplos de valores válidos: \"9:00 am\" ou \"12:45 pm\"."
+  },
+  "tooltip": {
+    "colocated": "Mesmo local: está a ver esta data e hora a partir do mesmo fuso horário para o qual foram configuradas."
+  },
+  "export": {
+    "countdownNote": "(contagem decrescente indisponível na exportação)"
+  }
+}

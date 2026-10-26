@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Macro pentru data localizată",
+      "description": "Afișează orele în fusul orar al fiecărui cititor"
+    },
+    "repeating": {
+      "title": "Macro pentru data localizată recurentă",
+      "description": "Afișează orele recurente în fusurile orare ale cititorilor"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Ora",
+      "description": "Ora, în fusul orar selectat mai jos, în formatul hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Data",
+      "description": "Data, în fusul orar selectat mai jos."
+    },
+    "startDate": {
+      "label": "Data de început",
+      "description": "Data de început, în fusul orar selectat mai jos."
+    },
+    "timeZone": {
+      "label": "Fus orar",
+      "description": "Fusul orar pentru care sunt configurate data și ora de mai sus. Dacă le-ați scris în ora locală, selectați fusul orar local."
+    },
+    "repetitionUnit": {
+      "label": "Unitate de repetare",
+      "description": "Ce unitate de timp se folosește pentru repetări.",
+      "week": "Săptămână (implicit)",
+      "day": "Zi",
+      "year": "An",
+      "hour": "Oră"
+    },
+    "repetitionPeriod": {
+      "label": "Perioadă",
+      "description": "Numărul de unități (săptămâni, zile etc.) după care se repetă evenimentul. Trebuie să fie 1 sau mai mare."
+    },
+    "displayOption": {
+      "label": "Format de afișare",
+      "description": "Cum va fi afișată data pentru cititor.",
+      "default": "Dată/oră localizată (implicit)",
+      "defaultAndOriginal": "Dată/oră localizată (cu fusul orar configurat)",
+      "defaultAndUtc": "UTC (cu dată/oră localizată)",
+      "humanCountdown": "Numărătoare inversă / timp scurs",
+      "nasaCountdown": "Numărătoare inversă T-(plus/minus)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Macroul nu este configurat. Configurați acest element în configurația macroului.",
+      "date": "Data nu este configurată. Configurați acest element în configurația macroului.",
+      "time": "Ora nu este configurată. Configurați acest element în configurația macroului.",
+      "timeZone": "Fusul orar nu este configurat. Configurați acest element în configurația macroului.",
+      "repetitionPeriod": "Perioada de repetare nu este configurată. Configurați acest element în configurația macroului.",
+      "field": "{field} nu este configurat. Configurați acest element în configurația macroului."
+    },
+    "repetitionPeriodInvalid": "Perioada de repetare trebuie să fie un număr întreg egal cu 1 sau mai mare.",
+    "repetitionPeriodInvalidWithHint": "Perioada de repetare trebuie să fie un număr întreg egal cu 1 sau mai mare. Configurați acest element în configurația macroului.",
+    "invalidTime": "Ora „{time}” nu are formatul „XX:XX (am|pm)”! Exemple de valori valide: „9:00 am” sau „12:45 pm”."
+  },
+  "tooltip": {
+    "colocated": "Aceeași locație: vizualizați această dată și oră din același fus orar pentru care au fost configurate."
+  },
+  "export": {
+    "countdownNote": "(numărătoarea inversă nu este disponibilă la export)"
+  }
+}
