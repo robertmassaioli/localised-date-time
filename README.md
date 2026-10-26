@@ -56,7 +56,7 @@ The **Repeating** macro adds:
 
 The app has two rendering paths:
 
-1. **Client-side (UI Kit):** `src/frontend/non-repeating.jsx` and `src/frontend/repeating.jsx` render the macro inline in Confluence using React and `moment-timezone`. The viewer's timezone is read from `view.getContext()`.
+1. **Client-side (UI Kit):** `src/frontend/non-repeating.jsx` and `src/frontend/repeating.jsx` render the macro inline in Confluence using React and [Luxon](https://moment.github.io/luxon/#/). The viewer's timezone is read from `view.getContext()`.
 
 2. **Server-side ADF export:** `src/adfExport.js` handles PDF, Word, and mobile exports. It calls the Confluence Users API to resolve the viewer's timezone and returns a static [ADF](https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/) document. This ensures exports show meaningful, timezone-correct content rather than being blank.
 
@@ -111,7 +111,18 @@ The file `src/timezones.js` is auto-generated from the latest `moment-timezone` 
 npm run gen-options
 ```
 
-This fetches the current timezone list from the `moment-timezone` GitHub repository and overwrites `src/timezones.js`.
+This fetches the current timezone list from the `moment-timezone` GitHub repository and overwrites `src/timezones.js`. The app itself no longer depends on `moment-timezone`.
+
+### Timezone abbreviations
+
+The macro shows tz-database abbreviations such as `AEDT` and `EST`. Luxon takes zone names from `Intl`, which prints `GMT+11` for Sydney in most locales, so `src/timezoneAbbreviations.js` holds a generated lookup. It only needs regenerating when the timezone database adds an abbreviation:
+
+```
+npm install --no-save moment-timezone
+node scripts/generate-tz-abbreviations.js
+```
+
+Do not commit the `package.json` or lockfile changes that the first command could make (`--no-save` avoids them).
 
 ---
 

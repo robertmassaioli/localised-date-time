@@ -6,7 +6,7 @@
 
 The rule for this work is that the macro shows the same text as before. The 93 existing tests are the spec. Where Luxon cannot give identical output, this document says so and lists the choice as a decision for the maintainer.
 
-**Status as of 2026-10-26:** see the table in section 8. Status values: ✅ done, ⬜ pending.
+**Status as of 2026-10-26:** everything is implemented on the branch `luxon-migration`, and the PR is the last item in section 8. Status values: ✅ done, ⬜ pending.
 
 ---
 
@@ -36,7 +36,7 @@ Tests that build moment objects:
 
 `adfExport.test.js` and `useDateMacroContext.test.js` do not import moment. They exercise the code through its public functions, so they check the port without edits.
 
-Also in scope: `package.json` and `package-lock.json` (add `luxon`, remove both moment packages). Out of scope: `src/timezones.js` and `generate-options.js`. The generator downloads a JSON file from GitHub and does not import moment. `AGENTS.md` and the 4.3 row of `codebase-review-2026-10.md` get a small update.
+Also in scope: `package.json` and `package-lock.json` (add `luxon`, remove both moment packages). Out of scope: `src/timezones.js` and `generate-options.js`. The generator downloads a JSON file from GitHub and does not import moment. The README and the 4.3 row of `codebase-review-2026-10.md` get a small update. `AGENTS.md` is not on this branch (it is on `add-agents-md`). Its commands table says `gen-options` regenerates the list "from `moment-timezone` data", which stays true, and it could gain a line about `scripts/generate-tz-abbreviations.js`.
 
 ---
 
@@ -162,16 +162,16 @@ The system timezone matters in a few places, because moment used local time for 
 
 | # | Item | Status |
 |---|------|--------|
-| 8.1 | Add `luxon` and the date helpers (`dateTime.js`, `relativeTime.js`, `timezoneAbbreviations.js`, generator script) | ⬜ Pending |
-| 8.2 | Port `displayOptions.js` (format, `fromNow`, NASA countdown) | ⬜ Pending |
-| 8.3 | Port `repetition.js` | ⬜ Pending |
-| 8.4 | Port `adfExport.js`, `common.jsx`, `non-repeating.jsx`, `repeating.jsx` | ⬜ Pending |
-| 8.5 | Port the existing tests that build moment objects | ⬜ Pending |
-| 8.6 | Add tests for the new modules and the DST gap case | ⬜ Pending |
-| 8.7 | Differential check against moment under five system timezones | ⬜ Pending |
-| 8.8 | Remove `moment` and `moment-timezone` from `package.json` and the lockfile | ⬜ Pending |
-| 8.9 | Mutation check, lint, tests, `forge lint` | ⬜ Pending |
-| 8.10 | Update `AGENTS.md` and `codebase-review-2026-10.md` item 4.3 | ⬜ Pending |
+| 8.1 | Add `luxon` and the date helpers (`dateTime.js`, `relativeTime.js`, `timezoneAbbreviations.js`, generator script) | ✅ Done |
+| 8.2 | Port `displayOptions.js` (format, `fromNow`, NASA countdown) | ✅ Done |
+| 8.3 | Port `repetition.js` | ✅ Done |
+| 8.4 | Port `adfExport.js`, `common.jsx`, `non-repeating.jsx`, `repeating.jsx` | ✅ Done |
+| 8.5 | Port the existing tests that build moment objects | ✅ Done |
+| 8.6 | Add tests for the new modules and the DST gap case | ✅ Done |
+| 8.7 | Differential check against moment under five system timezones | ✅ Done |
+| 8.8 | Remove `moment` and `moment-timezone` from `package.json` and the lockfile | ✅ Done |
+| 8.9 | Mutation check, lint, tests, `forge lint` | ✅ Done |
+| 8.10 | Update the README (Luxon, the abbreviation generator) and `codebase-review-2026-10.md` item 4.3 | ✅ Done |
 | 8.11 | Open the PR, check CI | ⬜ Pending |
 
 ## Open questions for the maintainer
