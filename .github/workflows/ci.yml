@@ -19,7 +19,10 @@ jobs:
       # public runner cannot reach. Every package is also on the public registry with the same
       # tarball, so the integrity hashes still match after the URL prefix is rewritten.
       - name: Point the lockfile at the public npm registry
-        run: sed -i -E 's#https://packages\.atlassian\.com/(artifactory/)?api/npm/[^/]+/#https://registry.npmjs.org/#g' package-lock.json
+        run: |
+          sed -i -E 's#https://packages\.atlassian\.com/(artifactory/)?api/npm/[^/]+/#https://registry.npmjs.org/#g' package-lock.json
+          # Artifactory names scoped tarballs .../@scope/pkg/-/@scope/pkg-1.0.0.tgz, npm names them .../@scope/pkg/-/pkg-1.0.0.tgz
+          sed -i -E 's#(/@[^/]+/[^/]+/-/)@[^/]+/#\1#g' package-lock.json
 
       - name: Install dependencies
         run: npm ci --registry=https://registry.npmjs.org
