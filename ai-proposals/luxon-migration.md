@@ -172,7 +172,7 @@ The system timezone matters in a few places, because moment used local time for 
 | 8.8 | Remove `moment` and `moment-timezone` from `package.json` and the lockfile | ✅ Done |
 | 8.9 | Mutation check, lint, tests, `forge lint` | ✅ Done |
 | 8.10 | Update the README (Luxon, the abbreviation generator) and `codebase-review-2026-10.md` item 4.3 | ✅ Done |
-| 8.11 | Open the PR, check CI | ⬜ Pending |
+| 8.11 | Open the PR (#13), check CI | ✅ Done |
 
 ## Open questions for the maintainer
 
