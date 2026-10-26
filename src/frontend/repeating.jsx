@@ -1,9 +1,10 @@
 import React from 'react';
-import ForgeReconciler, { DatePicker, I18nProvider, Label, Select, Text, Textfield } from '@forge/react';
+import ForgeReconciler, { DatePicker, I18nProvider, Label, Select, Text, Textfield, useProductContext } from '@forge/react';
 import { isPresent } from 'ts-is-present';
 import { FORMAT_DEFAULT } from "../displayOptions";
 import { parseConfiguredDate } from '../dateTime';
 import { TimeZones } from "../timezones";
+import { defaultTimeZoneOption } from '../defaultTimeZone';
 import { nextRepeatDate, REPEAT_WEEKLY, repetitionToUnits } from '../repetition';
 import { parseTime, renderDateLozenge, validateConfig } from './common';
 import { displayOptionChoices, repetitionUnitChoices } from './displayOptionChoices';
@@ -62,6 +63,8 @@ ForgeReconciler.render(
 
 const Config = () => {
   const { ready, t } = useTranslate();
+  // Hooks must run before the early return, so the hook order is the same on every render
+  const context = useProductContext();
   if (!ready) return null;
 
   return (
@@ -78,6 +81,7 @@ const Config = () => {
       <Select
         name="timeZone"
         isRequired
+        defaultValue={defaultTimeZoneOption(context?.timezone, TimeZones)}
         description={t('config.timeZone.description')}
         options={TimeZones.map(tz => ({ label: tz, value: tz }))}
         />
