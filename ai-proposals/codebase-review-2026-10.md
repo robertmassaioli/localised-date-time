@@ -14,8 +14,8 @@ These are the first batch to fix. They are small, and the branch `codebase-revie
 
 | # | Problem | Fix | Effort |
 |---|---------|-----|--------|
-| 1.1 | `npm run lint` fails with 4 parse errors. `.eslintrc` sets `ecmaVersion: 2017`, so ESLint cannot parse `?.` or named regex groups. The script also prints "a Forge UI hook is being used incorrectly" for any failure. | Set `ecmaVersion` to 2022. Quote the glob. Drop the misleading `hook-errors` fallback. | XS |
-| 1.2 | Config labels say "(Default)" but no `Select` has a `defaultValue`. A new repeating macro with the unit untouched shows "Repetition period not configured". | Add `defaultValue` to the display format and repetition unit selects. | XS |
+| 1.1 | `npm run lint` fails with 4 parse errors. `.eslintrc` sets `ecmaVersion: 2017`, so ESLint cannot parse `?.` or named regex groups. The script also prints "a Forge UI hook is being used incorrectly" for any failure. | Set `ecmaVersion` to 2021 (the maximum ESLint 7 supports). Quote the glob. Drop the misleading `hook-errors` fallback. | XS |
+| 1.2 | Config labels say "(Default)" but no `Select` has a `defaultValue`. A new repeating macro with the unit untouched shows "Repetition period not configured". | Add `defaultValue` to the display format and repetition unit selects. Also treat a missing repetition unit as weekly in the macro and the export, in case Forge does not save an untouched default. | XS |
 | 1.3 | The Time field description says "in your local time", but the time is read in the selected timezone. | Correct the description in both macros. A `TimePicker` is a follow-up (see 3.1). | XS |
 | 1.4 | `.forge/` (tunnel output) is untracked and not in `.gitignore`. | Add it to `.gitignore`. | XS |
 | 1.5 | `PRIVACY.md` has a typo: "Configuratino". | Fix the typo. | XS |
