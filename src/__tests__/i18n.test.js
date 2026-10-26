@@ -1,44 +1,82 @@
-import { DEFAULT_LOCALE, interpolate, makeTranslate } from '../i18n';
+import { createIntl } from 'react-intl';
+import { createTranslator, DEFAULT_LOCALE } from '../i18n';
+import { MESSAGES, resolveLocale, SUPPORTED_LOCALES } from '../messages';
 import { displayOptionChoices, repetitionUnitChoices } from '../frontend/displayOptionChoices';
 import { FORMAT_DEFAULT, FORMAT_NASA_COUNTDOWN } from '../displayOptions';
 import { REPEAT_HOURLY, REPEAT_WEEKLY } from '../repetition';
 import { translateFor } from './translate';
 
-describe('interpolate', () => {
-  test('fills in named placeholders', () => {
-    expect(interpolate('Time "{time}" is invalid', { time: '25:99' })).toBe('Time "25:99" is invalid');
+describe('createTranslator', () => {
+  test('translates a key for the locale', () => {
+    expect(createTranslator('fr-FR')('error.notConfigured.date')).toBe(
+      'La date n’est pas configurée. Configurez cet élément dans la configuration de la macro.'
+    );
   });
 
-  test('fills in the same placeholder twice', () => {
-    expect(interpolate('{a} and {a}', { a: 'x' })).toBe('x and x');
+  test('fills in ICU placeholders', () => {
+    expect(createTranslator('en-GB')('error.invalidTime', { time: '25:99' })).toMatch(/25:99/);
   });
 
-  test('leaves unknown placeholders in place', () => {
-    expect(interpolate('Hello {name}', {})).toBe('Hello {name}');
+  test('returns the key for a missing message, like Forge did, without logging an error', () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(createTranslator('en-GB')('missing.key')).toBe('missing.key');
+    expect(errorSpy).not.toHaveBeenCalled();
+    expect(warnSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+    warnSpy.mockRestore();
   });
 
-  test('leaves text without placeholders alone', () => {
-    expect(interpolate('Plain (am|pm)')).toBe('Plain (am|pm)');
+  test('uses the default locale for an unknown locale', () => {
+    expect(createTranslator('xx-XX')('error.notConfigured.date')).toBe(createTranslator('en-GB')('error.notConfigured.date'));
   });
 
-  test('does not treat inherited object properties as params', () => {
-    expect(interpolate('{constructor}', {})).toBe('{constructor}');
+  test('leaves unknown placeholders in a message as react-intl does and reports them', () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const text = createTranslator('en-GB')('error.invalidTime', {});
+    expect(text).not.toBe('');
+    expect(warnSpy).toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 
-  test('converts numbers to text', () => {
-    expect(interpolate('{n}', { n: 0 })).toBe('0');
+  // What react-intl adds over the old {name} replacement: ICU plurals and selects work in any message.
+  test('formats ICU plurals when a message needs them', () => {
+    const intl = createIntl({ locale: 'en-GB', messages: {} });
+    const message = { id: 'demo', defaultMessage: '{count, plural, one {# occurrence} other {# occurrences}}' };
+    expect(intl.formatMessage(message, { count: 1 })).toBe('1 occurrence');
+    expect(intl.formatMessage(message, { count: 3 })).toBe('3 occurrences');
   });
 });
 
-describe('makeTranslate', () => {
-  test('translates the key and applies params', () => {
-    const t = makeTranslate(key => ({ greeting: 'Hi {name}' }[key] ?? key));
-    expect(t('greeting', { name: 'Ana' })).toBe('Hi Ana');
+describe('resolveLocale', () => {
+  test.each([
+    ['fr-FR', 'fr-FR'],
+    ['FR-fr', 'fr-FR'],
+    ['fr_FR', 'fr-FR'],
+    ['en-AU', 'en-GB'],
+    ['en', 'en-GB'],
+    ['pt', 'pt-BR'],
+    ['zh-HK', 'zh-CN'],
+    ['de-AT', 'de-DE'],
+    ['xx-XX', 'en-GB'],
+    ['', 'en-GB'],
+    [undefined, 'en-GB'],
+    [42, 'en-GB']
+  ])('%p resolves to %p', (input, expected) => {
+    expect(resolveLocale(input)).toBe(expected);
   });
+});
 
-  test('returns the key when it is missing, like Forge does', () => {
-    const t = makeTranslate(key => key);
-    expect(t('missing.key')).toBe('missing.key');
+describe('every locale formats with react-intl', () => {
+  test.each(SUPPORTED_LOCALES)('%s: every message parses, formats and keeps its text', locale => {
+    const errors = [];
+    const intl = createIntl({ locale, messages: MESSAGES[locale], onError: e => errors.push(e.message) });
+    for (const id of Object.keys(MESSAGES[locale])) {
+      const text = intl.formatMessage({ id }, { field: 'FIELD', time: 'TIME' });
+      expect(text).not.toBe(id);
+      expect(text).not.toMatch(/[{}]/);
+    }
+    expect(errors).toEqual([]);
   });
 });
 

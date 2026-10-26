@@ -1,5 +1,7 @@
 import React from 'react';
 import TestRenderer from 'react-test-renderer';
+import { IntlProvider } from 'react-intl';
+import { MESSAGES } from '../messages';
 import { TimeZones } from '../timezones';
 
 let mockContext;
@@ -23,19 +25,20 @@ jest.mock('@forge/react', () => ({
   Textfield: 'Textfield',
   Lozenge: 'Lozenge',
   Tooltip: 'Tooltip',
-  // Translations are ready at once and return the key, so the tests do not depend on wording.
-  I18nProvider: ({ children }) => children,
-  useTranslation: () => ({ ready: true, t: key => key }),
   useConfig: () => undefined,
   useProductContext: () => mockContext
 }));
 
+// Each module is loaded once, so the Config component shares this file's copy of React with the renderer.
+const loadedConfigs = {};
+
 function loadConfig(modulePath) {
-  jest.isolateModules(() => {
+  if (!loadedConfigs[modulePath]) {
     require(modulePath);
-  });
-  // addConfig receives <I18nProvider><Config /></I18nProvider>, so the config component is its child.
-  return mockConfigElement.props.children.type;
+    // addConfig receives <MacroIntlProvider><Config /></MacroIntlProvider>, so the config component is its child.
+    loadedConfigs[modulePath] = mockConfigElement.props.children.type;
+  }
+  return loadedConfigs[modulePath];
 }
 
 function findSelect(node, name) {
@@ -57,7 +60,7 @@ describe.each([
 ])('%s config panel Timezone select', (_name, modulePath) => {
   function timeZoneSelect() {
     const Config = loadConfig(modulePath);
-    return findSelect(TestRenderer.create(<Config />).toJSON(), 'timeZone');
+    return findSelect(TestRenderer.create(<IntlProvider locale="en-GB" messages={MESSAGES['en-GB']}><Config /></IntlProvider>).toJSON(), 'timeZone');
   }
 
   it('defaults to the timezone from the product context', () => {

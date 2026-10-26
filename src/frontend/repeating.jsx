@@ -1,5 +1,5 @@
 import React from 'react';
-import ForgeReconciler, { DatePicker, I18nProvider, Label, Select, Text, Textfield, useProductContext } from '@forge/react';
+import ForgeReconciler, { DatePicker, Label, Select, Text, Textfield, useProductContext } from '@forge/react';
 import { isPresent } from 'ts-is-present';
 import { FORMAT_DEFAULT } from "../displayOptions";
 import { parseConfiguredDate } from '../dateTime';
@@ -9,6 +9,7 @@ import { nextRepeatDate, REPEAT_WEEKLY, repetitionToUnits } from '../repetition'
 import { parseTime, renderDateLozenge, validateConfig } from './common';
 import { displayOptionChoices, repetitionUnitChoices } from './displayOptionChoices';
 import { useDateMacroContext } from './useDateMacroContext';
+import { MacroIntlProvider } from './MacroIntlProvider';
 import { useTranslate } from './useTranslate';
 
 const App = () => {
@@ -55,9 +56,9 @@ const App = () => {
 
 ForgeReconciler.render(
   <React.StrictMode>
-    <I18nProvider>
+    <MacroIntlProvider>
       <App />
-    </I18nProvider>
+    </MacroIntlProvider>
   </React.StrictMode>
 );
 
@@ -112,7 +113,7 @@ const Config = () => {
 };
 
 ForgeReconciler.addConfig(
-  <I18nProvider>
+  <MacroIntlProvider>
     <Config />
-  </I18nProvider>
+  </MacroIntlProvider>
 );

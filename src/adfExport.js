@@ -1,8 +1,8 @@
-import api, { i18n, route } from '@forge/api';
+import api, { route } from '@forge/api';
 import { validateConfig, parseTime } from './configHelpers';
 import { inZone, parseConfiguredDate } from './dateTime';
 import { displayText, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, formatRequiresLiveUpdates } from './displayOptions';
-import { DEFAULT_LOCALE, makeTranslate } from './i18n';
+import { createTranslator } from './i18n';
 import { nextRepeatDate, repetitionToUnits, REPEAT_WEEKLY } from './repetition';
 
 /**
@@ -42,20 +42,11 @@ async function getUserTimezone(accountId, configuredTimezone) {
 
 /**
  * Builds the translate function for the export.
- * Forge does not send the viewer's locale to adfExport, so this uses payload.context.locale when it is present
- * and the default locale otherwise. A translation failure never breaks an export.
- * https://developer.atlassian.com/platform/forge/runtime-reference/i18n/
+ * Forge does not send the viewer's locale to adfExport, so this uses payload.context.locale when it is present.
+ * An unknown or missing locale gives the default locale, so an export never fails because of i18n.
  */
-async function getTranslate(payload) {
-  const candidates = [payload?.context?.locale, DEFAULT_LOCALE].filter(locale => typeof locale === 'string' && locale);
-  for (const locale of candidates) {
-    try {
-      return makeTranslate(await i18n.createTranslationFunction(locale));
-    } catch (e) {
-      console.warn(`[adfExport] could not load translations for ${locale}:`, e);
-    }
-  }
-  return makeTranslate(key => key);
+function getTranslate(payload) {
+  return createTranslator(payload?.context?.locale);
 }
 
 /**
@@ -159,7 +150,7 @@ function buildAdf(originalDate, viewerTimezone, config, t) {
 export async function handleNonRepeating(payload) {
   const config = payload?.extensionPayload?.config;
   const accountId = payload?.context?.accountId;
-  const t = await getTranslate(payload);
+  const t = getTranslate(payload);
 
   const validationError = validateConfig(config, config, t, ['date', 'time', 'timeZone']);
   if (validationError) {
@@ -182,7 +173,7 @@ export async function handleNonRepeating(payload) {
 export async function handleRepeating(payload) {
   const config = payload?.extensionPayload?.config;
   const accountId = payload?.context?.accountId;
-  const t = await getTranslate(payload);
+  const t = getTranslate(payload);
 
   const validationError = validateConfig(config, config, t, ['date', 'time', 'timeZone', 'repetitionPeriod']);
   if (validationError) {

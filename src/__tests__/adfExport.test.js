@@ -1,14 +1,11 @@
 import { handleNonRepeating, handleRepeating } from '../adfExport';
 import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN } from '../displayOptions';
-import { forgeTFor } from './translate';
 
 const mockRequestConfluence = jest.fn();
-const mockCreateTranslationFunction = jest.fn();
 
 jest.mock('@forge/api', () => ({
   __esModule: true,
   default: { asApp: () => ({ requestConfluence: (...args) => mockRequestConfluence(...args) }) },
-  i18n: { createTranslationFunction: (...args) => mockCreateTranslationFunction(...args) },
   route: (strings, ...values) => String.raw({ raw: strings.raw }, ...values)
 }));
 
@@ -45,9 +42,7 @@ describe('adfExport', () => {
 
   beforeEach(() => {
     mockRequestConfluence.mockReset();
-    mockCreateTranslationFunction.mockReset();
     // Only the locale files exist in this fake, as in a deployed app. Unknown locales throw.
-    mockCreateTranslationFunction.mockImplementation(async locale => forgeTFor(locale));
     warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
@@ -206,7 +201,6 @@ describe('adfExport', () => {
     test('uses the locale from the payload context', async () => {
       const adf = await handleNonRepeating(payload(noDate(), 'account-1', 'fr-FR'));
       expect(textOf(adf)).toEqual(['La date n’est pas configurée. Configurez cet élément dans la configuration de la macro.']);
-      expect(mockCreateTranslationFunction).toHaveBeenCalledWith('fr-FR');
     });
 
     test('translates the countdown note', async () => {
@@ -219,22 +213,16 @@ describe('adfExport', () => {
     test('uses the default locale en-GB when the payload has no locale', async () => {
       const adf = await handleNonRepeating(payload(noDate()));
       expect(textOf(adf)[0]).toMatch(/^Date not configured/);
-      expect(mockCreateTranslationFunction).toHaveBeenCalledWith('en-GB');
     });
 
-    test('falls back to the default locale and warns when the locale cannot be loaded', async () => {
+    test('falls back to the default locale for a locale it has no messages for', async () => {
       const adf = await handleNonRepeating(payload(noDate(), 'account-1', 'xx-XX'));
       expect(textOf(adf)[0]).toMatch(/^Date not configured/);
-      expect(mockCreateTranslationFunction).toHaveBeenNthCalledWith(1, 'xx-XX');
-      expect(mockCreateTranslationFunction).toHaveBeenNthCalledWith(2, 'en-GB');
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('xx-XX'), expect.anything());
     });
 
-    test('still returns a document when no translations load at all', async () => {
-      mockCreateTranslationFunction.mockRejectedValue(new Error('no bundle'));
-      const adf = await handleNonRepeating(payload(noDate(), 'account-1', 'fr-FR'));
-      expect(adf).toMatchObject({ version: 1, type: 'doc' });
-      expect(textOf(adf)).toEqual(['error.notConfigured.date']);
+    test('maps a regional variant to the nearest supported locale (en-AU gives en-GB)', async () => {
+      const adf = await handleNonRepeating(payload(noDate(), 'account-1', 'en-AU'));
+      expect(textOf(adf)[0]).toMatch(/^Date not configured/);
     });
   });
 });

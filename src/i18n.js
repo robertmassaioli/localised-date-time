@@ -1,21 +1,39 @@
 /**
- * Small helpers around the Forge translation function.
- * Forge's `t(key, defaultValue)` does not interpolate, so the app uses `{name}` placeholders and fills them in here.
- * See https://developer.atlassian.com/platform/forge/ui-kit/hooks/use-translation/
+ * Translation helpers built on react-intl (FormatJS), https://formatjs.github.io/docs/react-intl/
+ * The rest of the app keeps calling `t(key, params)`. Messages use ICU MessageFormat, so `{name}`
+ * placeholders work as before and plurals and selects are available when a message needs them.
  */
+import { createIntl, createIntlCache } from 'react-intl';
+import { DEFAULT_LOCALE, MESSAGES, resolveLocale } from './messages';
 
-// Matches `default` in manifest.yml. en-AU is not a supported Forge locale, so en-GB serves Australian spelling.
-export const DEFAULT_LOCALE = 'en-GB';
+export { DEFAULT_LOCALE };
 
-export function interpolate(text, params = {}) {
-  return text.replace(/\{(\w+)\}/g, (placeholder, name) =>
-    Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : placeholder
-  );
+const cache = createIntlCache();
+
+/**
+ * A missing translation returns the key (as Forge's `t` did), so it is not worth a console error.
+ * Anything else, such as a message that does not parse, is a real problem.
+ */
+export function onIntlError(error) {
+  if (error.code === 'MISSING_TRANSLATION') return;
+  console.warn('[i18n]', error.message);
 }
 
 /**
- * Wraps a Forge `t(key, defaultValue)` function into `translate(key, params)`.
+ * Wraps a react-intl `intl` object into `translate(key, params)`.
  */
-export function makeTranslate(forgeT) {
-  return (key, params) => interpolate(forgeT(key), params);
+export function makeTranslate(intl) {
+  return (key, params) => intl.formatMessage({ id: key }, params);
+}
+
+/**
+ * Builds a translate function outside React, for the export function and for tests.
+ */
+export function createTranslator(locale) {
+  const resolved = resolveLocale(locale);
+  const intl = createIntl(
+    { locale: resolved, defaultLocale: DEFAULT_LOCALE, messages: MESSAGES[resolved], onError: onIntlError },
+    cache
+  );
+  return makeTranslate(intl);
 }
