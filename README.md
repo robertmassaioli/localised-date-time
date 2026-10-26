@@ -26,7 +26,7 @@ Both macros share the following configuration fields:
 |-------|-------------|---------|
 | **Time** | The time in 12-hour AM/PM format | `9:00 am`, `12:45 pm` |
 | **Date** / **Start Date** | The date (or start date for repeating events) | `2024-11-15` |
-| **Timezone** | The timezone the date/time above is written in | `Australia/Sydney` |
+| **Timezone** | The timezone the date/time above is written in. The panel pre-selects your own timezone when it is in the list. | `Australia/Sydney` |
 | **Display format** | How the date is shown to viewers (see below) | `Localised Date/Time (Default)` |
 
 The **Repeating** macro adds:
