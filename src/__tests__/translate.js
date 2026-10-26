@@ -13,5 +13,5 @@ export function loadLocale(code) {
  * The app's `t(key, params)` for a locale, built with react-intl from the real locale files.
  */
 export function translateFor(code = 'en-GB') {
-  return createTranslator(code);
+  return createTranslator(code, loadLocale(code));
 }

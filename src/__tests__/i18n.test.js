@@ -1,42 +1,53 @@
+import fs from 'fs';
+import path from 'path';
 import { createIntl } from 'react-intl';
-import { createTranslator, DEFAULT_LOCALE } from '../i18n';
-import { MESSAGES, resolveLocale, SUPPORTED_LOCALES } from '../messages';
+import { createTranslator, DEFAULT_LOCALE, flattenMessages } from '../i18n';
 import { displayOptionChoices, repetitionUnitChoices } from '../frontend/displayOptionChoices';
 import { FORMAT_DEFAULT, FORMAT_NASA_COUNTDOWN } from '../displayOptions';
 import { REPEAT_HOURLY, REPEAT_WEEKLY } from '../repetition';
-import { translateFor } from './translate';
+import { loadLocale, translateFor } from './translate';
+
+describe('flattenMessages', () => {
+  test('turns nested Forge locale files into flat react-intl ids', () => {
+    expect(flattenMessages({ macro: { nonrepeating: { title: 'T' } }, plain: 'P' })).toEqual({
+      'macro.nonrepeating.title': 'T',
+      plain: 'P'
+    });
+  });
+
+  test('copes with missing translations', () => {
+    expect(flattenMessages(null)).toEqual({});
+    expect(flattenMessages(undefined)).toEqual({});
+  });
+});
 
 describe('createTranslator', () => {
   test('translates a key for the locale', () => {
-    expect(createTranslator('fr-FR')('error.notConfigured.date')).toBe(
+    expect(translateFor('fr-FR')('error.notConfigured.date')).toBe(
       'La date n’est pas configurée. Configurez cet élément dans la configuration de la macro.'
     );
   });
 
   test('fills in ICU placeholders', () => {
-    expect(createTranslator('en-GB')('error.invalidTime', { time: '25:99' })).toMatch(/25:99/);
+    expect(translateFor('en-GB')('error.invalidTime', { time: '25:99' })).toMatch(/25:99/);
   });
 
   test('returns the key for a missing message, like Forge did, without logging an error', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-    expect(createTranslator('en-GB')('missing.key')).toBe('missing.key');
+    expect(translateFor('en-GB')('missing.key')).toBe('missing.key');
     expect(errorSpy).not.toHaveBeenCalled();
     expect(warnSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
     warnSpy.mockRestore();
   });
 
-  test('uses the default locale for an unknown locale', () => {
-    expect(createTranslator('xx-XX')('error.notConfigured.date')).toBe(createTranslator('en-GB')('error.notConfigured.date'));
+  test('returns keys when there are no translations at all', () => {
+    expect(createTranslator('en-GB', null)('error.notConfigured.date')).toBe('error.notConfigured.date');
   });
 
-  test('leaves unknown placeholders in a message as react-intl does and reports them', () => {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-    const text = createTranslator('en-GB')('error.invalidTime', {});
-    expect(text).not.toBe('');
-    expect(warnSpy).toHaveBeenCalled();
-    warnSpy.mockRestore();
+  test('uses the default locale when none is given', () => {
+    expect(createTranslator(undefined, loadLocale('en-GB'))('error.notConfigured.date')).toMatch(/^Date not configured/);
   });
 
   // What react-intl adds over the old {name} replacement: ICU plurals and selects work in any message.
@@ -48,30 +59,18 @@ describe('createTranslator', () => {
   });
 });
 
-describe('resolveLocale', () => {
-  test.each([
-    ['fr-FR', 'fr-FR'],
-    ['FR-fr', 'fr-FR'],
-    ['fr_FR', 'fr-FR'],
-    ['en-AU', 'en-GB'],
-    ['en', 'en-GB'],
-    ['pt', 'pt-BR'],
-    ['zh-HK', 'zh-CN'],
-    ['de-AT', 'de-DE'],
-    ['xx-XX', 'en-GB'],
-    ['', 'en-GB'],
-    [undefined, 'en-GB'],
-    [42, 'en-GB']
-  ])('%p resolves to %p', (input, expected) => {
-    expect(resolveLocale(input)).toBe(expected);
-  });
-});
+const LOCALE_CODES = fs.readdirSync(path.join(__dirname, '..', '..', 'locales')).map(name => name.replace(/\.json$/, '')).sort();
 
 describe('every locale formats with react-intl', () => {
-  test.each(SUPPORTED_LOCALES)('%s: every message parses, formats and keeps its text', locale => {
+  test('there is a file for each of the 26 Forge locales', () => {
+    expect(LOCALE_CODES).toHaveLength(26);
+  });
+
+  test.each(LOCALE_CODES)('%s: every message parses, formats and keeps its text', locale => {
+    const messages = flattenMessages(loadLocale(locale));
     const errors = [];
-    const intl = createIntl({ locale, messages: MESSAGES[locale], onError: e => errors.push(e.message) });
-    for (const id of Object.keys(MESSAGES[locale])) {
+    const intl = createIntl({ locale, messages, onError: e => errors.push(e.message) });
+    for (const id of Object.keys(messages)) {
       const text = intl.formatMessage({ id }, { field: 'FIELD', time: 'TIME' });
       expect(text).not.toBe(id);
       expect(text).not.toMatch(/[{}]/);

@@ -1,7 +1,8 @@
 import React from 'react';
 import TestRenderer from 'react-test-renderer';
 import { IntlProvider } from 'react-intl';
-import { MESSAGES } from '../messages';
+import { flattenMessages } from '../i18n';
+import { loadLocale } from './translate';
 import { TimeZones } from '../timezones';
 
 let mockContext;
@@ -10,6 +11,9 @@ let mockConfigElement;
 // The real @forge/react needs the Forge bridge, which only exists in the browser.
 // The config modules call ForgeReconciler.render and addConfig when they load,
 // so the mock captures the Config element that addConfig receives.
+// MacroIntlProvider loads translations through the bridge. These tests render Config under their own IntlProvider.
+jest.mock('@forge/bridge', () => ({ i18n: { getTranslations: async () => ({ locale: 'en-GB', translations: {} }) } }));
+
 jest.mock('@forge/react', () => ({
   __esModule: true,
   default: {
@@ -60,7 +64,7 @@ describe.each([
 ])('%s config panel Timezone select', (_name, modulePath) => {
   function timeZoneSelect() {
     const Config = loadConfig(modulePath);
-    return findSelect(TestRenderer.create(<IntlProvider locale="en-GB" messages={MESSAGES['en-GB']}><Config /></IntlProvider>).toJSON(), 'timeZone');
+    return findSelect(TestRenderer.create(<IntlProvider locale="en-GB" messages={flattenMessages(loadLocale('en-GB'))}><Config /></IntlProvider>).toJSON(), 'timeZone');
   }
 
   it('defaults to the timezone from the product context', () => {

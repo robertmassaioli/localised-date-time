@@ -1,21 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useProductContext } from '@forge/react';
+import { i18n } from '@forge/bridge';
 import { IntlProvider } from 'react-intl';
-import { DEFAULT_LOCALE, onIntlError } from '../i18n';
-import { MESSAGES, resolveLocale } from '../messages';
+import { DEFAULT_LOCALE, flattenMessages, onIntlError } from '../i18n';
 
 /**
  * Gives the macro views and config panels a react-intl context for the viewer's locale.
- * The provider renders no markup of its own. It renders nothing until the Forge context has loaded.
+ * `i18n.getTranslations` fetches only that locale's file (plus its fallbacks), so no other locale is downloaded.
+ * https://developer.atlassian.com/platform/forge/apis-reference/ui-api-bridge/i18n/
+ * The provider renders no markup of its own. It renders nothing until the translations have loaded.
  * https://formatjs.github.io/docs/react-intl/api/#intlprovider
  */
 export function MacroIntlProvider({ children }) {
   const context = useProductContext();
-  if (!context) return null;
+  const hasContext = Boolean(context);
+  const requestedLocale = context?.locale;
+  const [loaded, setLoaded] = useState(undefined);
 
-  const locale = resolveLocale(context.locale);
+  useEffect(() => {
+    if (!hasContext) return undefined;
+    let cancelled = false;
+    i18n.getTranslations(requestedLocale ?? null)
+      .then(result => {
+        if (!cancelled) setLoaded({ locale: result.locale, messages: flattenMessages(result.translations) });
+      })
+      .catch(error => {
+        console.warn(`[i18n] could not load translations for ${requestedLocale}:`, error);
+        // Show the message keys rather than a blank panel
+        if (!cancelled) setLoaded({ locale: DEFAULT_LOCALE, messages: {} });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hasContext, requestedLocale]);
+
+  if (!loaded) return null;
   return (
-    <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={MESSAGES[locale]} onError={onIntlError}>
+    <IntlProvider locale={loaded.locale} defaultLocale={DEFAULT_LOCALE} messages={loaded.messages} onError={onIntlError}>
       {children}
     </IntlProvider>
   );
