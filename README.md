@@ -77,10 +77,17 @@ The app has two rendering paths:
 
 ## Quick Start
 
-**Deploy the app:**
+**Deploy the app to the development environment:**
 ```
-forge deploy
+npm run deploy:dev
 ```
+
+**Deploy the app to production:**
+```
+npm run deploy:prod
+```
+
+These run `forge deploy -e development` and `forge deploy -e production`.
 
 **Install on a Confluence site:**
 ```
@@ -92,7 +99,7 @@ forge install
 forge tunnel
 ```
 
-> Once installed, subsequent `forge deploy` runs are picked up automatically — no need to reinstall.
+> Once installed, subsequent deploys are picked up automatically — no need to reinstall. If a deploy reports new scopes or egress URLs, run `forge install --upgrade` for that environment.
 
 ---
 
@@ -121,6 +128,8 @@ npm run lint
 ```
 npm test
 ```
+
+GitHub Actions runs `npm run lint` and `npm test` on every pull request and on pushes to `main` (see `.github/workflows/ci.yml`).
 
 ---
 
