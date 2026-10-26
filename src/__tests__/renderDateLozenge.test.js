@@ -2,6 +2,7 @@ import React from 'react';
 import TestRenderer from 'react-test-renderer';
 import { DateTime } from 'luxon';
 import { renderDateLozenge } from '../frontend/common';
+import { translateFor } from './translate';
 import {
   FORMAT_DEFAULT,
   FORMAT_DEFAULT_AND_ORIGINAL,
@@ -19,11 +20,12 @@ const SYDNEY_TEXT = 'Fri, Nov 15, 2024 3:00pm AEDT';
 const NEW_YORK_TEXT = 'Thu, Nov 14, 2024 11:00pm EST';
 const UTC_TEXT = 'Fri, Nov 15, 2024 4:00am UTC';
 
-function render(displayOption, timeZone = 'America/New_York') {
+function render(displayOption, timeZone = 'America/New_York', t = translateFor('en-GB')) {
   const element = renderDateLozenge({
     originalDate,
     timeZone,
-    config: { timeZone: 'Australia/Sydney', displayOption }
+    config: { timeZone: 'Australia/Sydney', displayOption },
+    t
   });
   return TestRenderer.create(element).toJSON();
 }
@@ -69,6 +71,12 @@ describe('renderDateLozenge', () => {
       expect(lozengeTexts(tree)).toEqual([SYDNEY_TEXT]);
       const tooltips = findAll(tree, 'Tooltip');
       expect(tooltips).toHaveLength(1);
+      expect(tooltips[0].props.content).toBe('Co-located: You are viewing this date-time from the same timezone it was configured for.');
+    });
+
+    test('translates the co-located tooltip', () => {
+      const tree = render(FORMAT_DEFAULT_AND_ORIGINAL, 'Australia/Sydney', translateFor('fr-FR'));
+      expect(findAll(tree, 'Tooltip')[0].props.content).toMatch(/^Même lieu/);
     });
   });
 

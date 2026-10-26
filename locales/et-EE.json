@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Lokaliseeritud kuupäeva makro",
+      "description": "Kuvab kellaaegu iga vaataja ajavööndis"
+    },
+    "repeating": {
+      "title": "Korduva lokaliseeritud kuupäeva makro",
+      "description": "Kuvab korduvaid kellaaegu vaatajate ajavööndites"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Kellaaeg",
+      "description": "Kellaaeg allpool valitud ajavööndis, vormingus hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Kuupäev",
+      "description": "Kuupäev allpool valitud ajavööndis."
+    },
+    "startDate": {
+      "label": "Alguskuupäev",
+      "description": "Alguskuupäev allpool valitud ajavööndis."
+    },
+    "timeZone": {
+      "label": "Ajavöönd",
+      "description": "Ajavöönd, mille jaoks ülaltoodud kuupäev ja kellaaeg on seadistatud. Kui sisestasite need oma kohaliku aja järgi, valige oma kohalik ajavöönd."
+    },
+    "repetitionUnit": {
+      "label": "Kordusühik",
+      "description": "Millist ajaühikut kordustes kasutada.",
+      "week": "Nädal (vaikimisi)",
+      "day": "Päev",
+      "year": "Aasta",
+      "hour": "Tund"
+    },
+    "repetitionPeriod": {
+      "label": "Periood",
+      "description": "Ühikute (nädalad, päevad jne) arv enne sündmuse kordumist. Peab olema vähemalt 1."
+    },
+    "displayOption": {
+      "label": "Kuvamisvorming",
+      "description": "Kuidas teie kuupäev vaatajale kuvatakse.",
+      "default": "Lokaliseeritud kuupäev/kellaaeg (vaikimisi)",
+      "defaultAndOriginal": "Lokaliseeritud kuupäev/kellaaeg (koos seadistatud ajavööndiga)",
+      "defaultAndUtc": "UTC (koos lokaliseeritud kuupäeva/kellaajaga)",
+      "humanCountdown": "Tagasiloendus / möödunud aeg",
+      "nasaCountdown": "Tagasiloendus T-(pluss/miinus)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Makro pole seadistatud. Seadistage see makro seadistustes.",
+      "date": "Kuupäev pole seadistatud. Seadistage see makro seadistustes.",
+      "time": "Kellaaeg pole seadistatud. Seadistage see makro seadistustes.",
+      "timeZone": "Ajavöönd pole seadistatud. Seadistage see makro seadistustes.",
+      "repetitionPeriod": "Kordusperiood pole seadistatud. Seadistage see makro seadistustes.",
+      "field": "{field} pole seadistatud. Seadistage see makro seadistustes."
+    },
+    "repetitionPeriodInvalid": "Kordusperiood peab olema täisarv, mis on vähemalt 1.",
+    "repetitionPeriodInvalidWithHint": "Kordusperiood peab olema täisarv, mis on vähemalt 1. Seadistage see makro seadistustes.",
+    "invalidTime": "Kellaaeg \"{time}\" ei ole vormingus \"XX:XX (am|pm)\"! Kehtivad näited: \"9:00 am\" või \"12:45 pm\"."
+  },
+  "tooltip": {
+    "colocated": "Sama asukoht: vaatate seda kuupäeva ja kellaaega samast ajavööndist, mille jaoks see seadistati."
+  },
+  "export": {
+    "countdownNote": "(tagasiloendus pole eksportimisel saadaval)"
+  }
+}

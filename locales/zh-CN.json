@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "本地化日期宏",
+      "description": "按每位查看者的时区显示时间"
+    },
+    "repeating": {
+      "title": "重复本地化日期宏",
+      "description": "按查看者的时区显示重复时间"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "时间",
+      "description": "所选时区下的时间，格式为 hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "日期",
+      "description": "所选时区下的日期。"
+    },
+    "startDate": {
+      "label": "开始日期",
+      "description": "所选时区下的开始日期。"
+    },
+    "timeZone": {
+      "label": "时区",
+      "description": "上述日期和时间所对应的时区。如果您按本地时间填写，请选择您的本地时区。"
+    },
+    "repetitionUnit": {
+      "label": "重复单位",
+      "description": "重复所使用的时间单位。",
+      "week": "周（默认）",
+      "day": "天",
+      "year": "年",
+      "hour": "小时"
+    },
+    "repetitionPeriod": {
+      "label": "周期",
+      "description": "事件重复前的单位数量（周、天等）。必须大于或等于 1。"
+    },
+    "displayOption": {
+      "label": "显示格式",
+      "description": "向查看者显示日期的方式。",
+      "default": "本地化日期/时间（默认）",
+      "defaultAndOriginal": "本地化日期/时间（含配置的时区）",
+      "defaultAndUtc": "UTC（含本地化日期/时间）",
+      "humanCountdown": "倒计时 / 已过时间",
+      "nasaCountdown": "倒计时 T-（加/减）"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "宏尚未配置。请在宏配置中进行配置。",
+      "date": "日期尚未配置。请在宏配置中进行配置。",
+      "time": "时间尚未配置。请在宏配置中进行配置。",
+      "timeZone": "时区尚未配置。请在宏配置中进行配置。",
+      "repetitionPeriod": "重复周期尚未配置。请在宏配置中进行配置。",
+      "field": "{field}尚未配置。请在宏配置中进行配置。"
+    },
+    "repetitionPeriodInvalid": "重复周期必须是大于或等于 1 的整数。",
+    "repetitionPeriodInvalidWithHint": "重复周期必须是大于或等于 1 的整数。请在宏配置中进行配置。",
+    "invalidTime": "时间“{time}”不符合“XX:XX (am|pm)”格式！有效值示例：\"9:00 am\" 或 \"12:45 pm\"。"
+  },
+  "tooltip": {
+    "colocated": "同地：您查看此日期和时间所用的时区与其配置时区相同。"
+  },
+  "export": {
+    "countdownNote": "（导出中不支持倒计时）"
+  }
+}

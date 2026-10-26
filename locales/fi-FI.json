@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Lokalisoidun päivämäärän makro",
+      "description": "Näyttää ajat kunkin katsojan aikavyöhykkeellä"
+    },
+    "repeating": {
+      "title": "Toistuvan lokalisoidun päivämäärän makro",
+      "description": "Näyttää toistuvat ajat katsojien aikavyöhykkeillä"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Aika",
+      "description": "Aika alla valitulla aikavyöhykkeellä muodossa hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Päivämäärä",
+      "description": "Päivämäärä alla valitulla aikavyöhykkeellä."
+    },
+    "startDate": {
+      "label": "Aloituspäivämäärä",
+      "description": "Aloituspäivämäärä alla valitulla aikavyöhykkeellä."
+    },
+    "timeZone": {
+      "label": "Aikavyöhyke",
+      "description": "Aikavyöhyke, jolle yllä oleva päivämäärä ja aika on määritetty. Jos kirjoitit ne paikallisessa ajassasi, valitse oma paikallinen aikavyöhykkeesi."
+    },
+    "repetitionUnit": {
+      "label": "Toistoyksikkö",
+      "description": "Mitä aikayksikköä toistoissa käytetään.",
+      "week": "Viikko (oletus)",
+      "day": "Päivä",
+      "year": "Vuosi",
+      "hour": "Tunti"
+    },
+    "repetitionPeriod": {
+      "label": "Jakso",
+      "description": "Yksiköiden (viikot, päivät jne.) määrä ennen tapahtuman toistumista. Arvon on oltava vähintään 1."
+    },
+    "displayOption": {
+      "label": "Näyttömuoto",
+      "description": "Miten päivämäärä näytetään katsojalle.",
+      "default": "Lokalisoitu päivämäärä ja aika (oletus)",
+      "defaultAndOriginal": "Lokalisoitu päivämäärä ja aika (määritetyllä aikavyöhykkeellä)",
+      "defaultAndUtc": "UTC (ja lokalisoitu päivämäärä ja aika)",
+      "humanCountdown": "Lähtölaskenta / kulunut aika",
+      "nasaCountdown": "Lähtölaskenta T-(plus/miinus)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Makroa ei ole määritetty. Määritä se makron määrityksissä.",
+      "date": "Päivämäärää ei ole määritetty. Määritä se makron määrityksissä.",
+      "time": "Aikaa ei ole määritetty. Määritä se makron määrityksissä.",
+      "timeZone": "Aikavyöhykettä ei ole määritetty. Määritä se makron määrityksissä.",
+      "repetitionPeriod": "Toistojaksoa ei ole määritetty. Määritä se makron määrityksissä.",
+      "field": "Kenttää {field} ei ole määritetty. Määritä se makron määrityksissä."
+    },
+    "repetitionPeriodInvalid": "Toistojakson on oltava kokonaisluku, joka on vähintään 1.",
+    "repetitionPeriodInvalidWithHint": "Toistojakson on oltava kokonaisluku, joka on vähintään 1. Määritä se makron määrityksissä.",
+    "invalidTime": "Aika \"{time}\" ei ole muodossa \"XX:XX (am|pm)\"! Kelvollisia esimerkkejä ovat \"9:00 am\" ja \"12:45 pm\"."
+  },
+  "tooltip": {
+    "colocated": "Sama sijainti: tarkastelet tätä päivämäärää ja aikaa samalta aikavyöhykkeeltä, jolle se on määritetty."
+  },
+  "export": {
+    "countdownNote": "(lähtölaskenta ei ole käytettävissä viennissä)"
+  }
+}

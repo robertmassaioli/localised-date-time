@@ -1,11 +1,14 @@
 import { handleNonRepeating, handleRepeating } from '../adfExport';
 import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN } from '../displayOptions';
+import { forgeTFor } from './translate';
 
 const mockRequestConfluence = jest.fn();
+const mockCreateTranslationFunction = jest.fn();
 
 jest.mock('@forge/api', () => ({
   __esModule: true,
   default: { asApp: () => ({ requestConfluence: (...args) => mockRequestConfluence(...args) }) },
+  i18n: { createTranslationFunction: (...args) => mockCreateTranslationFunction(...args) },
   route: (strings, ...values) => String.raw({ raw: strings.raw }, ...values)
 }));
 
@@ -21,8 +24,8 @@ const SYDNEY_TEXT = 'Fri, Nov 15, 2024 3:00pm AEDT';
 const NEW_YORK_TEXT = 'Thu, Nov 14, 2024 11:00pm EST';
 const UTC_TEXT = 'Fri, Nov 15, 2024 4:00am UTC';
 
-function payload(config, accountId = 'account-1') {
-  return { extensionPayload: { config }, context: { accountId } };
+function payload(config, accountId = 'account-1', locale) {
+  return { extensionPayload: { config }, context: { accountId, ...(locale ? { locale } : {}) } };
 }
 
 function usersBulkReturns(timeZone) {
@@ -42,6 +45,9 @@ describe('adfExport', () => {
 
   beforeEach(() => {
     mockRequestConfluence.mockReset();
+    mockCreateTranslationFunction.mockReset();
+    // Only the locale files exist in this fake, as in a deployed app. Unknown locales throw.
+    mockCreateTranslationFunction.mockImplementation(async locale => forgeTFor(locale));
     warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
@@ -182,10 +188,53 @@ describe('adfExport', () => {
       expect(mockRequestConfluence).not.toHaveBeenCalled();
     });
 
+    test('says the repetition period is invalid in the viewer locale', async () => {
+      const adf = await handleRepeating(payload({ ...repeatingConfig, repetitionPeriod: '0' }, 'account-1', 'de-DE'));
+      expect(textOf(adf)).toEqual(['Der Wiederholungszeitraum muss eine ganze Zahl ab 1 sein.']);
+    });
+
     test('returns an error document when the period is missing', async () => {
       const { repetitionPeriod, ...withoutPeriod } = repeatingConfig;
       const adf = await handleRepeating(payload(withoutPeriod));
-      expect(textOf(adf)).toEqual(['RepetitionPeriod not configured. Please configure it in the Macro Configuration.']);
+      expect(textOf(adf)).toEqual(['Repetition period not configured. Please configure it in the Macro Configuration.']);
+    });
+  });
+
+  describe('locale', () => {
+    const noDate = () => { const { date, ...rest } = baseConfig; return rest; };
+
+    test('uses the locale from the payload context', async () => {
+      const adf = await handleNonRepeating(payload(noDate(), 'account-1', 'fr-FR'));
+      expect(textOf(adf)).toEqual(['La date n’est pas configurée. Configurez cet élément dans la configuration de la macro.']);
+      expect(mockCreateTranslationFunction).toHaveBeenCalledWith('fr-FR');
+    });
+
+    test('translates the countdown note', async () => {
+      usersBulkReturns('America/New_York');
+      const config = { ...baseConfig, displayOption: FORMAT_HUMAN_COUNTDOWN };
+      const adf = await handleNonRepeating(payload(config, 'account-1', 'de-DE'));
+      expect(textOf(adf)).toEqual([NEW_YORK_TEXT, ' (Countdown im Export nicht verfügbar)']);
+    });
+
+    test('uses the default locale en-GB when the payload has no locale', async () => {
+      const adf = await handleNonRepeating(payload(noDate()));
+      expect(textOf(adf)[0]).toMatch(/^Date not configured/);
+      expect(mockCreateTranslationFunction).toHaveBeenCalledWith('en-GB');
+    });
+
+    test('falls back to the default locale and warns when the locale cannot be loaded', async () => {
+      const adf = await handleNonRepeating(payload(noDate(), 'account-1', 'xx-XX'));
+      expect(textOf(adf)[0]).toMatch(/^Date not configured/);
+      expect(mockCreateTranslationFunction).toHaveBeenNthCalledWith(1, 'xx-XX');
+      expect(mockCreateTranslationFunction).toHaveBeenNthCalledWith(2, 'en-GB');
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('xx-XX'), expect.anything());
+    });
+
+    test('still returns a document when no translations load at all', async () => {
+      mockCreateTranslationFunction.mockRejectedValue(new Error('no bundle'));
+      const adf = await handleNonRepeating(payload(noDate(), 'account-1', 'fr-FR'));
+      expect(adf).toMatchObject({ version: 1, type: 'doc' });
+      expect(textOf(adf)).toEqual(['error.notConfigured.date']);
     });
   });
 });

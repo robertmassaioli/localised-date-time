@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Macro voor gelokaliseerde datum",
+      "description": "Toont tijden in de tijdzone van elke lezer"
+    },
+    "repeating": {
+      "title": "Macro voor terugkerende gelokaliseerde datum",
+      "description": "Toont terugkerende tijden in de tijdzones van lezers"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Tijd",
+      "description": "De tijd in de hieronder geselecteerde tijdzone, in de notatie hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Datum",
+      "description": "De datum in de hieronder geselecteerde tijdzone."
+    },
+    "startDate": {
+      "label": "Startdatum",
+      "description": "De startdatum in de hieronder geselecteerde tijdzone."
+    },
+    "timeZone": {
+      "label": "Tijdzone",
+      "description": "De tijdzone waarvoor de datum en tijd hierboven zijn ingesteld. Als u ze in uw lokale tijd hebt ingevoerd, selecteert u uw lokale tijdzone."
+    },
+    "repetitionUnit": {
+      "label": "Herhalingseenheid",
+      "description": "Welke tijdseenheid wordt gebruikt voor de herhalingen.",
+      "week": "Week (standaard)",
+      "day": "Dag",
+      "year": "Jaar",
+      "hour": "Uur"
+    },
+    "repetitionPeriod": {
+      "label": "Periode",
+      "description": "Het aantal eenheden (weken, dagen enzovoort) voordat deze gebeurtenis zich herhaalt. Moet 1 of hoger zijn."
+    },
+    "displayOption": {
+      "label": "Weergave-indeling",
+      "description": "Hoe uw datum aan de lezer wordt getoond.",
+      "default": "Gelokaliseerde datum/tijd (standaard)",
+      "defaultAndOriginal": "Gelokaliseerde datum/tijd (met ingestelde tijdzone)",
+      "defaultAndUtc": "UTC (met gelokaliseerde datum/tijd)",
+      "humanCountdown": "Aftellen / tijd sinds",
+      "nasaCountdown": "Aftellen T-(plus/min)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Macro is niet geconfigureerd. Configureer dit in de macroconfiguratie.",
+      "date": "Datum is niet geconfigureerd. Configureer dit in de macroconfiguratie.",
+      "time": "Tijd is niet geconfigureerd. Configureer dit in de macroconfiguratie.",
+      "timeZone": "Tijdzone is niet geconfigureerd. Configureer dit in de macroconfiguratie.",
+      "repetitionPeriod": "Herhalingsperiode is niet geconfigureerd. Configureer dit in de macroconfiguratie.",
+      "field": "{field} is niet geconfigureerd. Configureer dit in de macroconfiguratie."
+    },
+    "repetitionPeriodInvalid": "De herhalingsperiode moet een geheel getal van 1 of hoger zijn.",
+    "repetitionPeriodInvalidWithHint": "De herhalingsperiode moet een geheel getal van 1 of hoger zijn. Configureer dit in de macroconfiguratie.",
+    "invalidTime": "Tijd \"{time}\" heeft niet de notatie \"XX:XX (am|pm)\"! Geldige voorbeelden zijn: \"9:00 am\" of \"12:45 pm\"."
+  },
+  "tooltip": {
+    "colocated": "Zelfde locatie: u bekijkt deze datum en tijd vanuit dezelfde tijdzone als waarvoor ze zijn ingesteld."
+  },
+  "export": {
+    "countdownNote": "(aftellen is niet beschikbaar in export)"
+  }
+}

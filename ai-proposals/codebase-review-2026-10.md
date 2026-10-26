@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status as of 2026-10-26:** section 1 is done (PR #10). Section 2 is done except 2.6, the `npm audit` review, which is deferred on request (PR #11). 4.3, the Luxon migration, is done (PR #13). 3.1 and 4.2 are won't do for now. The rest of sections 3 and 4 are pending. Status values: ✅ done, ⬜ pending or open, ⛔ won't do.
+**Status as of 2026-10-27:** section 1 is done (PR #10). Section 2 is done except 2.6, the `npm audit` review, which is deferred on request (PR #11). In section 3, 3.3 (translations for all 26 locales, PR #15) and 3.8 (default config timezone, PR #16) are done. 4.3, the Luxon migration, is done (PR #13). 3.1 and 4.2 are won't do for now. The rest of sections 3 and 4 are pending. Status values: ✅ done, ⬜ pending or open, ⛔ won't do.
 
 A full read of the Localised Date Macro codebase after the Forge dependency upgrade (`@forge/react` 12, `@forge/bridge` 7, `@forge/api` 8, `@forge/resolver` 2) and the `useConfig` fix. This document lists what is broken, what is risky, and what we could add. It continues `improvements.md`, which still has four pending items (#5, #7, #8, #9). Where an item here overlaps one of those, the table says so.
 
@@ -46,11 +46,12 @@ These are the first batch to fix. They are small, and the branch `codebase-revie
 |---|------|-------|--------|--------|
 | 3.1 | `TimePicker` for the time field, with 24-hour input | Removes the free-text format errors. Stored values stay in the existing "h:mm am/pm" form so saved macros keep working. Overlaps `improvements.md` #5. | S | ⛔ Won't do (for now) |
 | 3.2 | Format dates in the viewer's locale and clock | `displayText` always uses `ddd, MMM DD, YYYY h:mma z`, so a 24-hour locale still sees am/pm. `context.locale` is available. `Intl.DateTimeFormat` with the viewer's locale and timezone fixes it. | M | ⬜ Pending |
-| 3.3 | Translate the UI strings | The macro titles and descriptions are translated. The config labels, descriptions, errors and display-format names are not. Also settle "Localised" versus "Localized" in the UI. `en-AU` is not a supported Forge locale, so `en-GB` stays the default fallback. | M | ⬜ Pending |
+| 3.3 | Translate the UI strings | The macro titles and descriptions are translated. The config labels, descriptions, errors and display-format names are not. Also settle "Localised" versus "Localized" in the UI. `en-AU` is not a supported Forge locale, so `en-GB` stays the default fallback. | M | ✅ Done (PR `i18n-all-locales`, see `i18n-all-locales.md`) |
 | 3.4 | Monthly repetition | Overlaps `improvements.md` #9. | XS | ⬜ Pending |
 | 3.5 | Richer tooltip | Show the original time, UTC, the relative time and the configured zone on hover, in addition to the chosen display format. | S | ⬜ Pending |
 | 3.6 | Past, happening-now and upcoming states | Use the `Lozenge` appearance to show which state an event is in. | S | ⬜ Pending |
 | 3.7 | More repeat options | "Until" end dates, specific weekdays, skipped occurrences. | M | ⬜ Pending |
+| 3.8 | Default the config Timezone to the editing user's timezone | See `default-timezone.md`. An untouched default may not be saved, which needs a check in Confluence. | XS | ✅ Done (branch `default-timezone`) |
 
 ---
 

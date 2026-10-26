@@ -1,76 +1,87 @@
 import React from 'react';
-import ForgeReconciler, { DatePicker, Label, Select, Text, Textfield } from '@forge/react';
+import ForgeReconciler, { DatePicker, I18nProvider, Label, Select, Text, Textfield, useProductContext } from '@forge/react';
 import { isPresent } from 'ts-is-present';
-import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN, FORMAT_NASA_COUNTDOWN } from "../displayOptions";
+import { FORMAT_DEFAULT } from "../displayOptions";
 import { parseConfiguredDate } from '../dateTime';
 import { TimeZones } from "../timezones";
+import { defaultTimeZoneOption } from '../defaultTimeZone';
 import { parseTime, renderDateLozenge, validateConfig } from './common';
+import { displayOptionChoices } from './displayOptionChoices';
 import { useDateMacroContext } from './useDateMacroContext';
+import { useTranslate } from './useTranslate';
 
 const App = () => {
   const { details, config, timeZone } = useDateMacroContext();
+  const { ready, t } = useTranslate();
+  if (!ready) return null;
 
   // Shared validation
-  const error = validateConfig(details, config);
+  const error = validateConfig(details, config, t);
   if (error) return <Text>{error}</Text>;
 
   // Shared time parsing
-  const parsed = parseTime(config.time);
+  const parsed = parseTime(config.time, t);
   if (parsed.error) return <Text>{parsed.error}</Text>;
 
   const {time, meridiem} = parsed;
 
   if(!isPresent(config.timeZone)) {
     return (
-      <Text>Time Zone not configured. Please configure it in the Macro Configuration.</Text>
+      <Text>{t('error.notConfigured.timeZone')}</Text>
     );
   }
 
   const originalDate = parseConfiguredDate(config.date, time, meridiem, config.timeZone);
 
-  return renderDateLozenge({ originalDate, timeZone, config });
+  return renderDateLozenge({ originalDate, timeZone, config, t });
 };
 
 ForgeReconciler.render(
   <React.StrictMode>
-    <App />
+    <I18nProvider>
+      <App />
+    </I18nProvider>
   </React.StrictMode>
 );
 
 const Config = () => {
+  const { ready, t } = useTranslate();
+  // Hooks must run before the early return, so the hook order is the same on every render
+  const context = useProductContext();
+  if (!ready) return null;
+
   return (
     <>
-      <Label labelFor='time'>Time</Label>
+      <Label labelFor='time'>{t('config.time.label')}</Label>
       <Textfield
               name="time"
-              description="The time, in the timezone selected below, in the format hh:mm am/pm"
-              placeholder="12:00am"
+              description={t('config.time.description')}
+              placeholder={t('config.time.placeholder')}
               />
-      <Label labelFor="date">Date</Label>
-      <DatePicker name="date" description="The date, in the timezone selected below." />
-      <Label labelFor='timeZone'>Timezone</Label>
+      <Label labelFor="date">{t('config.date.label')}</Label>
+      <DatePicker name="date" description={t('config.date.description')} />
+      <Label labelFor='timeZone'>{t('config.timeZone.label')}</Label>
       <Select
         name="timeZone"
         isRequired
-        description="The timezone that the Date Time above is configured for. If you have written the above in your local time then select your local timezone."
+        defaultValue={defaultTimeZoneOption(context?.timezone, TimeZones)}
+        description={t('config.timeZone.description')}
         options={TimeZones.map(tz => ({ label: tz, value: tz }))}
         />
-      <Label labelFor='displayOption'>Display format</Label>
+      <Label labelFor='displayOption'>{t('config.displayOption.label')}</Label>
       <Select
         name="displayOption"
         isRequired
-        defaultValue={{ label: 'Localised Date/Time (Default)', value: FORMAT_DEFAULT }}
-        description="How your date will be displayed to the viewer."
-        options={[
-          { label: 'Localised Date/Time (Default)', value: FORMAT_DEFAULT },
-          { label: 'Localised Date/Time (With configured timezone)', value: FORMAT_DEFAULT_AND_ORIGINAL },
-          { label: 'UTC (With Localised Date/Time)', value: FORMAT_DEFAULT_AND_UTC },
-          { label: 'Countdown / Time since', value: FORMAT_HUMAN_COUNTDOWN },
-          { label: 'Countdown T-(plus/minus)', value: FORMAT_NASA_COUNTDOWN }
-        ]}
+        defaultValue={{ label: t('config.displayOption.default'), value: FORMAT_DEFAULT }}
+        description={t('config.displayOption.description')}
+        options={displayOptionChoices(t)}
         />
     </>
   );
 };
 
-ForgeReconciler.addConfig(<Config />);
+ForgeReconciler.addConfig(
+  <I18nProvider>
+    <Config />
+  </I18nProvider>
+);

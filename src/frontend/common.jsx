@@ -7,7 +7,8 @@ export { validateConfig, parseTime } from '../configHelpers';
 export function renderDateLozenge({
   originalDate,
   timeZone,
-  config
+  config,
+  t
 }) {
   let date = originalDate;
 
@@ -29,7 +30,7 @@ export function renderDateLozenge({
       } else {
         return (
           <>
-            <Tooltip content="Co-located: You are viewing this date-time from the same timezone it was configured for.">
+            <Tooltip content={t('tooltip.colocated')}>
               <Lozenge>{displayText(config.displayOption, date)}</Lozenge>
             </Tooltip>
           </>

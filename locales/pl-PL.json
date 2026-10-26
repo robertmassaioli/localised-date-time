@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Makro lokalizowanej daty",
+      "description": "Wyświetla godziny w strefie czasowej każdego czytelnika"
+    },
+    "repeating": {
+      "title": "Makro powtarzającej się lokalizowanej daty",
+      "description": "Wyświetla powtarzające się godziny w strefach czasowych czytelników"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Godzina",
+      "description": "Godzina w strefie czasowej wybranej poniżej, w formacie hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Data",
+      "description": "Data w strefie czasowej wybranej poniżej."
+    },
+    "startDate": {
+      "label": "Data rozpoczęcia",
+      "description": "Data rozpoczęcia w strefie czasowej wybranej poniżej."
+    },
+    "timeZone": {
+      "label": "Strefa czasowa",
+      "description": "Strefa czasowa, dla której skonfigurowano powyższą datę i godzinę. Jeśli wpisano je w czasie lokalnym, wybierz swoją lokalną strefę czasową."
+    },
+    "repetitionUnit": {
+      "label": "Jednostka powtarzania",
+      "description": "Jakiej jednostki czasu użyć do powtórzeń.",
+      "week": "Tydzień (domyślnie)",
+      "day": "Dzień",
+      "year": "Rok",
+      "hour": "Godzina"
+    },
+    "repetitionPeriod": {
+      "label": "Okres",
+      "description": "Liczba jednostek (tygodni, dni itp.), po której to wydarzenie się powtarza. Musi wynosić co najmniej 1."
+    },
+    "displayOption": {
+      "label": "Format wyświetlania",
+      "description": "Jak data będzie wyświetlana czytelnikowi.",
+      "default": "Zlokalizowana data/godzina (domyślnie)",
+      "defaultAndOriginal": "Zlokalizowana data/godzina (ze skonfigurowaną strefą czasową)",
+      "defaultAndUtc": "UTC (ze zlokalizowaną datą/godziną)",
+      "humanCountdown": "Odliczanie / czas, który upłynął",
+      "nasaCountdown": "Odliczanie T-(plus/minus)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Makro nie zostało skonfigurowane. Skonfiguruj to w konfiguracji makra.",
+      "date": "Data nie została skonfigurowana. Skonfiguruj to w konfiguracji makra.",
+      "time": "Godzina nie została skonfigurowana. Skonfiguruj to w konfiguracji makra.",
+      "timeZone": "Strefa czasowa nie została skonfigurowana. Skonfiguruj to w konfiguracji makra.",
+      "repetitionPeriod": "Okres powtarzania nie został skonfigurowany. Skonfiguruj to w konfiguracji makra.",
+      "field": "Pole {field} nie zostało skonfigurowane. Skonfiguruj to w konfiguracji makra."
+    },
+    "repetitionPeriodInvalid": "Okres powtarzania musi być liczbą całkowitą równą co najmniej 1.",
+    "repetitionPeriodInvalidWithHint": "Okres powtarzania musi być liczbą całkowitą równą co najmniej 1. Skonfiguruj to w konfiguracji makra.",
+    "invalidTime": "Godzina „{time}” nie ma formatu „XX:XX (am|pm)”! Przykłady prawidłowych wartości: „9:00 am” lub „12:45 pm”."
+  },
+  "tooltip": {
+    "colocated": "To samo miejsce: oglądasz tę datę i godzinę z tej samej strefy czasowej, dla której je skonfigurowano."
+  },
+  "export": {
+    "countdownNote": "(odliczanie nie jest dostępne w eksporcie)"
+  }
+}

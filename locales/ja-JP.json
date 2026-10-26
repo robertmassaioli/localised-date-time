@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "ローカライズ日付マクロ",
+      "description": "閲覧者ごとのタイムゾーンで時刻を表示します"
+    },
+    "repeating": {
+      "title": "繰り返しローカライズ日付マクロ",
+      "description": "閲覧者のタイムゾーンで繰り返しの時刻を表示します"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "時刻",
+      "description": "下で選択したタイムゾーンでの時刻（hh:mm am/pm 形式）",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "日付",
+      "description": "下で選択したタイムゾーンでの日付。"
+    },
+    "startDate": {
+      "label": "開始日",
+      "description": "下で選択したタイムゾーンでの開始日。"
+    },
+    "timeZone": {
+      "label": "タイムゾーン",
+      "description": "上の日付と時刻を設定するタイムゾーン。現地時間で入力した場合は、ご自身のタイムゾーンを選択してください。"
+    },
+    "repetitionUnit": {
+      "label": "繰り返しの単位",
+      "description": "繰り返しに使用する時間の単位。",
+      "week": "週（デフォルト）",
+      "day": "日",
+      "year": "年",
+      "hour": "時間"
+    },
+    "repetitionPeriod": {
+      "label": "間隔",
+      "description": "イベントが繰り返されるまでの単位数（週、日など）。1 以上を指定してください。"
+    },
+    "displayOption": {
+      "label": "表示形式",
+      "description": "日付を閲覧者にどのように表示するか。",
+      "default": "ローカライズされた日時（デフォルト）",
+      "defaultAndOriginal": "ローカライズされた日時（設定したタイムゾーン付き）",
+      "defaultAndUtc": "UTC（ローカライズされた日時付き）",
+      "humanCountdown": "カウントダウン / 経過時間",
+      "nasaCountdown": "カウントダウン T-（プラス/マイナス）"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "マクロが設定されていません。マクロ設定で設定してください。",
+      "date": "日付が設定されていません。マクロ設定で設定してください。",
+      "time": "時刻が設定されていません。マクロ設定で設定してください。",
+      "timeZone": "タイムゾーンが設定されていません。マクロ設定で設定してください。",
+      "repetitionPeriod": "繰り返し間隔が設定されていません。マクロ設定で設定してください。",
+      "field": "{field}が設定されていません。マクロ設定で設定してください。"
+    },
+    "repetitionPeriodInvalid": "繰り返し間隔は 1 以上の整数にしてください。",
+    "repetitionPeriodInvalidWithHint": "繰り返し間隔は 1 以上の整数にしてください。マクロ設定で設定してください。",
+    "invalidTime": "時刻「{time}」が「XX:XX (am|pm)」形式ではありません。有効な値の例: 「9:00 am」、「12:45 pm」。"
+  },
+  "tooltip": {
+    "colocated": "同じ場所: この日時は、設定されたタイムゾーンと同じタイムゾーンから表示されています。"
+  },
+  "export": {
+    "countdownNote": "（エクスポートではカウントダウンは利用できません）"
+  }
+}

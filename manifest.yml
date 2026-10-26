@@ -35,10 +35,58 @@ modules:
       handler: index.handleRepeating
 translations:
   resources:
+    - key: zh-CN
+      path: locales/zh-CN.json
+    - key: zh-TW
+      path: locales/zh-TW.json
+    - key: cs-CZ
+      path: locales/cs-CZ.json
+    - key: da-DK
+      path: locales/da-DK.json
+    - key: nl-NL
+      path: locales/nl-NL.json
     - key: en-US
       path: locales/en-US.json
     - key: en-GB
       path: locales/en-GB.json
+    - key: et-EE
+      path: locales/et-EE.json
+    - key: fi-FI
+      path: locales/fi-FI.json
+    - key: fr-FR
+      path: locales/fr-FR.json
+    - key: de-DE
+      path: locales/de-DE.json
+    - key: hu-HU
+      path: locales/hu-HU.json
+    - key: is-IS
+      path: locales/is-IS.json
+    - key: it-IT
+      path: locales/it-IT.json
+    - key: ja-JP
+      path: locales/ja-JP.json
+    - key: ko-KR
+      path: locales/ko-KR.json
+    - key: no-NO
+      path: locales/no-NO.json
+    - key: pl-PL
+      path: locales/pl-PL.json
+    - key: pt-BR
+      path: locales/pt-BR.json
+    - key: pt-PT
+      path: locales/pt-PT.json
+    - key: ro-RO
+      path: locales/ro-RO.json
+    - key: ru-RU
+      path: locales/ru-RU.json
+    - key: sk-SK
+      path: locales/sk-SK.json
+    - key: tr-TR
+      path: locales/tr-TR.json
+    - key: es-ES
+      path: locales/es-ES.json
+    - key: sv-SE
+      path: locales/sv-SE.json
   fallback:
     default: en-GB
 resources:

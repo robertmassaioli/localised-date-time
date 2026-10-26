@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Macro data localizzata",
+      "description": "Mostra gli orari nel fuso orario di ciascun lettore"
+    },
+    "repeating": {
+      "title": "Macro data localizzata ricorrente",
+      "description": "Mostra gli orari ricorrenti nel fuso orario dei lettori"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Ora",
+      "description": "L’ora, nel fuso orario selezionato di seguito, nel formato hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Data",
+      "description": "La data, nel fuso orario selezionato di seguito."
+    },
+    "startDate": {
+      "label": "Data di inizio",
+      "description": "La data di inizio, nel fuso orario selezionato di seguito."
+    },
+    "timeZone": {
+      "label": "Fuso orario",
+      "description": "Il fuso orario per cui sono configurate la data e l’ora qui sopra. Se le hai scritte nel tuo orario locale, seleziona il tuo fuso orario locale."
+    },
+    "repetitionUnit": {
+      "label": "Unità di ripetizione",
+      "description": "Quale unità di tempo usare per le ripetizioni.",
+      "week": "Settimana (predefinita)",
+      "day": "Giorno",
+      "year": "Anno",
+      "hour": "Ora"
+    },
+    "repetitionPeriod": {
+      "label": "Periodo",
+      "description": "Il numero di unità (settimane, giorni e così via) prima che l’evento si ripeta. Deve essere 1 o superiore."
+    },
+    "displayOption": {
+      "label": "Formato di visualizzazione",
+      "description": "Come verrà mostrata la data al lettore.",
+      "default": "Data/ora localizzata (predefinito)",
+      "defaultAndOriginal": "Data/ora localizzata (con il fuso orario configurato)",
+      "defaultAndUtc": "UTC (con data/ora localizzata)",
+      "humanCountdown": "Conto alla rovescia / tempo trascorso",
+      "nasaCountdown": "Conto alla rovescia T-(più/meno)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "La macro non è configurata. Configura questo elemento nella configurazione della macro.",
+      "date": "La data non è configurata. Configura questo elemento nella configurazione della macro.",
+      "time": "L’ora non è configurata. Configura questo elemento nella configurazione della macro.",
+      "timeZone": "Il fuso orario non è configurato. Configura questo elemento nella configurazione della macro.",
+      "repetitionPeriod": "Il periodo di ripetizione non è configurato. Configura questo elemento nella configurazione della macro.",
+      "field": "{field} non è configurato. Configura questo elemento nella configurazione della macro."
+    },
+    "repetitionPeriodInvalid": "Il periodo di ripetizione deve essere un numero intero pari o superiore a 1.",
+    "repetitionPeriodInvalidWithHint": "Il periodo di ripetizione deve essere un numero intero pari o superiore a 1. Configura questo elemento nella configurazione della macro.",
+    "invalidTime": "L’ora “{time}” non è nel formato “XX:XX (am|pm)”! Esempi di valori validi: “9:00 am” o “12:45 pm”."
+  },
+  "tooltip": {
+    "colocated": "Stesso luogo: stai visualizzando questa data e ora dallo stesso fuso orario per cui è stata configurata."
+  },
+  "export": {
+    "countdownNote": "(conto alla rovescia non disponibile nell’esportazione)"
+  }
+}
