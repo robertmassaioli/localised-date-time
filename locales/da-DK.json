@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Makro til lokaliseret dato",
+      "description": "Viser tidspunkter i hver læsers tidszone"
+    },
+    "repeating": {
+      "title": "Makro til gentagende lokaliseret dato",
+      "description": "Viser gentagne tidspunkter i læsernes tidszoner"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Tid",
+      "description": "Tidspunktet i den tidszone, der er valgt nedenfor, i formatet hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Dato",
+      "description": "Datoen i den tidszone, der er valgt nedenfor."
+    },
+    "startDate": {
+      "label": "Startdato",
+      "description": "Startdatoen i den tidszone, der er valgt nedenfor."
+    },
+    "timeZone": {
+      "label": "Tidszone",
+      "description": "Den tidszone, som dato og tid ovenfor er angivet for. Hvis du har skrevet dem i din lokale tid, skal du vælge din lokale tidszone."
+    },
+    "repetitionUnit": {
+      "label": "Gentagelsesenhed",
+      "description": "Hvilken tidsenhed der bruges til gentagelserne.",
+      "week": "Uge (standard)",
+      "day": "Dag",
+      "year": "År",
+      "hour": "Time"
+    },
+    "repetitionPeriod": {
+      "label": "Periode",
+      "description": "Antal enheder (uger, dage osv.), før begivenheden gentages. Skal være 1 eller højere."
+    },
+    "displayOption": {
+      "label": "Visningsformat",
+      "description": "Hvordan datoen vises for læseren.",
+      "default": "Lokaliseret dato/tid (standard)",
+      "defaultAndOriginal": "Lokaliseret dato/tid (med den konfigurerede tidszone)",
+      "defaultAndUtc": "UTC (med lokaliseret dato/tid)",
+      "humanCountdown": "Nedtælling / tid siden",
+      "nasaCountdown": "Nedtælling T-(plus/minus)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Makroen er ikke konfigureret. Konfigurer det i makrokonfigurationen.",
+      "date": "Datoen er ikke konfigureret. Konfigurer det i makrokonfigurationen.",
+      "time": "Tiden er ikke konfigureret. Konfigurer det i makrokonfigurationen.",
+      "timeZone": "Tidszonen er ikke konfigureret. Konfigurer det i makrokonfigurationen.",
+      "repetitionPeriod": "Gentagelsesperioden er ikke konfigureret. Konfigurer det i makrokonfigurationen.",
+      "field": "{field} er ikke konfigureret. Konfigurer det i makrokonfigurationen."
+    },
+    "repetitionPeriodInvalid": "Gentagelsesperioden skal være et helt tal på 1 eller højere.",
+    "repetitionPeriodInvalidWithHint": "Gentagelsesperioden skal være et helt tal på 1 eller højere. Konfigurer det i makrokonfigurationen.",
+    "invalidTime": "Tiden \"{time}\" er ikke i formatet \"XX:XX (am|pm)\"! Gyldige eksempler: \"9:00 am\" eller \"12:45 pm\"."
+  },
+  "tooltip": {
+    "colocated": "Samme sted: Du ser denne dato og tid fra den samme tidszone, som den blev konfigureret til."
+  },
+  "export": {
+    "countdownNote": "(nedtælling er ikke tilgængelig i eksport)"
+  }
+}

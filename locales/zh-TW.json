@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "在地化日期巨集",
+      "description": "依每位檢視者的時區顯示時間"
+    },
+    "repeating": {
+      "title": "重複在地化日期巨集",
+      "description": "依檢視者的時區顯示重複時間"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "時間",
+      "description": "所選時區下的時間，格式為 hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "日期",
+      "description": "所選時區下的日期。"
+    },
+    "startDate": {
+      "label": "開始日期",
+      "description": "所選時區下的開始日期。"
+    },
+    "timeZone": {
+      "label": "時區",
+      "description": "上方日期時間所設定的時區。若您以本地時間填寫，請選擇您的本地時區。"
+    },
+    "repetitionUnit": {
+      "label": "重複單位",
+      "description": "重複所使用的時間單位。",
+      "week": "週（預設）",
+      "day": "天",
+      "year": "年",
+      "hour": "小時"
+    },
+    "repetitionPeriod": {
+      "label": "週期",
+      "description": "活動重複前的單位數（週、天等）。必須為 1 或以上。"
+    },
+    "displayOption": {
+      "label": "顯示格式",
+      "description": "向檢視者顯示日期的方式。",
+      "default": "在地化日期/時間（預設）",
+      "defaultAndOriginal": "在地化日期/時間（含設定的時區）",
+      "defaultAndUtc": "UTC（含在地化日期/時間）",
+      "humanCountdown": "倒數 / 已過時間",
+      "nasaCountdown": "倒數 T-（加/減）"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "尚未設定巨集。請在巨集設定中進行設定。",
+      "date": "尚未設定日期。請在巨集設定中進行設定。",
+      "time": "尚未設定時間。請在巨集設定中進行設定。",
+      "timeZone": "尚未設定時區。請在巨集設定中進行設定。",
+      "repetitionPeriod": "尚未設定重複週期。請在巨集設定中進行設定。",
+      "field": "尚未設定{field}。請在巨集設定中進行設定。"
+    },
+    "repetitionPeriodInvalid": "重複週期必須是 1 或以上的整數。",
+    "repetitionPeriodInvalidWithHint": "重複週期必須是 1 或以上的整數。請在巨集設定中進行設定。",
+    "invalidTime": "時間「{time}」不符合「XX:XX (am|pm)」格式！有效值範例：\"9:00 am\" 或 \"12:45 pm\"。"
+  },
+  "tooltip": {
+    "colocated": "同地：您檢視此日期時間所用的時區與其設定的時區相同。"
+  },
+  "export": {
+    "countdownNote": "（匯出內容不支援倒數）"
+  }
+}

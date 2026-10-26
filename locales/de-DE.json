@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Makro für lokalisiertes Datum",
+      "description": "Zeigt Zeiten in der Zeitzone jedes Betrachters an"
+    },
+    "repeating": {
+      "title": "Makro für wiederkehrendes lokalisiertes Datum",
+      "description": "Zeigt wiederkehrende Zeiten in den Zeitzonen der Betrachter an"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Uhrzeit",
+      "description": "Die Uhrzeit in der unten ausgewählten Zeitzone im Format hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Datum",
+      "description": "Das Datum in der unten ausgewählten Zeitzone."
+    },
+    "startDate": {
+      "label": "Startdatum",
+      "description": "Das Startdatum in der unten ausgewählten Zeitzone."
+    },
+    "timeZone": {
+      "label": "Zeitzone",
+      "description": "Die Zeitzone, für die Datum und Uhrzeit oben festgelegt sind. Wenn Sie beides in Ihrer Ortszeit eingegeben haben, wählen Sie Ihre lokale Zeitzone."
+    },
+    "repetitionUnit": {
+      "label": "Wiederholungseinheit",
+      "description": "Welche Zeiteinheit für die Wiederholungen verwendet wird.",
+      "week": "Woche (Standard)",
+      "day": "Tag",
+      "year": "Jahr",
+      "hour": "Stunde"
+    },
+    "repetitionPeriod": {
+      "label": "Zeitraum",
+      "description": "Die Anzahl der Einheiten (Wochen, Tage usw.), nach denen sich dieses Ereignis wiederholt. Muss mindestens 1 sein."
+    },
+    "displayOption": {
+      "label": "Anzeigeformat",
+      "description": "Wie Ihr Datum dem Betrachter angezeigt wird.",
+      "default": "Lokalisierte Datums- und Zeitangabe (Standard)",
+      "defaultAndOriginal": "Lokalisierte Datums- und Zeitangabe (mit konfigurierter Zeitzone)",
+      "defaultAndUtc": "UTC (mit lokalisierter Datums- und Zeitangabe)",
+      "humanCountdown": "Countdown / Zeit seit",
+      "nasaCountdown": "Countdown T-(plus/minus)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Das Makro ist nicht konfiguriert. Konfigurieren Sie dies in der Makrokonfiguration.",
+      "date": "Das Datum ist nicht konfiguriert. Konfigurieren Sie dies in der Makrokonfiguration.",
+      "time": "Die Uhrzeit ist nicht konfiguriert. Konfigurieren Sie dies in der Makrokonfiguration.",
+      "timeZone": "Die Zeitzone ist nicht konfiguriert. Konfigurieren Sie dies in der Makrokonfiguration.",
+      "repetitionPeriod": "Der Wiederholungszeitraum ist nicht konfiguriert. Konfigurieren Sie dies in der Makrokonfiguration.",
+      "field": "{field} ist nicht konfiguriert. Konfigurieren Sie dies in der Makrokonfiguration."
+    },
+    "repetitionPeriodInvalid": "Der Wiederholungszeitraum muss eine ganze Zahl ab 1 sein.",
+    "repetitionPeriodInvalidWithHint": "Der Wiederholungszeitraum muss eine ganze Zahl ab 1 sein. Konfigurieren Sie dies in der Makrokonfiguration.",
+    "invalidTime": "Die Uhrzeit „{time}“ hat nicht das Format „XX:XX (am|pm)“! Gültige Beispiele: „9:00 am“ oder „12:45 pm“."
+  },
+  "tooltip": {
+    "colocated": "Gleicher Standort: Sie sehen dieses Datum mit Uhrzeit aus derselben Zeitzone, für die es konfiguriert wurde."
+  },
+  "export": {
+    "countdownNote": "(Countdown im Export nicht verfügbar)"
+  }
+}

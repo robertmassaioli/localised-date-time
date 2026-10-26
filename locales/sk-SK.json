@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Makro lokalizovaného dátumu",
+      "description": "Zobrazuje časy v časovom pásme každého čitateľa"
+    },
+    "repeating": {
+      "title": "Makro opakovaného lokalizovaného dátumu",
+      "description": "Zobrazuje opakujúce sa časy v časových pásmach čitateľov"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Čas",
+      "description": "Čas v časovom pásme vybranom nižšie vo formáte hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Dátum",
+      "description": "Dátum v časovom pásme vybranom nižšie."
+    },
+    "startDate": {
+      "label": "Dátum začiatku",
+      "description": "Dátum začiatku v časovom pásme vybranom nižšie."
+    },
+    "timeZone": {
+      "label": "Časové pásmo",
+      "description": "Časové pásmo, pre ktoré je nastavený vyššie uvedený dátum a čas. Ak ste ich zadali vo svojom miestnom čase, vyberte svoje miestne časové pásmo."
+    },
+    "repetitionUnit": {
+      "label": "Jednotka opakovania",
+      "description": "Akú jednotku času použiť pri opakovaniach.",
+      "week": "Týždeň (predvolené)",
+      "day": "Deň",
+      "year": "Rok",
+      "hour": "Hodina"
+    },
+    "repetitionPeriod": {
+      "label": "Perióda",
+      "description": "Počet jednotiek (týždňov, dní a pod.), po ktorých sa udalosť zopakuje. Musí byť 1 alebo viac."
+    },
+    "displayOption": {
+      "label": "Formát zobrazenia",
+      "description": "Ako sa dátum zobrazí čitateľovi.",
+      "default": "Lokalizovaný dátum a čas (predvolené)",
+      "defaultAndOriginal": "Lokalizovaný dátum a čas (s nastaveným časovým pásmom)",
+      "defaultAndUtc": "UTC (s lokalizovaným dátumom a časom)",
+      "humanCountdown": "Odpočítavanie / uplynutý čas",
+      "nasaCountdown": "Odpočítavanie T-(plus/mínus)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Makro nie je nakonfigurované. Nastavte to v konfigurácii makra.",
+      "date": "Dátum nie je nakonfigurovaný. Nastavte to v konfigurácii makra.",
+      "time": "Čas nie je nakonfigurovaný. Nastavte to v konfigurácii makra.",
+      "timeZone": "Časové pásmo nie je nakonfigurované. Nastavte to v konfigurácii makra.",
+      "repetitionPeriod": "Perióda opakovania nie je nakonfigurovaná. Nastavte to v konfigurácii makra.",
+      "field": "Pole {field} nie je nakonfigurované. Nastavte to v konfigurácii makra."
+    },
+    "repetitionPeriodInvalid": "Perióda opakovania musí byť celé číslo 1 alebo vyššie.",
+    "repetitionPeriodInvalidWithHint": "Perióda opakovania musí byť celé číslo 1 alebo vyššie. Nastavte to v konfigurácii makra.",
+    "invalidTime": "Čas „{time}“ nie je vo formáte „XX:XX (am|pm)“! Platné hodnoty sú napríklad „9:00 am“ alebo „12:45 pm“."
+  },
+  "tooltip": {
+    "colocated": "Rovnaké miesto: tento dátum a čas si pozeráte z rovnakého časového pásma, pre ktoré boli nastavené."
+  },
+  "export": {
+    "countdownNote": "(odpočítavanie nie je v exporte dostupné)"
+  }
+}

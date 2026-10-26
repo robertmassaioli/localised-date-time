@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Macro de date localisée",
+      "description": "Affiche les heures dans le fuseau horaire de chaque lecteur"
+    },
+    "repeating": {
+      "title": "Macro de date localisée récurrente",
+      "description": "Affiche les heures récurrentes dans le fuseau horaire des lecteurs"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Heure",
+      "description": "L’heure, dans le fuseau horaire sélectionné ci-dessous, au format hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Date",
+      "description": "La date, dans le fuseau horaire sélectionné ci-dessous."
+    },
+    "startDate": {
+      "label": "Date de début",
+      "description": "La date de début, dans le fuseau horaire sélectionné ci-dessous."
+    },
+    "timeZone": {
+      "label": "Fuseau horaire",
+      "description": "Le fuseau horaire pour lequel la date et l’heure ci-dessus sont configurées. Si vous les avez saisies dans votre heure locale, sélectionnez votre fuseau horaire local."
+    },
+    "repetitionUnit": {
+      "label": "Unité de répétition",
+      "description": "L’unité de temps à utiliser pour les répétitions.",
+      "week": "Semaine (par défaut)",
+      "day": "Jour",
+      "year": "Année",
+      "hour": "Heure"
+    },
+    "repetitionPeriod": {
+      "label": "Période",
+      "description": "Le nombre d’unités (semaines, jours, etc.) avant que cet événement se répète. Doit être supérieur ou égal à 1."
+    },
+    "displayOption": {
+      "label": "Format d’affichage",
+      "description": "La façon dont votre date sera affichée au lecteur.",
+      "default": "Date/heure localisée (par défaut)",
+      "defaultAndOriginal": "Date/heure localisée (avec le fuseau horaire configuré)",
+      "defaultAndUtc": "UTC (avec date/heure localisée)",
+      "humanCountdown": "Compte à rebours / temps écoulé",
+      "nasaCountdown": "Compte à rebours T-(plus/moins)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "La macro n’est pas configurée. Configurez cet élément dans la configuration de la macro.",
+      "date": "La date n’est pas configurée. Configurez cet élément dans la configuration de la macro.",
+      "time": "L’heure n’est pas configurée. Configurez cet élément dans la configuration de la macro.",
+      "timeZone": "Le fuseau horaire n’est pas configuré. Configurez cet élément dans la configuration de la macro.",
+      "repetitionPeriod": "La période de répétition n’est pas configurée. Configurez cet élément dans la configuration de la macro.",
+      "field": "{field} n’est pas configuré. Configurez cet élément dans la configuration de la macro."
+    },
+    "repetitionPeriodInvalid": "La période de répétition doit être un nombre entier supérieur ou égal à 1.",
+    "repetitionPeriodInvalidWithHint": "La période de répétition doit être un nombre entier supérieur ou égal à 1. Configurez cet élément dans la configuration de la macro.",
+    "invalidTime": "L’heure « {time} » n’est pas au format « XX:XX (am|pm) » ! Exemples de valeurs valides : « 9:00 am » ou « 12:45 pm »."
+  },
+  "tooltip": {
+    "colocated": "Même lieu : vous consultez cette date et cette heure depuis le fuseau horaire pour lequel elles ont été configurées."
+  },
+  "export": {
+    "countdownNote": "(compte à rebours non disponible dans l’export)"
+  }
+}

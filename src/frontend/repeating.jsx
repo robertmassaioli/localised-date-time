@@ -1,29 +1,33 @@
 import React from 'react';
-import ForgeReconciler, { DatePicker, Label, Select, Text, Textfield } from '@forge/react';
+import ForgeReconciler, { DatePicker, I18nProvider, Label, Select, Text, Textfield } from '@forge/react';
 import { isPresent } from 'ts-is-present';
-import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN, FORMAT_NASA_COUNTDOWN } from "../displayOptions";
+import { FORMAT_DEFAULT } from "../displayOptions";
 import { parseConfiguredDate } from '../dateTime';
 import { TimeZones } from "../timezones";
-import { nextRepeatDate, REPEAT_ANNUALLY, REPEAT_DAILY, REPEAT_HOURLY, REPEAT_WEEKLY, repetitionToUnits } from '../repetition';
+import { nextRepeatDate, REPEAT_WEEKLY, repetitionToUnits } from '../repetition';
 import { parseTime, renderDateLozenge, validateConfig } from './common';
+import { displayOptionChoices, repetitionUnitChoices } from './displayOptionChoices';
 import { useDateMacroContext } from './useDateMacroContext';
+import { useTranslate } from './useTranslate';
 
 const App = () => {
   const { details, config, timeZone } = useDateMacroContext();
+  const { ready, t } = useTranslate();
+  if (!ready) return null;
 
   // Shared validation
-  const error = validateConfig(details, config);
+  const error = validateConfig(details, config, t);
   if (error) return <Text>{error}</Text>;
 
   // Shared time parsing
-  const parsed = parseTime(config.time);
+  const parsed = parseTime(config.time, t);
   if (parsed.error) return <Text>{parsed.error}</Text>;
 
   const {time, meridiem} = parsed;
 
   if(!isPresent(config.timeZone)) {
     return (
-      <Text>Time Zone not configured. Please configure it in the Macro Configuration.</Text>
+      <Text>{t('error.notConfigured.timeZone')}</Text>
     );
   }
 
@@ -31,82 +35,80 @@ const App = () => {
   const repetitionPeriodRaw = config.repetitionPeriod;
   if (!isPresent(repetitionPeriodRaw)) {
     return (
-      <Text>Repetition period not configured. Please configure it in the Macro Configuration.</Text>
+      <Text>{t('error.notConfigured.repetitionPeriod')}</Text>
     );
   }
 
   const repetitionPeriod = parseInt(repetitionPeriodRaw, 10);
   if (isNaN(repetitionPeriod) || repetitionPeriod < 1) {
     return (
-      <Text>Repetition period must be a whole number of 1 or higher. Please configure it in the Macro Configuration.</Text>
+      <Text>{t('error.repetitionPeriodInvalidWithHint')}</Text>
     );
   }
 
   const startDate = parseConfiguredDate(config.date, time, meridiem, config.timeZone);
   const originalDate = nextRepeatDate(startDate, repetitionPeriod, repetitionToUnits(repetitionUnit));
 
-  return renderDateLozenge({ originalDate, timeZone, config });
+  return renderDateLozenge({ originalDate, timeZone, config, t });
 };
 
 ForgeReconciler.render(
   <React.StrictMode>
-    <App />
+    <I18nProvider>
+      <App />
+    </I18nProvider>
   </React.StrictMode>
 );
 
 const Config = () => {
+  const { ready, t } = useTranslate();
+  if (!ready) return null;
+
   return (
     <>
-      <Label labelFor='time'>Time</Label>
+      <Label labelFor='time'>{t('config.time.label')}</Label>
       <Textfield
               name="time"
-              description="The time, in the timezone selected below, in the format hh:mm am/pm"
-              placeholder="12:00am"
+              description={t('config.time.description')}
+              placeholder={t('config.time.placeholder')}
               />
-      <Label labelFor="date">Start Date</Label>
-      <DatePicker name="date" description="The start date, in the timezone selected below." />
-      <Label labelFor='timeZone'>Timezone</Label>
+      <Label labelFor="date">{t('config.startDate.label')}</Label>
+      <DatePicker name="date" description={t('config.startDate.description')} />
+      <Label labelFor='timeZone'>{t('config.timeZone.label')}</Label>
       <Select
         name="timeZone"
         isRequired
-        description="The timezone that the Date Time above is configured for. If you have written the above in your local time then select your local timezone."
+        description={t('config.timeZone.description')}
         options={TimeZones.map(tz => ({ label: tz, value: tz }))}
         />
-      <Label labelFor='repetitionUnit'>Repetition Unit</Label>
+      <Label labelFor='repetitionUnit'>{t('config.repetitionUnit.label')}</Label>
       <Select
         name="repetitionUnit"
         isRequired
-        defaultValue={{ label: 'Week (Default)', value: REPEAT_WEEKLY }}
-        description="What unit of time to use for the repetitions."
-        options={[
-          { label: 'Week (Default)', value: REPEAT_WEEKLY },
-          { label: 'Day', value: REPEAT_DAILY },
-          { label: 'Year', value: REPEAT_ANNUALLY },
-          { label: 'Hour', value: REPEAT_HOURLY }
-        ]}
+        defaultValue={{ label: t('config.repetitionUnit.week'), value: REPEAT_WEEKLY }}
+        description={t('config.repetitionUnit.description')}
+        options={repetitionUnitChoices(t)}
         />
-      <Label labelFor='repetitionPeriod'>Period</Label>
+      <Label labelFor='repetitionPeriod'>{t('config.repetitionPeriod.label')}</Label>
       <Textfield
         isRequired
         name="repetitionPeriod"
-        description="The number of units (weeks, days etc) before this event repeats. Must be 1 or higher."
+        description={t('config.repetitionPeriod.description')}
         />
-      <Label labelFor='displayOption'>Display format</Label>
+      <Label labelFor='displayOption'>{t('config.displayOption.label')}</Label>
       <Select
         name="displayOption"
         isRequired
-        defaultValue={{ label: 'Localised Date/Time (Default)', value: FORMAT_DEFAULT }}
-        description="How your date will be displayed to the viewer."
-        options={[
-          { label: 'Localised Date/Time (Default)', value: FORMAT_DEFAULT },
-          { label: 'Localised Date/Time (With configured timezone)', value: FORMAT_DEFAULT_AND_ORIGINAL },
-          { label: 'UTC (With Localised Date/Time)', value: FORMAT_DEFAULT_AND_UTC },
-          { label: 'Countdown / Time since', value: FORMAT_HUMAN_COUNTDOWN },
-          { label: 'Countdown T-(plus/minus)', value: FORMAT_NASA_COUNTDOWN }
-        ]}
+        defaultValue={{ label: t('config.displayOption.default'), value: FORMAT_DEFAULT }}
+        description={t('config.displayOption.description')}
+        options={displayOptionChoices(t)}
         />
     </>
   );
 };
 
-ForgeReconciler.addConfig(<Config />);
+ForgeReconciler.addConfig(
+  <I18nProvider>
+    <Config />
+  </I18nProvider>
+);

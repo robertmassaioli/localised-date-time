@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status as of 2026-10-26:** not started. Status values: ✅ done, ⬜ pending or open.
+**Status as of 2026-10-26:** done in PR `i18n-all-locales`. Open risks that need the maintainer are marked ⬜ in section 7. Status values: ✅ done, ⬜ pending or open.
 
 This implements item 3.3 of `codebase-review-2026-10.md`. Every user-visible string moves into `locales/<code>.json` and gets a translation for each of the 26 locales on the [Forge supported locale codes](https://developer.atlassian.com/platform/forge/manifest-reference/forge-supported-locale-codes/) page. This change touches strings only. It adds no components and changes no styling. Date formatting stays as it is, because item 3.2 owns it.
 
@@ -26,14 +26,14 @@ References:
 
 | # | Area and files | Strings | How it is translated | Status |
 |---|----------------|---------|----------------------|--------|
-| 1.1 | Manifest `title` and `description`, both macros (`manifest.yml`) | 4 | Already `i18n:` keys. Extend to all locales. | ⬜ Pending |
-| 1.2 | Config panel labels and field descriptions, both macros (`non-repeating.jsx`, `repeating.jsx`) | 14 labels, descriptions and placeholders | `t('config....')` in the `Config` component, wrapped in `I18nProvider`. | ⬜ Pending |
-| 1.3 | Display-format names (5) and repetition unit labels (4), including the `defaultValue` labels | 9 | Shared helper `src/frontend/displayOptionChoices.js` builds the option lists from `t`. Both macros use it. | ⬜ Pending |
-| 1.4 | `validateConfig` messages in `src/configHelpers.js` | 6 | A message per field (`date`, `time`, `timeZone`, `repetitionPeriod`) plus a generic one with `{field}`. A per-field message avoids grammar problems that a joined "{field} not configured" sentence would cause in languages with gender or case. | ⬜ Pending |
-| 1.5 | `parseTime` error | 1, with `{time}` | `t('error.invalidTime', { time })`. | ⬜ Pending |
-| 1.6 | `Time Zone not configured` and the two `Repetition period` messages in the `App` components | 3 | The "not configured" messages reuse the `validateConfig` keys. The "must be a whole number" message has two keys, one with the "please configure" hint (macro) and one without (export). | ⬜ Pending |
-| 1.7 | Co-located tooltip in `renderDateLozenge` (`src/frontend/common.jsx`) | 1 | `renderDateLozenge` is a plain function, so it receives `t` in its argument object. | ⬜ Pending |
-| 1.8 | Export error documents and the countdown note (`src/adfExport.js`) | 1 plus the shared messages | Server-side `t` from `i18n.createTranslationFunction`. | ⬜ Pending |
+| 1.1 | Manifest `title` and `description`, both macros (`manifest.yml`) | 4 | Already `i18n:` keys. Extend to all locales. | ✅ Done |
+| 1.2 | Config panel labels and field descriptions, both macros (`non-repeating.jsx`, `repeating.jsx`) | 3 shared plus 5 per macro (labels, descriptions, placeholder) | `t('config....')` in the `Config` component, wrapped in `I18nProvider`. | ✅ Done |
+| 1.3 | Display-format names (5) and repetition unit labels (4), including the `defaultValue` labels | 9 | Shared helper `src/frontend/displayOptionChoices.js` builds the option lists from `t`. Both macros use it. | ✅ Done |
+| 1.4 | `validateConfig` messages in `src/configHelpers.js` | 6 | A message per field (`date`, `time`, `timeZone`, `repetitionPeriod`) plus a generic one with `{field}`. A per-field message avoids grammar problems that a joined "{field} not configured" sentence would cause in languages with gender or case. | ✅ Done |
+| 1.5 | `parseTime` error | 1, with `{time}` | `t('error.invalidTime', { time })`. | ✅ Done |
+| 1.6 | `Time Zone not configured` and the two `Repetition period` messages in the `App` components | 3 | The "not configured" messages reuse the `validateConfig` keys. The "must be a whole number" message has two keys, one with the "please configure" hint (macro) and one without (export). | ✅ Done |
+| 1.7 | Co-located tooltip in `renderDateLozenge` (`src/frontend/common.jsx`) | 1 | `renderDateLozenge` is a plain function, so it receives `t` in its argument object. | ✅ Done |
+| 1.8 | Export error documents and the countdown note (`src/adfExport.js`) | 1 plus the shared messages | Server-side `t` from `i18n.createTranslationFunction`. | ✅ Done |
 
 Not translated: IANA timezone ids in the timezone select, log messages (`console.warn`), the `ddd, MMM DD, YYYY h:mma z` date format (item 3.2), and the `am` and `pm` tokens the time parser accepts. The time placeholder `12:00am` is a key so a locale can change it, but every locale keeps the `am/pm` form because the parser only accepts it.
 
@@ -107,20 +107,20 @@ I will break two of the new tests on purpose (drop a key, change a placeholder) 
 
 | Risk | Mitigation | Status |
 |------|------------|--------|
-| 26 files may approach the 100 KB combined limit (CJK text is 3 bytes per character in UTF-8). | Test enforces it. Strings are kept short. | ⬜ Open |
+| 26 files may approach the 100 KB combined limit (CJK text is 3 bytes per character in UTF-8). | Test enforces it. Strings are kept short. | ✅ Done. 82 KB measured |
 | Machine-written translations contain errors or odd terms. | PR says so and lists languages for reviewers. | ⬜ Open |
 | Config panel components may not be able to call `useTranslation` at runtime. Library source says they can. It cannot be run here. | State it in the PR. The maintainer checks with `forge tunnel`. | ⬜ Open |
 | The export has no viewer locale, so PDF and Word output stays English. | Use `context.locale` if present. Maintainer decides if more is needed. | ⬜ Open |
 | Another branch migrates `moment` to Luxon and edits `adfExport.js`, `common.jsx` and their tests. | Edits here stay small and local to strings. The second PR to merge needs a small conflict fix. | ⬜ Open |
-| `I18nProvider` makes the macro render nothing until the translation files load. | `ready` guard returns `null` briefly. Falls back to key text if a load fails, which tests cannot see. | ⬜ Open |
+| `I18nProvider` makes the macro render nothing until the translation files load. | `ready` guard returns `null` briefly. Falls back to key text if a load fails, which tests cannot see. | ✅ Done |
 
 ## 8. Work plan
 
 | # | Step | Status |
 |---|------|--------|
-| 8.1 | `src/i18n.js`, `useTranslate.js`, option helper | ⬜ Pending |
-| 8.2 | Wire the frontend, `configHelpers` and `adfExport` | ⬜ Pending |
-| 8.3 | `locales/en-GB.json` and `en-US.json` complete, then 24 more | ⬜ Pending |
-| 8.4 | Manifest resources | ⬜ Pending |
-| 8.5 | Tests, mutation checks, lint, `forge lint` | ⬜ Pending |
-| 8.6 | Mark 3.3 done, open PR, check CI | ⬜ Pending |
+| 8.1 | `src/i18n.js`, `useTranslate.js`, option helper | ✅ Done |
+| 8.2 | Wire the frontend, `configHelpers` and `adfExport` | ✅ Done |
+| 8.3 | `locales/en-GB.json` and `en-US.json` complete, then 24 more | ✅ Done |
+| 8.4 | Manifest resources | ✅ Done |
+| 8.5 | Tests, mutation checks, lint, `forge lint` | ✅ Done |
+| 8.6 | Mark 3.3 done, open PR, check CI | ✅ Done |

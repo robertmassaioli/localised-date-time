@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "Lokalizált dátum makró",
+      "description": "Az időpontokat az egyes megtekintők időzónájában jeleníti meg"
+    },
+    "repeating": {
+      "title": "Ismétlődő lokalizált dátum makró",
+      "description": "Az ismétlődő időpontokat a megtekintők időzónájában jeleníti meg"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "Idő",
+      "description": "Az idő az alább kiválasztott időzónában, hh:mm am/pm formátumban",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Dátum",
+      "description": "A dátum az alább kiválasztott időzónában."
+    },
+    "startDate": {
+      "label": "Kezdő dátum",
+      "description": "A kezdő dátum az alább kiválasztott időzónában."
+    },
+    "timeZone": {
+      "label": "Időzóna",
+      "description": "Az az időzóna, amelyre a fenti dátum és idő be van állítva. Ha helyi idő szerint adta meg őket, válassza a helyi időzónáját."
+    },
+    "repetitionUnit": {
+      "label": "Ismétlés egysége",
+      "description": "Milyen időegységet használjon az ismétlésekhez.",
+      "week": "Hét (alapértelmezett)",
+      "day": "Nap",
+      "year": "Év",
+      "hour": "Óra"
+    },
+    "repetitionPeriod": {
+      "label": "Időszak",
+      "description": "Hány egység (hét, nap stb.) után ismétlődik az esemény. Legalább 1 legyen."
+    },
+    "displayOption": {
+      "label": "Megjelenítési formátum",
+      "description": "Hogyan jelenik meg a dátum a megtekintő számára.",
+      "default": "Lokalizált dátum/idő (alapértelmezett)",
+      "defaultAndOriginal": "Lokalizált dátum/idő (a beállított időzónával)",
+      "defaultAndUtc": "UTC (lokalizált dátummal/idővel)",
+      "humanCountdown": "Visszaszámlálás / eltelt idő",
+      "nasaCountdown": "Visszaszámlálás T-(plusz/mínusz)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "A makró nincs beállítva. Állítsa be a makró beállításaiban.",
+      "date": "A dátum nincs beállítva. Állítsa be a makró beállításaiban.",
+      "time": "Az idő nincs beállítva. Állítsa be a makró beállításaiban.",
+      "timeZone": "Az időzóna nincs beállítva. Állítsa be a makró beállításaiban.",
+      "repetitionPeriod": "Az ismétlési időszak nincs beállítva. Állítsa be a makró beállításaiban.",
+      "field": "A(z) {field} nincs beállítva. Állítsa be a makró beállításaiban."
+    },
+    "repetitionPeriodInvalid": "Az ismétlési időszaknak legalább 1-es egész számnak kell lennie.",
+    "repetitionPeriodInvalidWithHint": "Az ismétlési időszaknak legalább 1-es egész számnak kell lennie. Állítsa be a makró beállításaiban.",
+    "invalidTime": "A(z) \"{time}\" idő nem a \"XX:XX (am|pm)\" formátumú! Érvényes példák: \"9:00 am\" vagy \"12:45 pm\"."
+  },
+  "tooltip": {
+    "colocated": "Azonos hely: ezt a dátumot és időt abból az időzónából nézi, amelyre beállították."
+  },
+  "export": {
+    "countdownNote": "(a visszaszámlálás nem érhető el exportáláskor)"
+  }
+}

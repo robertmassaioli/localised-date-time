@@ -1,0 +1,71 @@
+{
+  "macro": {
+    "nonrepeating": {
+      "title": "현지화된 날짜 매크로",
+      "description": "각 보는 사람의 시간대로 시간을 표시합니다"
+    },
+    "repeating": {
+      "title": "반복되는 현지화된 날짜 매크로",
+      "description": "보는 사람의 시간대로 반복되는 시간을 표시합니다"
+    }
+  },
+  "config": {
+    "time": {
+      "label": "시간",
+      "description": "아래에서 선택한 시간대의 시간이며 hh:mm am/pm 형식입니다",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "날짜",
+      "description": "아래에서 선택한 시간대의 날짜입니다."
+    },
+    "startDate": {
+      "label": "시작 날짜",
+      "description": "아래에서 선택한 시간대의 시작 날짜입니다."
+    },
+    "timeZone": {
+      "label": "시간대",
+      "description": "위의 날짜와 시간이 설정된 시간대입니다. 현지 시간으로 입력했다면 현지 시간대를 선택하세요."
+    },
+    "repetitionUnit": {
+      "label": "반복 단위",
+      "description": "반복에 사용할 시간 단위입니다.",
+      "week": "주(기본값)",
+      "day": "일",
+      "year": "년",
+      "hour": "시간"
+    },
+    "repetitionPeriod": {
+      "label": "기간",
+      "description": "이 이벤트가 반복되기까지의 단위 수(주, 일 등)입니다. 1 이상이어야 합니다."
+    },
+    "displayOption": {
+      "label": "표시 형식",
+      "description": "날짜가 보는 사람에게 표시되는 방식입니다.",
+      "default": "현지화된 날짜/시간(기본값)",
+      "defaultAndOriginal": "현지화된 날짜/시간(설정된 시간대 포함)",
+      "defaultAndUtc": "UTC(현지화된 날짜/시간 포함)",
+      "humanCountdown": "카운트다운 / 경과 시간",
+      "nasaCountdown": "카운트다운 T-(플러스/마이너스)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "매크로가 구성되지 않았습니다. 매크로 구성에서 구성해 주세요.",
+      "date": "날짜가 구성되지 않았습니다. 매크로 구성에서 구성해 주세요.",
+      "time": "시간이 구성되지 않았습니다. 매크로 구성에서 구성해 주세요.",
+      "timeZone": "시간대가 구성되지 않았습니다. 매크로 구성에서 구성해 주세요.",
+      "repetitionPeriod": "반복 기간이 구성되지 않았습니다. 매크로 구성에서 구성해 주세요.",
+      "field": "{field}이(가) 구성되지 않았습니다. 매크로 구성에서 구성해 주세요."
+    },
+    "repetitionPeriodInvalid": "반복 기간은 1 이상의 정수여야 합니다.",
+    "repetitionPeriodInvalidWithHint": "반복 기간은 1 이상의 정수여야 합니다. 매크로 구성에서 구성해 주세요.",
+    "invalidTime": "시간 \"{time}\"이(가) \"XX:XX (am|pm)\" 형식이 아닙니다! 올바른 값의 예: \"9:00 am\" 또는 \"12:45 pm\"."
+  },
+  "tooltip": {
+    "colocated": "같은 위치: 이 날짜와 시간이 구성된 시간대와 같은 시간대에서 보고 있습니다."
+  },
+  "export": {
+    "countdownNote": "(내보내기에서는 카운트다운을 사용할 수 없음)"
+  }
+}

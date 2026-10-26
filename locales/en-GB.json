@@ -8,5 +8,64 @@
       "title": "Repeating localised date macro",
       "description": "Display recurring times in viewers’ time zones"
     }
+  },
+  "config": {
+    "time": {
+      "label": "Time",
+      "description": "The time, in the timezone selected below, in the format hh:mm am/pm",
+      "placeholder": "12:00am"
+    },
+    "date": {
+      "label": "Date",
+      "description": "The date, in the timezone selected below."
+    },
+    "startDate": {
+      "label": "Start Date",
+      "description": "The start date, in the timezone selected below."
+    },
+    "timeZone": {
+      "label": "Timezone",
+      "description": "The timezone that the Date Time above is configured for. If you have written the above in your local time then select your local timezone."
+    },
+    "repetitionUnit": {
+      "label": "Repetition Unit",
+      "description": "What unit of time to use for the repetitions.",
+      "week": "Week (Default)",
+      "day": "Day",
+      "year": "Year",
+      "hour": "Hour"
+    },
+    "repetitionPeriod": {
+      "label": "Period",
+      "description": "The number of units (weeks, days etc) before this event repeats. Must be 1 or higher."
+    },
+    "displayOption": {
+      "label": "Display format",
+      "description": "How your date will be displayed to the viewer.",
+      "default": "Localised Date/Time (Default)",
+      "defaultAndOriginal": "Localised Date/Time (With configured timezone)",
+      "defaultAndUtc": "UTC (With Localised Date/Time)",
+      "humanCountdown": "Countdown / Time since",
+      "nasaCountdown": "Countdown T-(plus/minus)"
+    }
+  },
+  "error": {
+    "notConfigured": {
+      "macro": "Macro not configured. Please configure it in the Macro Configuration.",
+      "date": "Date not configured. Please configure it in the Macro Configuration.",
+      "time": "Time not configured. Please configure it in the Macro Configuration.",
+      "timeZone": "Time Zone not configured. Please configure it in the Macro Configuration.",
+      "repetitionPeriod": "Repetition period not configured. Please configure it in the Macro Configuration.",
+      "field": "{field} not configured. Please configure it in the Macro Configuration."
+    },
+    "repetitionPeriodInvalid": "Repetition period must be a whole number of 1 or higher.",
+    "repetitionPeriodInvalidWithHint": "Repetition period must be a whole number of 1 or higher. Please configure it in the Macro Configuration.",
+    "invalidTime": "Time \"{time}\" not in the \"XX:XX (am|pm)\" format! Example, valid values are: \"9:00 am\" or \"12:45 pm\"."
+  },
+  "tooltip": {
+    "colocated": "Co-located: You are viewing this date-time from the same timezone it was configured for."
+  },
+  "export": {
+    "countdownNote": "(countdown not available in export)"
   }
 }
