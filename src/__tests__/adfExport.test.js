@@ -1,0 +1,191 @@
+import { handleNonRepeating, handleRepeating } from '../adfExport';
+import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN } from '../displayOptions';
+
+const mockRequestConfluence = jest.fn();
+
+jest.mock('@forge/api', () => ({
+  __esModule: true,
+  default: { asApp: () => ({ requestConfluence: (...args) => mockRequestConfluence(...args) }) },
+  route: (strings, ...values) => String.raw({ raw: strings.raw }, ...values)
+}));
+
+// 3:00 pm in Sydney (UTC+11 in November) is 11:00 pm the previous day in New York (UTC-5)
+const baseConfig = {
+  date: '2024-11-15',
+  time: '3:00 pm',
+  timeZone: 'Australia/Sydney',
+  displayOption: FORMAT_DEFAULT
+};
+
+const SYDNEY_TEXT = 'Fri, Nov 15, 2024 3:00pm AEDT';
+const NEW_YORK_TEXT = 'Thu, Nov 14, 2024 11:00pm EST';
+const UTC_TEXT = 'Fri, Nov 15, 2024 4:00am UTC';
+
+function payload(config, accountId = 'account-1') {
+  return { extensionPayload: { config }, context: { accountId } };
+}
+
+function usersBulkReturns(timeZone) {
+  mockRequestConfluence.mockResolvedValue({
+    ok: true,
+    status: 200,
+    json: async () => ({ results: [{ timeZone }] })
+  });
+}
+
+function textOf(adf) {
+  return adf.content[0].content.map(node => node.text ?? node.attrs?.text);
+}
+
+describe('adfExport', () => {
+  let warnSpy;
+
+  beforeEach(() => {
+    mockRequestConfluence.mockReset();
+    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    warnSpy.mockRestore();
+  });
+
+  describe('handleNonRepeating', () => {
+    test('shows the date in the viewer timezone', async () => {
+      usersBulkReturns('America/New_York');
+      const adf = await handleNonRepeating(payload(baseConfig));
+      expect(adf).toMatchObject({ version: 1, type: 'doc' });
+      expect(textOf(adf)).toEqual([NEW_YORK_TEXT]);
+      expect(adf.content[0].content[0]).toMatchObject({
+        type: 'status',
+        attrs: { localId: expect.any(String), color: 'neutral' }
+      });
+    });
+
+    test('asks users-bulk for the viewer account', async () => {
+      usersBulkReturns('America/New_York');
+      await handleNonRepeating(payload(baseConfig, 'account-42'));
+      expect(mockRequestConfluence).toHaveBeenCalledTimes(1);
+      const [url, options] = mockRequestConfluence.mock.calls[0];
+      expect(url).toBe('/wiki/api/v2/users-bulk');
+      expect(JSON.parse(options.body)).toEqual({ accountIds: ['account-42'] });
+    });
+
+    test('uses the configured timezone and makes no request when there is no account', async () => {
+      const adf = await handleNonRepeating(payload(baseConfig, null));
+      expect(textOf(adf)).toEqual([SYDNEY_TEXT]);
+      expect(mockRequestConfluence).not.toHaveBeenCalled();
+    });
+
+    test('falls back to the configured timezone and warns when the API returns an error status', async () => {
+      mockRequestConfluence.mockResolvedValue({ ok: false, status: 403, json: async () => ({}) });
+      const adf = await handleNonRepeating(payload(baseConfig));
+      expect(textOf(adf)).toEqual([SYDNEY_TEXT]);
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('status 403'));
+    });
+
+    test('falls back to the configured timezone when the API throws', async () => {
+      mockRequestConfluence.mockRejectedValue(new Error('network down'));
+      const adf = await handleNonRepeating(payload(baseConfig));
+      expect(textOf(adf)).toEqual([SYDNEY_TEXT]);
+      expect(warnSpy).toHaveBeenCalled();
+    });
+
+    test('falls back to the configured timezone and warns when the user has no timezone', async () => {
+      mockRequestConfluence.mockResolvedValue({ ok: true, status: 200, json: async () => ({ results: [{}] }) });
+      const adf = await handleNonRepeating(payload(baseConfig));
+      expect(textOf(adf)).toEqual([SYDNEY_TEXT]);
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('no timeZone'));
+    });
+
+    test('never logs the account id', async () => {
+      mockRequestConfluence.mockResolvedValue({ ok: false, status: 500, json: async () => ({}) });
+      const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {});
+      await handleNonRepeating(payload(baseConfig, 'secret-account-id'));
+      const logged = JSON.stringify([...warnSpy.mock.calls, ...infoSpy.mock.calls]);
+      expect(logged).not.toContain('secret-account-id');
+      infoSpy.mockRestore();
+    });
+
+    test('returns an error document for a missing field', async () => {
+      const { date, ...withoutDate } = baseConfig;
+      const adf = await handleNonRepeating(payload(withoutDate));
+      expect(textOf(adf)).toEqual(['Date not configured. Please configure it in the Macro Configuration.']);
+      expect(mockRequestConfluence).not.toHaveBeenCalled();
+    });
+
+    test('returns an error document when there is no config at all', async () => {
+      const adf = await handleNonRepeating({ context: { accountId: 'a' } });
+      expect(textOf(adf)[0]).toMatch(/not configured/);
+    });
+
+    test('returns an error document for an invalid time', async () => {
+      const adf = await handleNonRepeating(payload({ ...baseConfig, time: '25:99' }));
+      expect(textOf(adf)[0]).toMatch(/not in the "XX:XX \(am\|pm\)" format/);
+    });
+
+    describe('display options', () => {
+      test('configured timezone display shows both when the viewer is elsewhere', async () => {
+        usersBulkReturns('America/New_York');
+        const adf = await handleNonRepeating(payload({ ...baseConfig, displayOption: FORMAT_DEFAULT_AND_ORIGINAL }));
+        expect(textOf(adf)).toEqual([NEW_YORK_TEXT, ' (', SYDNEY_TEXT, ')']);
+      });
+
+      test('configured timezone display shows one date when the viewer is in the configured timezone', async () => {
+        usersBulkReturns('Australia/Sydney');
+        const adf = await handleNonRepeating(payload({ ...baseConfig, displayOption: FORMAT_DEFAULT_AND_ORIGINAL }));
+        expect(textOf(adf)).toEqual([SYDNEY_TEXT]);
+      });
+
+      test('UTC display shows UTC first and the viewer time in brackets', async () => {
+        usersBulkReturns('America/New_York');
+        const adf = await handleNonRepeating(payload({ ...baseConfig, displayOption: FORMAT_DEFAULT_AND_UTC }));
+        expect(textOf(adf)).toEqual([UTC_TEXT, ' (', NEW_YORK_TEXT, ')']);
+      });
+
+      test('countdown formats fall back to the absolute date with a note', async () => {
+        usersBulkReturns('America/New_York');
+        const adf = await handleNonRepeating(payload({ ...baseConfig, displayOption: FORMAT_HUMAN_COUNTDOWN }));
+        expect(textOf(adf)).toEqual([NEW_YORK_TEXT, ' (countdown not available in export)']);
+      });
+    });
+  });
+
+  describe('handleRepeating', () => {
+    const repeatingConfig = { ...baseConfig, repetitionUnit: 'repeat-weekly', repetitionPeriod: '1' };
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+      // Thursday 14 Nov 2024, 00:00 UTC: the next Friday 3:00 pm Sydney occurrence is 2024-11-15
+      jest.setSystemTime(new Date('2024-11-14T00:00:00Z'));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test('shows the next occurrence in the viewer timezone', async () => {
+      usersBulkReturns('America/New_York');
+      const adf = await handleRepeating(payload({ ...repeatingConfig, date: '2024-11-01' }));
+      expect(textOf(adf)).toEqual([NEW_YORK_TEXT]);
+    });
+
+    test('treats a missing repetition unit as weekly', async () => {
+      usersBulkReturns('America/New_York');
+      const { repetitionUnit, ...withoutUnit } = repeatingConfig;
+      const adf = await handleRepeating(payload({ ...withoutUnit, date: '2024-11-01' }));
+      expect(textOf(adf)).toEqual([NEW_YORK_TEXT]);
+    });
+
+    test.each(['0', '-3', 'abc', ''])('rejects the repetition period %p', async (period) => {
+      const adf = await handleRepeating(payload({ ...repeatingConfig, repetitionPeriod: period }));
+      expect(textOf(adf)[0]).toMatch(/Repetition period|not configured/);
+      expect(mockRequestConfluence).not.toHaveBeenCalled();
+    });
+
+    test('returns an error document when the period is missing', async () => {
+      const { repetitionPeriod, ...withoutPeriod } = repeatingConfig;
+      const adf = await handleRepeating(payload(withoutPeriod));
+      expect(textOf(adf)).toEqual(['RepetitionPeriod not configured. Please configure it in the Macro Configuration.']);
+    });
+  });
+});
