@@ -1,8 +1,8 @@
 import React from 'react';
 import ForgeReconciler, { DatePicker, Label, Select, Text, Textfield } from '@forge/react';
-import moment from 'moment-timezone';
 import { isPresent } from 'ts-is-present';
 import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN, FORMAT_NASA_COUNTDOWN } from "../displayOptions";
+import { parseConfiguredDate } from '../dateTime';
 import { TimeZones } from "../timezones";
 import { parseTime, renderDateLozenge, validateConfig } from './common';
 import { useDateMacroContext } from './useDateMacroContext';
@@ -19,7 +19,6 @@ const App = () => {
   if (parsed.error) return <Text>{parsed.error}</Text>;
 
   const {time, meridiem} = parsed;
-  let parsedTime = `${time} ${meridiem}`;
 
   if(!isPresent(config.timeZone)) {
     return (
@@ -27,8 +26,7 @@ const App = () => {
     );
   }
 
-  const configuredDate = `${config.date} ${parsedTime}`;
-  const originalDate = moment.tz(configuredDate, 'YYYY-MM-DD h:mma', config.timeZone);
+  const originalDate = parseConfiguredDate(config.date, time, meridiem, config.timeZone);
 
   return renderDateLozenge({ originalDate, timeZone, config });
 };

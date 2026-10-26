@@ -1,6 +1,6 @@
 import React from 'react';
 import TestRenderer from 'react-test-renderer';
-import moment from 'moment-timezone';
+import { DateTime } from 'luxon';
 import { renderDateLozenge } from '../frontend/common';
 import {
   FORMAT_DEFAULT,
@@ -14,7 +14,7 @@ import {
 jest.mock('@forge/react', () => ({ Lozenge: 'Lozenge', Tooltip: 'Tooltip', Text: 'Text' }));
 
 // 3:00 pm in Sydney (UTC+11 in November) is 11:00 pm the previous day in New York (UTC-5)
-const originalDate = moment.tz('2024-11-15 3:00 pm', 'YYYY-MM-DD h:mma', 'Australia/Sydney');
+const originalDate = DateTime.fromISO('2024-11-15T15:00', { zone: 'Australia/Sydney' });
 const SYDNEY_TEXT = 'Fri, Nov 15, 2024 3:00pm AEDT';
 const NEW_YORK_TEXT = 'Thu, Nov 14, 2024 11:00pm EST';
 const UTC_TEXT = 'Fri, Nov 15, 2024 4:00am UTC';
