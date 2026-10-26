@@ -1,9 +1,10 @@
 import React from 'react';
-import ForgeReconciler, { DatePicker, Label, Select, Text, Textfield } from '@forge/react';
+import ForgeReconciler, { DatePicker, Label, Select, Text, Textfield, useProductContext } from '@forge/react';
 import { isPresent } from 'ts-is-present';
 import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN, FORMAT_NASA_COUNTDOWN } from "../displayOptions";
 import { parseConfiguredDate } from '../dateTime';
 import { TimeZones } from "../timezones";
+import { defaultTimeZoneOption } from '../defaultTimeZone';
 import { parseTime, renderDateLozenge, validateConfig } from './common';
 import { useDateMacroContext } from './useDateMacroContext';
 
@@ -38,6 +39,7 @@ ForgeReconciler.render(
 );
 
 const Config = () => {
+  const context = useProductContext();
   return (
     <>
       <Label labelFor='time'>Time</Label>
@@ -52,6 +54,7 @@ const Config = () => {
       <Select
         name="timeZone"
         isRequired
+        defaultValue={defaultTimeZoneOption(context?.timezone, TimeZones)}
         description="The timezone that the Date Time above is configured for. If you have written the above in your local time then select your local timezone."
         options={TimeZones.map(tz => ({ label: tz, value: tz }))}
         />

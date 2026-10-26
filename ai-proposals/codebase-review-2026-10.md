@@ -51,6 +51,7 @@ These are the first batch to fix. They are small, and the branch `codebase-revie
 | 3.5 | Richer tooltip | Show the original time, UTC, the relative time and the configured zone on hover, in addition to the chosen display format. | S | ⬜ Pending |
 | 3.6 | Past, happening-now and upcoming states | Use the `Lozenge` appearance to show which state an event is in. | S | ⬜ Pending |
 | 3.7 | More repeat options | "Until" end dates, specific weekdays, skipped occurrences. | M | ⬜ Pending |
+| 3.8 | Default the config Timezone to the editing user's timezone | See `default-timezone.md`. An untouched default may not be saved, which needs a check in Confluence. | XS | ✅ Done (branch `default-timezone`) |
 
 ---
 
