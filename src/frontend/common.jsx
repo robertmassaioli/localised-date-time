@@ -1,5 +1,6 @@
 import React from 'react';
-import { displayText, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC } from "../displayOptions";
+import { inZone } from "../dateTime";
+import { displayText,FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC } from "../displayOptions";
 import { Lozenge, Tooltip, Text } from '@forge/react';
 export { validateConfig, parseTime } from '../configHelpers';
 
@@ -11,7 +12,7 @@ export function renderDateLozenge({
   let date = originalDate;
 
   if (typeof timeZone === 'string') {
-    date = originalDate.clone().tz(timeZone);
+    date = inZone(originalDate, timeZone);
 
     const configuredTimezoneSameAsUserTimezone = config.timeZone === timeZone;
     if (config.displayOption === FORMAT_DEFAULT_AND_ORIGINAL) {
@@ -35,7 +36,7 @@ export function renderDateLozenge({
         );
       }
     } else if (config.displayOption === FORMAT_DEFAULT_AND_UTC) {
-      const utcDate = originalDate.clone().tz('UTC');
+      const utcDate = originalDate.setZone('UTC');
       return (
         <>
           <Text>

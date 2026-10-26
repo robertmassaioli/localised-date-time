@@ -60,7 +60,7 @@ These are the first batch to fix. They are small, and the branch `codebase-revie
 |---|---------|-----|--------|--------|
 | 4.1 | Both macros duplicate their Config forms and the display option lists. Only the hook was shared. | Pull the shared fields (Time, Date, Timezone, Display format) into one component. | M | ⬜ Pending |
 | 4.2 | `src/timezones.js` is a 600-line generated file that includes legacy aliases such as `Africa/Asmera` next to `Africa/Asmara`. | Use `Intl.supportedValuesOf('timeZone')` or `moment.tz.names()` and remove the file and `generate-options.js`. | S | ⬜ Pending |
-| 4.3 | `moment` is in maintenance mode. | Move to `Intl` or Luxon. Best done together with 3.2. | M | ⬜ Pending |
+| 4.3 | `moment` is in maintenance mode. | Move to `Intl` or Luxon. Best done together with 3.2. | M | ✅ Done on branch `luxon-migration` (Luxon, see `luxon-migration.md`). 3.2 is still open |
 | 4.4 | Label associations on the config form (`improvements.md` #7). | See that document. | S | ⬜ Pending |
 
 ---

@@ -1,4 +1,4 @@
-import moment from 'moment-timezone';
+import { DateTime } from 'luxon';
 import {
   formatRequiresLiveUpdates,
   displayText,
@@ -36,7 +36,7 @@ describe('formatRequiresLiveUpdates', () => {
 });
 
 describe('displayText', () => {
-  const fixedDate = moment.tz('2024-11-15 09:00', 'YYYY-MM-DD HH:mm', 'Australia/Sydney');
+  const fixedDate = DateTime.fromISO('2024-11-15T09:00', { zone: 'Australia/Sydney' });
 
   describe('default format', () => {
     test('formats a date in the standard pattern', () => {
@@ -54,13 +54,13 @@ describe('displayText', () => {
 
   describe('human countdown format', () => {
     test('returns a relative string for a future date', () => {
-      const future = moment().add(2, 'hours');
+      const future = DateTime.now().plus({ hours: 2 });
       const result = displayText(FORMAT_HUMAN_COUNTDOWN, future);
       expect(result).toMatch(/in/i);
     });
 
     test('returns a relative string for a past date', () => {
-      const past = moment().subtract(3, 'days');
+      const past = DateTime.now().minus({ days: 3 });
       const result = displayText(FORMAT_HUMAN_COUNTDOWN, past);
       expect(result).toMatch(/ago/i);
     });
@@ -68,39 +68,39 @@ describe('displayText', () => {
 
   describe('NASA countdown format', () => {
     test('returns T+ for a past date', () => {
-      const past = moment().subtract(1, 'hour');
+      const past = DateTime.now().minus({ hour: 1 });
       const result = displayText(FORMAT_NASA_COUNTDOWN, past);
       expect(result).toMatch(/^T\+/);
     });
 
     test('returns T- for a future date', () => {
-      const future = moment().add(1, 'hour');
+      const future = DateTime.now().plus({ hour: 1 });
       const result = displayText(FORMAT_NASA_COUNTDOWN, future);
       expect(result).toMatch(/^T-/);
     });
 
     test('includes hours component when difference is hours', () => {
-      const future = moment().add(3, 'hours');
+      const future = DateTime.now().plus({ hours: 3 });
       const result = displayText(FORMAT_NASA_COUNTDOWN, future);
       expect(result).toMatch(/h/);
     });
 
     test('includes days component when difference spans days', () => {
-      const future = moment().add(5, 'days').add(2, 'hours');
+      const future = DateTime.now().plus({ days: 5 }).plus({ hours: 2 });
       const result = displayText(FORMAT_NASA_COUNTDOWN, future);
       expect(result).toMatch(/5d/);
     });
 
     test('includes years component when difference spans years', () => {
       // Use a large enough gap that years will always appear regardless of DST/month-length variance
-      const future = moment().add(3, 'years');
+      const future = DateTime.now().plus({ years: 3 });
       const result = displayText(FORMAT_NASA_COUNTDOWN, future);
       expect(result).toMatch(/[23]y/);
     });
 
     test('returns exactly "T-" with no components for a moment just in the future (0-second diff)', () => {
       // A date exactly now should show T- with no further components
-      const almostNow = moment().add(1, 'milliseconds');
+      const almostNow = DateTime.now().plus({ milliseconds: 1 });
       const result = displayText(FORMAT_NASA_COUNTDOWN, almostNow);
       expect(result).toMatch(/^T-$/);
     });

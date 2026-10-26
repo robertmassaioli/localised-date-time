@@ -1,8 +1,8 @@
 import React from 'react';
 import ForgeReconciler, { DatePicker, Label, Select, Text, Textfield } from '@forge/react';
-import moment from 'moment-timezone';
 import { isPresent } from 'ts-is-present';
 import { FORMAT_DEFAULT, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, FORMAT_HUMAN_COUNTDOWN, FORMAT_NASA_COUNTDOWN } from "../displayOptions";
+import { parseConfiguredDate } from '../dateTime';
 import { TimeZones } from "../timezones";
 import { nextRepeatDate, REPEAT_ANNUALLY, REPEAT_DAILY, REPEAT_HOURLY, REPEAT_WEEKLY, repetitionToUnits } from '../repetition';
 import { parseTime, renderDateLozenge, validateConfig } from './common';
@@ -20,7 +20,6 @@ const App = () => {
   if (parsed.error) return <Text>{parsed.error}</Text>;
 
   const {time, meridiem} = parsed;
-  let parsedTime = `${time} ${meridiem}`;
 
   if(!isPresent(config.timeZone)) {
     return (
@@ -43,8 +42,8 @@ const App = () => {
     );
   }
 
-  const configuredDate = `${config.date} ${parsedTime}`;
-  const originalDate = nextRepeatDate(moment.tz(configuredDate, 'YYYY-MM-DD h:mma', config.timeZone), repetitionPeriod, repetitionToUnits(repetitionUnit));
+  const startDate = parseConfiguredDate(config.date, time, meridiem, config.timeZone);
+  const originalDate = nextRepeatDate(startDate, repetitionPeriod, repetitionToUnits(repetitionUnit));
 
   return renderDateLozenge({ originalDate, timeZone, config });
 };
