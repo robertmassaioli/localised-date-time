@@ -6,24 +6,20 @@ Guidance for AI coding agents working in this repository. Read it before you cha
 
 A Forge app for Confluence that provides two inline macros, "Localised date macro" and "Repeating localised date macro". Viewers see a configured date and time converted to their own timezone. The macros render with UI Kit (`render: native`). A server-side `adfExport` function renders them for PDF, Word and mobile exports. `README.md` has the user-facing description.
 
-## UI components: only use what is on the UI Kit components page
+## UI components: only use what comes from `@forge/react`
 
-**The only UI components you may use are the ones listed on https://developer.atlassian.com/platform/forge/ui-kit/components/ .**
+**All frontend UI must come from the `@forge/react` package. Nothing else may render on screen.**
 
 This is a hard rule. It applies to every file that renders anything: the macro views, the config panels and any future module.
 
-- Before you use a component, open that page and confirm the component is listed there. If it is not listed, you may not use it. Ask the maintainer instead.
-- Import components from `@forge/react` only.
-- Components that the page marks Preview or EAP are on the page, so they are allowed. Say so in the PR description when you use one.
+- Import every component from `@forge/react`. The [UI Kit components page](https://developer.atlassian.com/platform/forge/ui-kit/components/) documents what the package offers. Read it before you build something new.
 - Do not use HTML elements (`div`, `span`, `table` and so on).
 - Do not import from `@atlaskit/*`. Those packages are in `node_modules` as dependencies of Forge, and importing them directly is not allowed.
-- Do not add other React component libraries, and do not hand-build a component that the page already provides.
-- Styling goes through the components on the page, such as `Box`, `Inline`, `Stack` and `XCSS`.
-- Hooks from `@forge/react` (`useConfig`, `useProductContext`, `useTranslation`) are not components, so this rule does not cover them.
-
-### Known deviation to resolve
-
-The config forms use `Label` from `@forge/react`. `Label` is documented on the [Form page](https://developer.atlassian.com/platform/forge/ui-kit/components/form/) but it is not on the components list. Do not use `Label` anywhere new. The maintainer will decide whether to keep it or replace it. Remove this section once that is settled.
+- Do not add other React component libraries, custom CSS or hand-written markup.
+- Do not hand-build a component that `@forge/react` already provides.
+- Style through what `@forge/react` provides, such as `Box`, `Inline`, `Stack` and `XCSS`.
+- Components that the docs mark Preview or EAP can change. Say so in the PR description when you use one.
+- Hooks from `@forge/react` (`useConfig`, `useProductContext`, `useTranslation`) are not components. They are fine to use.
 
 ## Commands
 
