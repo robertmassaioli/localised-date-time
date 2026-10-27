@@ -55,6 +55,17 @@ describe('useDateMacroContext', () => {
     expect(latest.timeZone).toBeUndefined();
   });
 
+  test('returns the viewer locale exactly as the platform reports it', () => {
+    mockContext = { timezone: 'Australia/Sydney', locale: 'en-AU' };
+    mount();
+    expect(latest.locale).toBe('en-AU');
+  });
+
+  test('has no locale until the context loads', () => {
+    mount();
+    expect(latest.locale).toBeUndefined();
+  });
+
   test('has details but no config for an unconfigured macro', () => {
     mockContext = { timezone: 'Australia/Sydney' };
     mount();

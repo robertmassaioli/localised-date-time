@@ -20,12 +20,13 @@ const SYDNEY_TEXT = 'Fri, Nov 15, 2024 3:00pm AEDT';
 const NEW_YORK_TEXT = 'Thu, Nov 14, 2024 11:00pm EST';
 const UTC_TEXT = 'Fri, Nov 15, 2024 4:00am UTC';
 
-function render(displayOption, timeZone = 'America/New_York', t = translateFor('en-GB')) {
+function render(displayOption, timeZone = 'America/New_York', t = translateFor('en-GB'), { locale, clock } = {}) {
   const element = renderDateLozenge({
     originalDate,
     timeZone,
-    config: { timeZone: 'Australia/Sydney', displayOption },
-    t
+    config: { timeZone: 'Australia/Sydney', displayOption, ...(clock ? { clock } : {}) },
+    t,
+    locale
   });
   return TestRenderer.create(element).toJSON();
 }
@@ -106,6 +107,70 @@ describe('renderDateLozenge', () => {
     test('NASA countdown switches to T-plus after the event', () => {
       jest.setSystemTime(new Date('2024-11-15T05:30:00Z'));
       expect(lozengeTexts(render(FORMAT_NASA_COUNTDOWN))).toEqual(['T+1h30m']);
+    });
+  });
+
+  // Intl puts U+202F before AM and PM in some locales
+  const plain = texts => texts.map(text => text.replace(/[\u202f\u00a0]/g, ' '));
+
+  describe('with a viewer locale', () => {
+    const lozenges = (displayOption, locale, clock, timeZone) => plain(lozengeTexts(render(displayOption, timeZone, translateFor('en-GB'), { locale, clock })));
+
+    test.each([
+      ['en-US', 'Thu, Nov 14, 2024, 11:00 PM EST'],
+      ['en-GB', 'Thu, 14 Nov 2024, 23:00 EST'],
+      ['de-DE', 'Do., 14. Nov. 2024, 23:00 EST'],
+      ['ja-JP', '2024年11月14日(木) 23:00 EST']
+    ])('%s formats the viewer time in its own layout', (locale, expected) => {
+      expect(lozenges(FORMAT_DEFAULT, locale)).toEqual([expected]);
+    });
+
+    test('the raw locale en-AU, which has no translation file, formats as en-AU', () => {
+      expect(lozenges(FORMAT_DEFAULT, 'en-AU')).toEqual(['Thu, 14 Nov 2024, 11:00 pm EST']);
+    });
+
+    test('a locale Intl has no data for uses the nearest translation locale', () => {
+      expect(lozenges(FORMAT_DEFAULT, 'not a locale!!')).toEqual(['Thu, 14 Nov 2024, 23:00 EST']);
+    });
+
+    test('no locale keeps the legacy English pattern', () => {
+      expect(lozenges(FORMAT_DEFAULT, undefined)).toEqual([NEW_YORK_TEXT]);
+    });
+
+    test('the configured timezone format uses the locale for both dates', () => {
+      expect(lozenges(FORMAT_DEFAULT_AND_ORIGINAL, 'de-DE')).toEqual([
+        'Do., 14. Nov. 2024, 23:00 EST',
+        'Fr., 15. Nov. 2024, 15:00 AEDT'
+      ]);
+    });
+
+    test('the UTC format uses the locale for both dates', () => {
+      expect(lozenges(FORMAT_DEFAULT_AND_UTC, 'de-DE')).toEqual([
+        'Fr., 15. Nov. 2024, 04:00 UTC',
+        'Do., 14. Nov. 2024, 23:00 EST'
+      ]);
+    });
+
+    test('the same-timezone tooltip format uses the locale', () => {
+      expect(lozenges(FORMAT_DEFAULT_AND_ORIGINAL, 'de-DE', undefined, 'Australia/Sydney')).toEqual(['Fr., 15. Nov. 2024, 15:00 AEDT']);
+    });
+
+    describe('the author clock setting', () => {
+      test('applies to English locales', () => {
+        expect(lozenges(FORMAT_DEFAULT, 'en-GB', '12h')).toEqual(['Thu, 14 Nov 2024, 11:00 pm EST']);
+        expect(lozenges(FORMAT_DEFAULT, 'en-US', '24h')).toEqual(['Thu, Nov 14, 2024, 23:00 EST']);
+        expect(lozenges(FORMAT_DEFAULT, 'en-AU', '24h')).toEqual(['Thu, 14 Nov 2024, 23:00 EST']);
+      });
+
+      test('auto and a missing setting keep the locale default', () => {
+        expect(lozenges(FORMAT_DEFAULT, 'en-GB', 'auto')).toEqual(['Thu, 14 Nov 2024, 23:00 EST']);
+        expect(lozenges(FORMAT_DEFAULT, 'en-GB', undefined)).toEqual(['Thu, 14 Nov 2024, 23:00 EST']);
+      });
+
+      test('never changes a locale with its own clock: 12-hour still shows 24 hours in German', () => {
+        expect(lozenges(FORMAT_DEFAULT, 'de-DE', '12h')).toEqual(['Do., 14. Nov. 2024, 23:00 EST']);
+        expect(lozenges(FORMAT_DEFAULT, 'ko-KR', '24h')).toEqual(['2024년 11월 14일 (목) 오후 11:00 EST']);
+      });
     });
   });
 });

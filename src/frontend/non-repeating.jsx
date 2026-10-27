@@ -12,7 +12,7 @@ import { MacroIntlProvider } from './MacroIntlProvider';
 import { useTranslate } from './useTranslate';
 
 const App = () => {
-  const { details, config, timeZone } = useDateMacroContext();
+  const { details, config, timeZone, locale } = useDateMacroContext();
   const { ready, t } = useTranslate();
   if (!ready) return null;
 
@@ -34,7 +34,7 @@ const App = () => {
 
   const originalDate = parseConfiguredDate(config.date, time, meridiem, config.timeZone);
 
-  return renderDateLozenge({ originalDate, timeZone, config, t });
+  return renderDateLozenge({ originalDate, timeZone, config, t, locale });
 };
 
 ForgeReconciler.render(

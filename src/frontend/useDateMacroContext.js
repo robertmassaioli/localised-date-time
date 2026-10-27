@@ -10,10 +10,11 @@ import { formatRequiresLiveUpdates } from '../displayOptions';
  * useConfig subscribes to macro config changes, so config autosaved from the
  * config panel reaches the rendered macro while it is open in the editor.
  *
- * Returns { details, config, timeZone, now } where:
+ * Returns { details, config, timeZone, locale, now } where:
  *  - details: the raw context object ({ timeZone, config }), undefined until the context has loaded
  *  - config:  the macro config, undefined until it has loaded or while the macro is unconfigured
  *  - timeZone: the viewer's timezone
+ *  - locale:   the viewer's locale as the platform reports it, which can be one without translation files, such as en-AU
  *  - now:     a timestamp (ms) that updates every second when in countdown mode,
  *             triggering re-renders to keep the countdown current
  */
@@ -23,6 +24,7 @@ export function useDateMacroContext() {
   const config = useConfig();
   const context = useProductContext();
   const timeZone = context?.timezone;
+  const locale = context?.locale;
 
   const details = useMemo(
     () => (context ? { timeZone, config } : undefined),
@@ -37,5 +39,5 @@ export function useDateMacroContext() {
     return undefined;
   }, [details]);
 
-  return { details, config, timeZone, now };
+  return { details, config, timeZone, locale, now };
 }
