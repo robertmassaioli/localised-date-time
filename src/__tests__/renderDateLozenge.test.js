@@ -155,6 +155,29 @@ describe('renderDateLozenge', () => {
       expect(lozenges(FORMAT_DEFAULT_AND_ORIGINAL, 'de-DE', undefined, 'Australia/Sydney')).toEqual(['Fr., 15. Nov. 2024, 15:00 AEDT']);
     });
 
+    describe('countdown formats', () => {
+      beforeEach(() => {
+        jest.useFakeTimers();
+        // 28 hours before the event, which starts at 2024-11-15T04:00:00Z
+        jest.setSystemTime(new Date('2024-11-14T00:00:00Z'));
+      });
+
+      afterEach(() => {
+        jest.useRealTimers();
+      });
+
+      test('the human countdown is worded in the viewer locale', () => {
+        expect(lozenges(FORMAT_HUMAN_COUNTDOWN, 'de-DE')).toEqual(['morgen']);
+        expect(lozenges(FORMAT_HUMAN_COUNTDOWN, 'en-GB')).toEqual(['tomorrow']);
+        expect(lozenges(FORMAT_HUMAN_COUNTDOWN, undefined)).toEqual(['in a day']);
+      });
+
+      test('the NASA countdown is the same in every locale', () => {
+        expect(lozenges(FORMAT_NASA_COUNTDOWN, 'de-DE')).toEqual(['T-1d4h']);
+        expect(lozenges(FORMAT_NASA_COUNTDOWN, 'ja-JP')).toEqual(['T-1d4h']);
+      });
+    });
+
     describe('the author clock setting', () => {
       test('applies to English locales', () => {
         expect(lozenges(FORMAT_DEFAULT, 'en-GB', '12h')).toEqual(['Thu, 14 Nov 2024, 11:00 pm EST']);

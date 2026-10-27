@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 import { nasaCountdown, relativeFromNow } from '../relativeTime';
+import { SUPPORTED_LOCALES } from '../i18n';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -58,6 +59,74 @@ describe('relativeFromNow', () => {
     } finally {
       jest.useRealTimers();
     }
+  });
+});
+
+describe('relativeFromNow with a locale', () => {
+  const now = DateTime.fromISO('2026-10-26T03:17:05.123Z', { zone: 'UTC' });
+  const text = (offsetMs, locale) => relativeFromNow(now.plus({ milliseconds: offsetMs }), now, locale);
+
+  // The thresholds and rounding are the ones tested above. Here the same unit and number are worded by Intl.
+  test.each([
+    ['en-US', 'in 1 minute', 'tomorrow', '3 hours ago', 'in 5 months'],
+    ['en-GB', 'in 1 minute', 'tomorrow', '3 hours ago', 'in 5 months'],
+    ['de-DE', 'in 1 Minute', 'morgen', 'vor 3 Stunden', 'in 5 Monaten'],
+    ['ja-JP', '1 分後', '明日', '3 時間前', '5 か月後'],
+    ['pl-PL', 'za 1 minutę', 'jutro', '3 godziny temu', 'za 5 miesięcy'],
+    ['ru-RU', 'через 1 минуту', 'завтра', '3 часа назад', 'через 5 месяцев'],
+    ['is-IS', 'eftir 1 mínútu', 'á morgun', 'fyrir 3 klukkustundum', 'eftir 5 mánuði']
+  ])('%s', (locale, minute, day, hoursAgo, months) => {
+    expect(text(60 * SECOND, locale)).toBe(minute);
+    expect(text(DAY, locale)).toBe(day);
+    expect(text(-3 * HOUR, locale)).toBe(hoursAgo);
+    expect(relativeFromNow(now.plus({ months: 5 }), now, locale)).toBe(months);
+  });
+
+  test('under 45 seconds is "now", because Intl has no "a few seconds"', () => {
+    expect(text(10 * SECOND, 'en-GB')).toBe('now');
+    expect(text(-10 * SECOND, 'en-GB')).toBe('now');
+    expect(text(44 * SECOND, 'de-DE')).toBe('jetzt');
+  });
+
+  test('uses the same unit and number as the English text at every threshold', () => {
+    const formatter = new Intl.RelativeTimeFormat('de-DE', { numeric: 'auto' });
+    for (const [offset, value, unit] of [
+      [45 * SECOND, 1, 'minute'],
+      [90 * SECOND, 2, 'minute'],
+      [45 * MINUTE, 1, 'hour'],
+      [22 * HOUR, 1, 'day'],
+      [26 * DAY, 1, 'month']
+    ]) {
+      expect(text(offset, 'de-DE')).toBe(formatter.format(value, unit));
+      expect(text(-offset, 'de-DE')).toBe(formatter.format(-value, unit));
+    }
+  });
+
+  test('past and future read differently in every supported locale', () => {
+    for (const locale of SUPPORTED_LOCALES) {
+      const future = text(3 * HOUR, locale);
+      const past = text(-3 * HOUR, locale);
+      expect(future).toMatch(/\S/);
+      expect(past).toMatch(/\S/);
+      expect(future).not.toBe(past);
+    }
+  });
+
+  test('without a locale it keeps the legacy English text', () => {
+    expect(text(DAY, undefined)).toBe('in a day');
+    expect(text(-3 * HOUR, undefined)).toBe('3 hours ago');
+    expect(text(10 * SECOND, undefined)).toBe('in a few seconds');
+  });
+
+  test('an invalid date still reads Invalid date', () => {
+    expect(relativeFromNow(DateTime.invalid('test'), now, 'de-DE')).toBe('Invalid date');
+  });
+
+  test('a malformed locale tag falls back to the legacy English text and warns', () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(text(DAY, 'not a locale!!')).toBe('in a day');
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('not a locale!!'), expect.anything());
+    warnSpy.mockRestore();
   });
 });
 

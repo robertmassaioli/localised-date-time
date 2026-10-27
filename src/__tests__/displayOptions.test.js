@@ -88,6 +88,13 @@ describe('displayText', () => {
       expect(result).toMatch(/in/i);
     });
 
+    test('uses the viewer locale for the wording', () => {
+      const future = DateTime.now().plus({ days: 1 });
+      expect(displayText(FORMAT_HUMAN_COUNTDOWN, future, { locale: 'de-DE' })).toBe('morgen');
+      expect(displayText(FORMAT_HUMAN_COUNTDOWN, future, { locale: 'en-GB' })).toBe('tomorrow');
+      expect(displayText(FORMAT_HUMAN_COUNTDOWN, future)).toBe('in a day');
+    });
+
     test('returns a relative string for a past date', () => {
       const past = DateTime.now().minus({ days: 3 });
       const result = displayText(FORMAT_HUMAN_COUNTDOWN, past);
