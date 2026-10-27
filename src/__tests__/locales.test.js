@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { SUPPORTED_LOCALES } from '../i18n';
 
 const ROOT = path.join(__dirname, '..', '..');
 const LOCALES_DIR = path.join(ROOT, 'locales');
@@ -44,6 +45,10 @@ function sourceFiles(dir) {
 const defaultFlat = flatten(readLocale(defaultLocale));
 
 describe('manifest translations', () => {
+  test('the locale list used for resolving locales matches the manifest', () => {
+    expect([...SUPPORTED_LOCALES].sort()).toEqual([...EXPECTED_LOCALES].sort());
+  });
+
   test('the manifest lists exactly the Forge supported locales', () => {
     expect(resources.map(r => r.key).sort()).toEqual([...EXPECTED_LOCALES].sort());
   });

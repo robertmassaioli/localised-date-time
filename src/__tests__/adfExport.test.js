@@ -223,11 +223,33 @@ describe('adfExport', () => {
     });
 
     test('falls back to the default locale and warns when the locale cannot be loaded', async () => {
-      const adf = await handleNonRepeating(payload(noDate(), 'account-1', 'xx-XX'));
+      mockGetTranslations.mockImplementation(async locale => {
+        if (locale === 'fr-FR') throw new Error('no file');
+        return { locale, translations: loadLocale(locale) };
+      });
+      const adf = await handleNonRepeating(payload(noDate(), 'account-1', 'fr-FR'));
       expect(textOf(adf)[0]).toMatch(/^Date not configured/);
-      expect(mockGetTranslations).toHaveBeenNthCalledWith(1, 'xx-XX');
+      expect(mockGetTranslations).toHaveBeenNthCalledWith(1, 'fr-FR');
       expect(mockGetTranslations).toHaveBeenNthCalledWith(2, 'en-GB');
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('xx-XX'), expect.anything());
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('fr-FR'), expect.anything());
+    });
+
+    // The platform can send locales outside the 26 that have translation files, and Forge would give those English.
+    test.each([
+      ['en-AU', 'en-GB'],
+      ['de-AT', 'de-DE'],
+      ['fr-CA', 'fr-FR'],
+      ['zh-HK', 'zh-TW'],
+      ['xx-XX', 'en-GB']
+    ])('asks for %s as %s and loads it once', async (raw, expected) => {
+      await handleNonRepeating(payload(noDate(), 'account-1', raw));
+      expect(mockGetTranslations).toHaveBeenCalledTimes(1);
+      expect(mockGetTranslations).toHaveBeenCalledWith(expected);
+    });
+
+    test('translates for a regional variant using its language', async () => {
+      const adf = await handleNonRepeating(payload(noDate(), 'account-1', 'de-AT'));
+      expect(textOf(adf)[0]).toMatch(/^Das Datum|^Datum/);
     });
 
     test('still returns a document when no translations load at all', async () => {
