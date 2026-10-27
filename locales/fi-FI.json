@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (ja lokalisoitu päivämäärä ja aika)",
       "humanCountdown": "Lähtölaskenta / kulunut aika",
       "nasaCountdown": "Lähtölaskenta T-(plus/miinus)"
+    },
+    "clock": {
+      "label": "Kello",
+      "description": "Automaattinen noudattaa kunkin katselijan kieltä. 12 tunnin ja 24 tunnin kello koskevat vain katselijoita, joiden kieli on englanti. Muissa kielissä käytetään tavanomaista kelloa.",
+      "auto": "Automaattinen (oletus)",
+      "h12": "12 tunnin",
+      "h24": "24 tunnin"
     }
   },
   "error": {

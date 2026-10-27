@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { createIntl } from 'react-intl';
 import { createTranslator, DEFAULT_LOCALE, flattenMessages, formattingLocale, resolveLocale, SUPPORTED_LOCALES } from '../i18n';
-import { displayOptionChoices, repetitionUnitChoices } from '../frontend/displayOptionChoices';
+import { clockChoices, displayOptionChoices, repetitionUnitChoices } from '../frontend/displayOptionChoices';
 import { FORMAT_DEFAULT, FORMAT_NASA_COUNTDOWN } from '../displayOptions';
 import { REPEAT_HOURLY, REPEAT_WEEKLY } from '../repetition';
 import { loadLocale, translateFor } from './translate';
@@ -155,6 +155,16 @@ describe('default locale', () => {
 });
 
 describe('select option helpers', () => {
+  test('clock options keep their values and use translated labels', () => {
+    expect(clockChoices(translateFor('en-GB'))).toEqual([
+      { label: 'Automatic (Default)', value: 'auto' },
+      { label: '12-hour', value: '12h' },
+      { label: '24-hour', value: '24h' }
+    ]);
+    expect(clockChoices(translateFor('de-DE')).map(o => o.label)).toEqual(['Automatisch (Standard)', '12-Stunden', '24-Stunden']);
+    expect(clockChoices(translateFor('ja-JP')).map(o => o.value)).toEqual(['auto', '12h', '24h']);
+  });
+
   test('display options keep their values and use translated labels', () => {
     const options = displayOptionChoices(translateFor('de-DE'));
     expect(options).toHaveLength(5);

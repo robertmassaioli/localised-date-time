@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (lokalizált dátummal/idővel)",
       "humanCountdown": "Visszaszámlálás / eltelt idő",
       "nasaCountdown": "Visszaszámlálás T-(plusz/mínusz)"
+    },
+    "clock": {
+      "label": "Óra",
+      "description": "Az automatikus az egyes megtekintők nyelvét követi. A 12 órás és a 24 órás beállítás csak az angol nyelvű megtekintőkre vonatkozik. A többi nyelv a megszokott órát használja.",
+      "auto": "Automatikus (alapértelmezett)",
+      "h12": "12 órás",
+      "h24": "24 órás"
     }
   },
   "error": {

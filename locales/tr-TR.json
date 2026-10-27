@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (yerelleştirilmiş tarih/saatle)",
       "humanCountdown": "Geri sayım / geçen süre",
       "nasaCountdown": "Geri sayım T-(artı/eksi)"
+    },
+    "clock": {
+      "label": "Saat",
+      "description": "Otomatik, her görüntüleyenin diline göre belirlenir. 12 saatlik ve 24 saatlik seçenekler yalnızca dili İngilizce olan görüntüleyenler için geçerlidir. Diğer diller olağan saat biçimini korur.",
+      "auto": "Otomatik (varsayılan)",
+      "h12": "12 saatlik",
+      "h24": "24 saatlik"
     }
   },
   "error": {

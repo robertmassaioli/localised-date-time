@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (med lokaliserat datum/tid)",
       "humanCountdown": "Nedräkning / tid sedan",
       "nasaCountdown": "Nedräkning T-(plus/minus)"
+    },
+    "clock": {
+      "label": "Klocka",
+      "description": "Automatisk följer varje läsares språk. 12-timmars och 24-timmars gäller bara för läsare vars språk är engelska. Andra språk behåller sin vanliga klocka.",
+      "auto": "Automatisk (standard)",
+      "h12": "12-timmars",
+      "h24": "24-timmars"
     }
   },
   "error": {

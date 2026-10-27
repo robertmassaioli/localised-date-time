@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (cu dată/oră localizată)",
       "humanCountdown": "Numărătoare inversă / timp scurs",
       "nasaCountdown": "Numărătoare inversă T-(plus/minus)"
+    },
+    "clock": {
+      "label": "Ceas",
+      "description": "Automat urmează limba fiecărui cititor. Formatele de 12 ore și de 24 de ore se aplică doar cititorilor a căror limbă este engleza. Celelalte limbi își păstrează ceasul obișnuit.",
+      "auto": "Automat (implicit)",
+      "h12": "12 ore",
+      "h24": "24 de ore"
     }
   },
   "error": {

@@ -2,11 +2,12 @@ import React from 'react';
 import ForgeReconciler, { DatePicker, Label, Select, Text, Textfield, useProductContext } from '@forge/react';
 import { isPresent } from 'ts-is-present';
 import { FORMAT_DEFAULT } from "../displayOptions";
+import { CLOCK_AUTO } from '../clock';
 import { parseConfiguredDate } from '../dateTime';
 import { TimeZones } from "../timezones";
 import { defaultTimeZoneOption } from '../defaultTimeZone';
 import { parseTime, renderDateLozenge, validateConfig } from './common';
-import { displayOptionChoices } from './displayOptionChoices';
+import { clockChoices, displayOptionChoices } from './displayOptionChoices';
 import { useDateMacroContext } from './useDateMacroContext';
 import { MacroIntlProvider } from './MacroIntlProvider';
 import { useTranslate } from './useTranslate';
@@ -76,6 +77,13 @@ const Config = () => {
         defaultValue={{ label: t('config.displayOption.default'), value: FORMAT_DEFAULT }}
         description={t('config.displayOption.description')}
         options={displayOptionChoices(t)}
+        />
+      <Label labelFor='clock'>{t('config.clock.label')}</Label>
+      <Select
+        name="clock"
+        defaultValue={{ label: t('config.clock.auto'), value: CLOCK_AUTO }}
+        description={t('config.clock.description')}
+        options={clockChoices(t)}
         />
     </>
   );
