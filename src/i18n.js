@@ -42,6 +42,24 @@ export function resolveLocale(locale) {
     ?? DEFAULT_LOCALE;
 }
 
+/**
+ * The locale to format dates with. This is the raw locale the platform reports, not the translation locale, so
+ * `en-AU` stays `en-AU` and `Intl` can give it `AEDT` and a 12-hour clock. A locale `Intl` has no data for,
+ * or a malformed one, falls back to the nearest translation locale. No locale at all gives undefined,
+ * which formats with the legacy English pattern.
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/supportedLocalesOf
+ */
+export function formattingLocale(locale) {
+  if (typeof locale !== 'string' || !locale) return undefined;
+  const tag = locale.replace(/_/g, '-');
+  try {
+    if (Intl.DateTimeFormat.supportedLocalesOf([tag]).length > 0) return tag;
+  } catch (error) {
+    // A malformed tag makes Intl throw, so use the nearest translation locale instead
+  }
+  return resolveLocale(locale);
+}
+
 const cache = createIntlCache();
 
 /**

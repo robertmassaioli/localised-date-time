@@ -17,14 +17,11 @@ const absCeil = n => (n < 0 ? Math.floor(n) : Math.ceil(n));
 const THRESHOLDS = { seconds: 44, secondsToMinute: 45, minutes: 45, hours: 22, days: 26, months: 11 };
 
 /**
- * Port of moment's `fromNow()` for the English locale: "a few seconds ago", "in a day",
- * "3 months ago". The calendar month count is taken in the system timezone, like moment.
+ * Port of moment's `fromNow()` thresholds and rounding. Picks the unit and the number to show, with the legacy
+ * English text for it: "a few seconds", "in a day", "3 months ago". The calendar month count is taken in the
+ * system timezone, like moment.
  */
-export function relativeFromNow(date, now = DateTime.now()) {
-  if (!date.isValid) {
-    return 'Invalid date';
-  }
-
+function describeRelative(date, now) {
   const isFuture = date.toMillis() > now.toMillis();
   const [earlier, later] = [date, now].sort((a, b) => a.toMillis() - b.toMillis()).map(d => d.toLocal());
 
@@ -42,20 +39,49 @@ export function relativeFromNow(date, now = DateTime.now()) {
   const months = Math.round(wholeMonths + daysToMonths(remainderMs / MS_PER_DAY));
   const years = Math.round((wholeMonths + daysToMonths(remainderMs / MS_PER_DAY)) / 12);
 
+  // `value` is 0 for "a few seconds", which has no number
   let text;
-  if (seconds <= THRESHOLDS.seconds) text = 'a few seconds';
-  else if (seconds < THRESHOLDS.secondsToMinute) text = `${seconds} seconds`;
-  else if (minutes <= 1) text = 'a minute';
-  else if (minutes < THRESHOLDS.minutes) text = `${minutes} minutes`;
-  else if (hours <= 1) text = 'an hour';
-  else if (hours < THRESHOLDS.hours) text = `${hours} hours`;
-  else if (days <= 1) text = 'a day';
-  else if (days < THRESHOLDS.days) text = `${days} days`;
-  else if (months <= 1) text = 'a month';
-  else if (months < THRESHOLDS.months) text = `${months} months`;
-  else if (years <= 1) text = 'a year';
-  else text = `${years} years`;
+  let value;
+  let unit;
+  if (seconds <= THRESHOLDS.seconds) [text, value, unit] = ['a few seconds', 0, 'second'];
+  else if (seconds < THRESHOLDS.secondsToMinute) [text, value, unit] = [`${seconds} seconds`, seconds, 'second'];
+  else if (minutes <= 1) [text, value, unit] = ['a minute', 1, 'minute'];
+  else if (minutes < THRESHOLDS.minutes) [text, value, unit] = [`${minutes} minutes`, minutes, 'minute'];
+  else if (hours <= 1) [text, value, unit] = ['an hour', 1, 'hour'];
+  else if (hours < THRESHOLDS.hours) [text, value, unit] = [`${hours} hours`, hours, 'hour'];
+  else if (days <= 1) [text, value, unit] = ['a day', 1, 'day'];
+  else if (days < THRESHOLDS.days) [text, value, unit] = [`${days} days`, days, 'day'];
+  else if (months <= 1) [text, value, unit] = ['a month', 1, 'month'];
+  else if (months < THRESHOLDS.months) [text, value, unit] = [`${months} months`, months, 'month'];
+  else if (years <= 1) [text, value, unit] = ['a year', 1, 'year'];
+  else [text, value, unit] = [`${years} years`, years, 'year'];
 
+  return { isFuture, text, value, unit };
+}
+
+/**
+ * How far away a date is, in words: "in a day" or "3 months ago".
+ *
+ * With a `locale` the words come from `Intl.RelativeTimeFormat`, so they are grammatical in every language
+ * and use its own forms ("tomorrow", "1 hour ago", "now" for under 45 seconds).
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat
+ * Without a locale it is the legacy English text.
+ */
+export function relativeFromNow(date, now = DateTime.now(), locale) {
+  if (!date.isValid) {
+    return 'Invalid date';
+  }
+
+  const { isFuture, text, value, unit } = describeRelative(date, now);
+  if (locale) {
+    try {
+      const formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+      return formatter.format(value === 0 ? 0 : (isFuture ? value : -value), unit);
+    } catch (error) {
+      // A malformed locale tag makes Intl throw, so show the legacy English text and not an error
+      console.warn(`[relativeTime] could not format for locale "${locale}":`, error);
+    }
+  }
   return isFuture ? `in ${text}` : `${text} ago`;
 }
 

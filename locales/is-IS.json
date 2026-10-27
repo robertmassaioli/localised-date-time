@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (með staðfærðri dagsetningu/tíma)",
       "humanCountdown": "Niðurtalning / tími liðinn",
       "nasaCountdown": "Niðurtalning T-(plús/mínus)"
+    },
+    "clock": {
+      "label": "Klukka",
+      "description": "Sjálfvirkt fylgir tungumáli hvers áhorfanda. 12 stunda og 24 stunda klukka gilda aðeins um áhorfendur sem nota ensku. Önnur tungumál halda sinni venjulegu klukku.",
+      "auto": "Sjálfvirkt (sjálfgefið)",
+      "h12": "12 stunda",
+      "h24": "24 stunda"
     }
   },
   "error": {

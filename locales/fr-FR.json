@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (avec date/heure localisée)",
       "humanCountdown": "Compte à rebours / temps écoulé",
       "nasaCountdown": "Compte à rebours T-(plus/moins)"
+    },
+    "clock": {
+      "label": "Horloge",
+      "description": "« Automatique » suit la langue de chaque lecteur. Les formats 12 heures et 24 heures s’appliquent uniquement aux lecteurs dont la langue est l’anglais. Les autres langues gardent leur horloge habituelle.",
+      "auto": "Automatique (par défaut)",
+      "h12": "12 heures",
+      "h24": "24 heures"
     }
   },
   "error": {

@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (koos lokaliseeritud kuupäeva/kellaajaga)",
       "humanCountdown": "Tagasiloendus / möödunud aeg",
       "nasaCountdown": "Tagasiloendus T-(pluss/miinus)"
+    },
+    "clock": {
+      "label": "Kell",
+      "description": "Automaatne järgib iga vaataja keelt. 12-tunnine ja 24-tunnine kehtivad ainult inglise keelt kasutavatele vaatajatele. Teised keeled jätavad oma tavapärase kella.",
+      "auto": "Automaatne (vaikimisi)",
+      "h12": "12-tunnine",
+      "h24": "24-tunnine"
     }
   },
   "error": {

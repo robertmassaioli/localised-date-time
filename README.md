@@ -28,6 +28,7 @@ Both macros share the following configuration fields:
 | **Date** / **Start Date** | The date (or start date for repeating events) | `2024-11-15` |
 | **Timezone** | The timezone the date/time above is written in. The panel pre-selects your own timezone when it is in the list. | `Australia/Sydney` |
 | **Display format** | How the date is shown to viewers (see below) | `Localised Date/Time (Default)` |
+| **Clock** | 12-hour or 24-hour time. Applies to viewers whose language is English. Every other language keeps its usual clock. Optional, and `Automatic` by default. | `Automatic`, `12-hour`, `24-hour` |
 
 The **Repeating** macro adds:
 
@@ -48,6 +49,22 @@ The **Repeating** macro adds:
 | **Countdown / Time since** | Live countdown (e.g. "in 3 hours" or "2 days ago"). Updates every second. |
 | **Countdown T-(plus/minus)** | NASA-style countdown (e.g. `T-2d4h30m`). Updates every second. |
 
+### How dates read for each viewer
+
+Each viewer sees dates in their own language and clock, using their Atlassian account or browser language ([`Intl`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat) does the formatting).
+
+| Viewer locale | Date |
+|---------------|------|
+| `en-US` | `Fri, Nov 15, 2024, 3:00 PM AEDT` |
+| `en-GB` | `Fri, 15 Nov 2024, 15:00 AEDT` |
+| `de-DE` | `Fr., 15. Nov. 2024, 15:00 AEDT` |
+| `ja-JP` | `2024年11月15日(金) 15:00 AEDT` |
+
+- The time zone is always the tz-database abbreviation (`AEDT`, `EST`), because `Intl` gives `GMT+11` in most locales.
+- The **Clock** setting only changes English locales. A macro set to 12-hour still shows 24 hours to a German viewer.
+- The countdown formats use the viewer's language for the words ("tomorrow", "morgen"). `T-2d4h30m` is the same everywhere.
+- PDF and Word exports keep the English pattern `Fri, Nov 15, 2024 3:00pm AEDT`, because Forge does not tell exports who is reading.
+
 > **Note:** The two countdown formats display as a static absolute date in PDF/Word exports, since exports are snapshots and cannot update live.
 
 ---
@@ -56,7 +73,7 @@ The **Repeating** macro adds:
 
 The app has two rendering paths:
 
-1. **Client-side (UI Kit):** `src/frontend/non-repeating.jsx` and `src/frontend/repeating.jsx` render the macro inline in Confluence using React and [Luxon](https://moment.github.io/luxon/#/). The viewer's timezone is read from `view.getContext()`.
+1. **Client-side (UI Kit):** `src/frontend/non-repeating.jsx` and `src/frontend/repeating.jsx` render the macro inline in Confluence using React and [Luxon](https://moment.github.io/luxon/#/). The viewer's timezone and locale are read from the product context.
 
 2. **Server-side ADF export:** `src/adfExport.js` handles PDF, Word, and mobile exports. It calls the Confluence Users API to resolve the viewer's timezone and returns a static [ADF](https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/) document. This ensures exports show meaningful, timezone-correct content rather than being blank.
 

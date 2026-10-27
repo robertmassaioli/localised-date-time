@@ -50,6 +50,23 @@ describe('displayText', () => {
     jest.useRealTimers();
   });
 
+  describe('default format with a viewer locale', () => {
+    test('uses the locale layout and clock', () => {
+      const text = displayText(FORMAT_DEFAULT, fixedDate, { locale: 'de-DE' });
+      expect(text).toBe('Fr., 15. Nov. 2024, 09:00 AEDT');
+    });
+
+    test('hourCycle changes the clock', () => {
+      const text = displayText(FORMAT_DEFAULT, fixedDate, { locale: 'en-GB', hourCycle: 'h12' }).replace(/[\u202f\u00a0]/g, ' ');
+      expect(text).toBe('Fri, 15 Nov 2024, 9:00 am AEDT');
+    });
+
+    test('without options it keeps the legacy English pattern', () => {
+      expect(displayText(FORMAT_DEFAULT, fixedDate)).toBe('Fri, Nov 15, 2024 9:00am AEDT');
+      expect(displayText(FORMAT_DEFAULT, fixedDate, {})).toBe('Fri, Nov 15, 2024 9:00am AEDT');
+    });
+  });
+
   describe('default format', () => {
     test('formats a date in the standard pattern', () => {
       const result = displayText(FORMAT_DEFAULT, fixedDate);
@@ -69,6 +86,13 @@ describe('displayText', () => {
       const future = DateTime.now().plus({ hours: 2 });
       const result = displayText(FORMAT_HUMAN_COUNTDOWN, future);
       expect(result).toMatch(/in/i);
+    });
+
+    test('uses the viewer locale for the wording', () => {
+      const future = DateTime.now().plus({ days: 1 });
+      expect(displayText(FORMAT_HUMAN_COUNTDOWN, future, { locale: 'de-DE' })).toBe('morgen');
+      expect(displayText(FORMAT_HUMAN_COUNTDOWN, future, { locale: 'en-GB' })).toBe('tomorrow');
+      expect(displayText(FORMAT_HUMAN_COUNTDOWN, future)).toBe('in a day');
     });
 
     test('returns a relative string for a past date', () => {

@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (mit lokalisierter Datums- und Zeitangabe)",
       "humanCountdown": "Countdown / Zeit seit",
       "nasaCountdown": "Countdown T-(plus/minus)"
+    },
+    "clock": {
+      "label": "Uhrzeitformat",
+      "description": "Automatisch richtet sich nach der Sprache der jeweiligen Betrachter. 12-Stunden und 24-Stunden gelten nur für Betrachter, deren Sprache Englisch ist. Andere Sprachen behalten ihre übliche Uhrzeitdarstellung.",
+      "auto": "Automatisch (Standard)",
+      "h12": "12-Stunden",
+      "h24": "24-Stunden"
     }
   },
   "error": {

@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (met gelokaliseerde datum/tijd)",
       "humanCountdown": "Aftellen / tijd sinds",
       "nasaCountdown": "Aftellen T-(plus/min)"
+    },
+    "clock": {
+      "label": "Klok",
+      "description": "Automatisch volgt de taal van elke lezer. 12-uurs en 24-uurs gelden alleen voor lezers met Engels als taal. Andere talen houden hun gebruikelijke klok aan.",
+      "auto": "Automatisch (standaard)",
+      "h12": "12-uurs",
+      "h24": "24-uurs"
     }
   },
   "error": {

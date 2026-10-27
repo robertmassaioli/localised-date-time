@@ -62,10 +62,12 @@ describe.each([
   ['non-repeating', '../frontend/non-repeating'],
   ['repeating', '../frontend/repeating']
 ])('%s config panel Timezone select', (_name, modulePath) => {
-  function timeZoneSelect() {
+  function selectNamed(name) {
     const Config = loadConfig(modulePath);
-    return findSelect(TestRenderer.create(<IntlProvider locale="en-GB" messages={flattenMessages(loadLocale('en-GB'))}><Config /></IntlProvider>).toJSON(), 'timeZone');
+    return findSelect(TestRenderer.create(<IntlProvider locale="en-GB" messages={flattenMessages(loadLocale('en-GB'))}><Config /></IntlProvider>).toJSON(), name);
   }
+
+  const timeZoneSelect = () => selectNamed('timeZone');
 
   it('defaults to the timezone from the product context', () => {
     mockContext = { timezone: 'Australia/Sydney' };
@@ -95,5 +97,21 @@ describe.each([
     const select = timeZoneSelect();
     expect(select.props.options).toHaveLength(TimeZones.length);
     expect(select.props.options).toContainEqual({ label: 'Australia/Sydney', value: 'Australia/Sydney' });
+  });
+
+  describe('Clock select', () => {
+    it('offers Automatic, 12-hour and 24-hour, with Automatic as the default', () => {
+      const select = selectNamed('clock');
+      expect(select.props.options).toEqual([
+        { label: 'Automatic (Default)', value: 'auto' },
+        { label: '12-hour', value: '12h' },
+        { label: '24-hour', value: '24h' }
+      ]);
+      expect(select.props.defaultValue).toEqual({ label: 'Automatic (Default)', value: 'auto' });
+    });
+
+    it('is optional, so existing macros without it stay automatic', () => {
+      expect(selectNamed('clock').props.isRequired).toBeFalsy();
+    });
   });
 });

@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (con data/ora localizzata)",
       "humanCountdown": "Conto alla rovescia / tempo trascorso",
       "nasaCountdown": "Conto alla rovescia T-(più/meno)"
+    },
+    "clock": {
+      "label": "Orologio",
+      "description": "«Automatico» segue la lingua di ciascun lettore. Il formato a 12 ore e quello a 24 ore si applicano solo ai lettori la cui lingua è l’inglese. Le altre lingue mantengono il loro orologio abituale.",
+      "auto": "Automatico (predefinito)",
+      "h12": "12 ore",
+      "h24": "24 ore"
     }
   },
   "error": {

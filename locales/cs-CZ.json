@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (s lokalizovaným datem a časem)",
       "humanCountdown": "Odpočet / uplynulý čas",
       "nasaCountdown": "Odpočet T-(plus/minus)"
+    },
+    "clock": {
+      "label": "Hodiny",
+      "description": "Automaticky se řídí jazykem každého čtenáře. 12hodinový a 24hodinový formát platí jen pro čtenáře s angličtinou. Ostatní jazyky používají své obvyklé hodiny.",
+      "auto": "Automaticky (výchozí)",
+      "h12": "12hodinový",
+      "h24": "24hodinový"
     }
   },
   "error": {

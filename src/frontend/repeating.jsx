@@ -2,18 +2,19 @@ import React from 'react';
 import ForgeReconciler, { DatePicker, Label, Select, Text, Textfield, useProductContext } from '@forge/react';
 import { isPresent } from 'ts-is-present';
 import { FORMAT_DEFAULT } from "../displayOptions";
+import { CLOCK_AUTO } from '../clock';
 import { parseConfiguredDate } from '../dateTime';
 import { TimeZones } from "../timezones";
 import { defaultTimeZoneOption } from '../defaultTimeZone';
 import { nextRepeatDate, REPEAT_WEEKLY, repetitionToUnits } from '../repetition';
 import { parseTime, renderDateLozenge, validateConfig } from './common';
-import { displayOptionChoices, repetitionUnitChoices } from './displayOptionChoices';
+import { clockChoices, displayOptionChoices, repetitionUnitChoices } from './displayOptionChoices';
 import { useDateMacroContext } from './useDateMacroContext';
 import { MacroIntlProvider } from './MacroIntlProvider';
 import { useTranslate } from './useTranslate';
 
 const App = () => {
-  const { details, config, timeZone } = useDateMacroContext();
+  const { details, config, timeZone, locale } = useDateMacroContext();
   const { ready, t } = useTranslate();
   if (!ready) return null;
 
@@ -51,7 +52,7 @@ const App = () => {
   const startDate = parseConfiguredDate(config.date, time, meridiem, config.timeZone);
   const originalDate = nextRepeatDate(startDate, repetitionPeriod, repetitionToUnits(repetitionUnit));
 
-  return renderDateLozenge({ originalDate, timeZone, config, t });
+  return renderDateLozenge({ originalDate, timeZone, config, t, locale });
 };
 
 ForgeReconciler.render(
@@ -107,6 +108,13 @@ const Config = () => {
         defaultValue={{ label: t('config.displayOption.default'), value: FORMAT_DEFAULT }}
         description={t('config.displayOption.description')}
         options={displayOptionChoices(t)}
+        />
+      <Label labelFor='clock'>{t('config.clock.label')}</Label>
+      <Select
+        name="clock"
+        defaultValue={{ label: t('config.clock.auto'), value: CLOCK_AUTO }}
+        description={t('config.clock.description')}
+        options={clockChoices(t)}
         />
     </>
   );

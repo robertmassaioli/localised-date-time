@@ -47,6 +47,13 @@
       "defaultAndUtc": "UTC (ze zlokalizowaną datą/godziną)",
       "humanCountdown": "Odliczanie / czas, który upłynął",
       "nasaCountdown": "Odliczanie T-(plus/minus)"
+    },
+    "clock": {
+      "label": "Zegar",
+      "description": "Automatyczny stosuje język każdego czytelnika. Format 12-godzinny i 24-godzinny dotyczy tylko czytelników, których językiem jest angielski. Inne języki zachowują swój zwykły zegar.",
+      "auto": "Automatyczny (domyślnie)",
+      "h12": "12-godzinny",
+      "h24": "24-godzinny"
     }
   },
   "error": {
