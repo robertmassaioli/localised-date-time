@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import { DateTime, Settings } from 'luxon';
 import { nasaCountdown, relativeFromNow } from '../relativeTime';
 import { SUPPORTED_LOCALES } from '../i18n';
 
@@ -9,6 +9,17 @@ const DAY = 24 * HOUR;
 
 // The expected text below comes from moment's fromNow() and duration code, which this module replaces
 describe('relativeFromNow', () => {
+  // relativeFromNow counts calendar months in the system timezone, like moment, through Luxon's toLocal(), which
+  // follows Settings.defaultZone. A few table rows sit exactly on a rounding boundary (548 days is 1.5 years), where
+  // a daylight saving hour in the machine's zone tips the result, so the tests pin the zone and not the machine.
+  const systemZone = Settings.defaultZone;
+  beforeAll(() => {
+    Settings.defaultZone = 'UTC';
+  });
+  afterAll(() => {
+    Settings.defaultZone = systemZone;
+  });
+
   const now = DateTime.fromISO('2026-10-26T03:17:05.123Z', { zone: 'UTC' });
   const text = offsetMs => relativeFromNow(now.plus({ milliseconds: offsetMs }), now);
 
@@ -59,6 +70,32 @@ describe('relativeFromNow', () => {
     } finally {
       jest.useRealTimers();
     }
+  });
+
+  // Away from a rounding boundary the text does not depend on the system zone, whatever its daylight saving rules.
+  describe.each([
+    'UTC', 'Europe/London', 'Europe/Dublin', 'America/New_York', 'America/Los_Angeles', 'America/St_Johns',
+    'America/Santiago', 'Africa/Casablanca', 'Asia/Kolkata', 'Asia/Tokyo', 'Australia/Sydney', 'Australia/Lord_Howe',
+    'Pacific/Auckland', 'Pacific/Chatham'
+  ])('system zone %s', zone => {
+    beforeEach(() => {
+      Settings.defaultZone = zone;
+    });
+    afterEach(() => {
+      Settings.defaultZone = 'UTC';
+    });
+
+    test.each([
+      [90 * MINUTE, '2 hours'],
+      [3 * DAY, '3 days'],
+      [100 * DAY, '3 months'],
+      [400 * DAY, 'a year'],
+      [700 * DAY, '2 years'],
+      [5 * 365 * DAY, '5 years']
+    ])('%i ms away is "%s"', (offsetMs, expected) => {
+      expect(text(offsetMs)).toBe(`in ${expected}`);
+      expect(text(-offsetMs)).toBe(`${expected} ago`);
+    });
   });
 });
 
