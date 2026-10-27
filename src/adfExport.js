@@ -2,7 +2,7 @@ import api, { i18n, route } from '@forge/api';
 import { validateConfig, parseTime } from './configHelpers';
 import { inZone, parseConfiguredDate } from './dateTime';
 import { displayText, FORMAT_DEFAULT_AND_ORIGINAL, FORMAT_DEFAULT_AND_UTC, formatRequiresLiveUpdates } from './displayOptions';
-import { DEFAULT_LOCALE, makeTranslate } from './i18n';
+import { createTranslator, DEFAULT_LOCALE } from './i18n';
 import { nextRepeatDate, repetitionToUnits, REPEAT_WEEKLY } from './repetition';
 
 /**
@@ -48,14 +48,16 @@ async function getUserTimezone(accountId, configuredTimezone) {
  */
 async function getTranslate(payload) {
   const candidates = [payload?.context?.locale, DEFAULT_LOCALE].filter(locale => typeof locale === 'string' && locale);
-  for (const locale of candidates) {
+  for (const candidate of candidates) {
     try {
-      return makeTranslate(await i18n.createTranslationFunction(locale));
+      // Reads only this locale's file (and its fallbacks) from the deployed bundle.
+      const { locale, translations } = await i18n.getTranslations(candidate);
+      return createTranslator(locale, translations);
     } catch (e) {
-      console.warn(`[adfExport] could not load translations for ${locale}:`, e);
+      console.warn(`[adfExport] could not load translations for ${candidate}:`, e);
     }
   }
-  return makeTranslate(key => key);
+  return createTranslator(DEFAULT_LOCALE, {});
 }
 
 /**

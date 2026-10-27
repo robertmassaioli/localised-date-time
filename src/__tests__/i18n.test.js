@@ -1,44 +1,81 @@
-import { DEFAULT_LOCALE, interpolate, makeTranslate } from '../i18n';
+import fs from 'fs';
+import path from 'path';
+import { createIntl } from 'react-intl';
+import { createTranslator, DEFAULT_LOCALE, flattenMessages } from '../i18n';
 import { displayOptionChoices, repetitionUnitChoices } from '../frontend/displayOptionChoices';
 import { FORMAT_DEFAULT, FORMAT_NASA_COUNTDOWN } from '../displayOptions';
 import { REPEAT_HOURLY, REPEAT_WEEKLY } from '../repetition';
-import { translateFor } from './translate';
+import { loadLocale, translateFor } from './translate';
 
-describe('interpolate', () => {
-  test('fills in named placeholders', () => {
-    expect(interpolate('Time "{time}" is invalid', { time: '25:99' })).toBe('Time "25:99" is invalid');
+describe('flattenMessages', () => {
+  test('turns nested Forge locale files into flat react-intl ids', () => {
+    expect(flattenMessages({ macro: { nonrepeating: { title: 'T' } }, plain: 'P' })).toEqual({
+      'macro.nonrepeating.title': 'T',
+      plain: 'P'
+    });
   });
 
-  test('fills in the same placeholder twice', () => {
-    expect(interpolate('{a} and {a}', { a: 'x' })).toBe('x and x');
-  });
-
-  test('leaves unknown placeholders in place', () => {
-    expect(interpolate('Hello {name}', {})).toBe('Hello {name}');
-  });
-
-  test('leaves text without placeholders alone', () => {
-    expect(interpolate('Plain (am|pm)')).toBe('Plain (am|pm)');
-  });
-
-  test('does not treat inherited object properties as params', () => {
-    expect(interpolate('{constructor}', {})).toBe('{constructor}');
-  });
-
-  test('converts numbers to text', () => {
-    expect(interpolate('{n}', { n: 0 })).toBe('0');
+  test('copes with missing translations', () => {
+    expect(flattenMessages(null)).toEqual({});
+    expect(flattenMessages(undefined)).toEqual({});
   });
 });
 
-describe('makeTranslate', () => {
-  test('translates the key and applies params', () => {
-    const t = makeTranslate(key => ({ greeting: 'Hi {name}' }[key] ?? key));
-    expect(t('greeting', { name: 'Ana' })).toBe('Hi Ana');
+describe('createTranslator', () => {
+  test('translates a key for the locale', () => {
+    expect(translateFor('fr-FR')('error.notConfigured.date')).toBe(
+      'La date n’est pas configurée. Configurez cet élément dans la configuration de la macro.'
+    );
   });
 
-  test('returns the key when it is missing, like Forge does', () => {
-    const t = makeTranslate(key => key);
-    expect(t('missing.key')).toBe('missing.key');
+  test('fills in ICU placeholders', () => {
+    expect(translateFor('en-GB')('error.invalidTime', { time: '25:99' })).toMatch(/25:99/);
+  });
+
+  test('returns the key for a missing message, like Forge did, without logging an error', () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(translateFor('en-GB')('missing.key')).toBe('missing.key');
+    expect(errorSpy).not.toHaveBeenCalled();
+    expect(warnSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+    warnSpy.mockRestore();
+  });
+
+  test('returns keys when there are no translations at all', () => {
+    expect(createTranslator('en-GB', null)('error.notConfigured.date')).toBe('error.notConfigured.date');
+  });
+
+  test('uses the default locale when none is given', () => {
+    expect(createTranslator(undefined, loadLocale('en-GB'))('error.notConfigured.date')).toMatch(/^Date not configured/);
+  });
+
+  // What react-intl adds over the old {name} replacement: ICU plurals and selects work in any message.
+  test('formats ICU plurals when a message needs them', () => {
+    const intl = createIntl({ locale: 'en-GB', messages: {} });
+    const message = { id: 'demo', defaultMessage: '{count, plural, one {# occurrence} other {# occurrences}}' };
+    expect(intl.formatMessage(message, { count: 1 })).toBe('1 occurrence');
+    expect(intl.formatMessage(message, { count: 3 })).toBe('3 occurrences');
+  });
+});
+
+const LOCALE_CODES = fs.readdirSync(path.join(__dirname, '..', '..', 'locales')).map(name => name.replace(/\.json$/, '')).sort();
+
+describe('every locale formats with react-intl', () => {
+  test('there is a file for each of the 26 Forge locales', () => {
+    expect(LOCALE_CODES).toHaveLength(26);
+  });
+
+  test.each(LOCALE_CODES)('%s: every message parses, formats and keeps its text', locale => {
+    const messages = flattenMessages(loadLocale(locale));
+    const errors = [];
+    const intl = createIntl({ locale, messages, onError: e => errors.push(e.message) });
+    for (const id of Object.keys(messages)) {
+      const text = intl.formatMessage({ id }, { field: 'FIELD', time: 'TIME' });
+      expect(text).not.toBe(id);
+      expect(text).not.toMatch(/[{}]/);
+    }
+    expect(errors).toEqual([]);
   });
 });
 
