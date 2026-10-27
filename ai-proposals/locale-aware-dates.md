@@ -1,6 +1,6 @@
 # Proposal: Locale-Aware Dates and Clocks (item 3.2)
 
-**Status as of 2026-10-27:** proposal under review. Nothing in this document is implemented. Item 3.2 of `codebase-review-2026-10.md` links here. Decisions 1, 2, 4, 5 and 6 are made and recorded below. Decision 3 (timezone names) is the only one still open.
+**Status as of 2026-10-28:** implemented on the branch `locale-aware-dates`, except the manual check in work breakdown item 4. All six decisions are made. Decision 3 (timezone names) went with option A, as recommended.
 
 ## Summary
 
@@ -12,7 +12,7 @@ The macro always prints dates in one English pattern, `ddd, MMM DD, YYYY h:mma z
 |---|----------|--------|
 | 1 | `en-US` viewers: keep today's text, or switch to the `Intl` pattern? | **Decided: switch to the `Intl` pattern.** `Fri, Nov 15, 2024, 3:00 PM AEDT`. The old pattern stays only where no locale is known (exports). |
 | 2 | Clock setting for macro authors (Auto, 12-hour, 24-hour) | **Decided: yes, as a separate last PR. A locale's own convention beats the author's setting, except in the flexible locales `en-GB` and `en-US`.** An author who picks 12-hour still gets 24-hour for viewers in a locale that does not use a 12-hour clock. See "The clock". |
-| 3 | Timezone names: `AEDT`, `GMT+11`, `UTC+11` or something else | **Open.** Six options with real examples are in "Timezone names in detail". |
+| 3 | Timezone names: `AEDT`, `GMT+11`, `UTC+11` or something else | **Decided: option A, our tz-database abbreviation in every locale.** Six options with real examples are in "Timezone names in detail". |
 | 4 | Relative text ("in a day") | **Decided: use `Intl.RelativeTimeFormat` wording in every language.** English becomes "tomorrow", "1 hour ago", "now". |
 | 5 | NASA countdown (`T-1d4h`) | **Decided: leave it alone.** It reads the same in every language. |
 | 6 | Exports, given that Forge sends no viewer locale to `adfExport` | **Decided: keep the legacy English pattern.** A spike item looks for a locale source in the Confluence user APIs. |
@@ -208,7 +208,7 @@ No config migration is needed. Saved macros keep their settings.
 - `src/frontend/common.jsx`, `src/frontend/non-repeating.jsx`, `src/frontend/repeating.jsx`: pass the locale.
 - `src/adfExport.js`: no behaviour change. It passes no locale.
 - Tests: `dateTime.test.js`, `displayOptions.test.js`, `relativeTime.test.js`, `renderDateLozenge.test.js`, plus new cases below.
-- In the last PR (decision 2): `clockFor` and the flexible-locale set, the config forms, `locales/*.json` (3 keys in each of 26 files), `README.md`.
+- For the clock setting (decision 2): `clockFor` and the flexible-locale set, the config forms, `locales/*.json` (5 keys in each of 26 files), `README.md`.
 
 ## Test plan
 
@@ -244,17 +244,18 @@ No config migration is needed. Saved macros keep their settings.
 
 | # | Piece | Effort | Status |
 |---|-------|--------|--------|
-| 1 | `formatDateTime` with `toLocaleParts` and the abbreviation swap, plus tests for 26 locales | M | ⬜ Pending (awaiting review) |
-| 2 | Pass `locale` through `displayText`, `renderDateLozenge` and the macro views | S | ⬜ Pending |
-| 3 | Split `relativeFromNow` and format with `Intl.RelativeTimeFormat` | M | ⬜ Pending |
-| 4 | Find what locale an Australian account reports. Set the browser language to English (Australia), then log `context.locale`. Repeat with the Atlassian account language set to English (UK) | XS | ⬜ Pending |
-| 5 | Export keeps the legacy pattern, with a test that says so | XS | ⬜ Pending (decided) |
-| 6 | Macro `clock` setting (Auto, 12-hour, 24-hour), the `clockFor` locale rule with `en-GB` and `en-US` flexible, 3 keys in 26 locales, README | M | ⬜ Pending (decided, last PR) |
+| 1 | `formatDateTime` with `toLocaleParts` and the abbreviation swap, plus tests for 26 locales | M | ✅ Done |
+| 2 | Pass `locale` through `displayText`, `renderDateLozenge` and the macro views | S | ✅ Done |
+| 3 | Split `relativeFromNow` and format with `Intl.RelativeTimeFormat` | M | ✅ Done |
+| 4 | Find what locale an Australian account reports. Set the browser language to English (Australia), then log `context.locale`. Repeat with the Atlassian account language set to English (UK) | XS | ⬜ Pending (manual check, needs an account with that browser language) |
+| 5 | Export keeps the legacy pattern, with a test that says so | XS | ✅ Done |
+| 6 | Macro `clock` setting (Auto, 12-hour, 24-hour), the `clockFor` locale rule with `en-GB` and `en-US` flexible, 5 keys in 26 locales, README | M | ✅ Done |
 
-Suggested PRs: 1, 2 and 5 together, then 3, then 6.
+All six pieces landed in one PR, as separate commits in this order, so the clock setting can be split out if you want.
 
 ## Open questions
 
-1. **Timezone names (decision 3).** Pick one of A to F in "Timezone names in detail". My recommendation is A.
+None. Two follow-ups stay open:
 
-Everything else is decided.
+1. **What locale does an Australian account report?** Work breakdown item 4. Set the browser language to English (Australia) on a development install and log `context.locale`.
+2. **Translations need native review.** The five clock strings in 24 languages are machine-generated, like the earlier locale files.

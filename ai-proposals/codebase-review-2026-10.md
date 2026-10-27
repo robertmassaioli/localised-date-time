@@ -45,7 +45,7 @@ These are the first batch to fix. They are small, and the branch `codebase-revie
 | # | Idea | Notes | Effort | Status |
 |---|------|-------|--------|--------|
 | 3.1 | `TimePicker` for the time field, with 24-hour input | Removes the free-text format errors. Stored values stay in the existing "h:mm am/pm" form so saved macros keep working. Overlaps `improvements.md` #5. | S | ⛔ Won't do (for now) |
-| 3.2 | Format dates in the viewer's locale and clock | `displayText` always uses `ddd, MMM DD, YYYY h:mma z`, so a 24-hour locale still sees am/pm. `context.locale` is available. `Intl.DateTimeFormat` with the viewer's locale and timezone fixes it. | M | 📝 Proposal written, awaiting review (see `locale-aware-dates.md`) |
+| 3.2 | Format dates in the viewer's locale and clock | `displayText` always uses `ddd, MMM DD, YYYY h:mma z`, so a 24-hour locale still sees am/pm. `context.locale` is available. `Intl.DateTimeFormat` with the viewer's locale and timezone fixes it. | M | ✅ Done (see `locale-aware-dates.md`) |
 | 3.3 | Translate the UI strings | The macro titles and descriptions are translated. The config labels, descriptions, errors and display-format names are not. Also settle "Localised" versus "Localized" in the UI. `en-AU` is not a supported Forge locale, so `en-GB` stays the default fallback. | M | ✅ Done (PR `i18n-all-locales`, see `i18n-all-locales.md`) |
 | 3.4 | Monthly repetition | Overlaps `improvements.md` #9. | XS | ⬜ Pending |
 | 3.5 | Richer tooltip | Show the original time, UTC, the relative time and the configured zone on hover, in addition to the chosen display format. | S | ⬜ Pending |
