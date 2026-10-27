@@ -28,6 +28,8 @@ This is a hard rule. It applies to every file that renders anything: the macro v
 | `npm test` | Runs the Jest suite. |
 | `npm run lint` | Runs ESLint over `src`. |
 | `npm run gen-options` | Regenerates `src/timezones.js` from `moment-timezone` data. |
+| `npm run proposals:check` | Checks the numbering of the proposals in `ai-proposals/` (`scripts/check-proposals.js`). `npm test` runs the same check. |
+| `npm run proposals:next` | Prints the number the next proposal should use, such as `008`. |
 | `npm run deploy:dev` | `forge deploy -e development` |
 | `npm run deploy:prod` | `forge deploy -e production` |
 | `forge lint` | Lints the Forge app and manifest. Needs the maintainer's Forge login. |
@@ -65,7 +67,18 @@ Use Node 22 (`.nvmrc`). Run lint and tests before you commit, and run `forge lin
 
 ## Planning documents
 
-Proposals live in `ai-proposals/`. Read the relevant one before you start, write a new one for any sizeable change, and keep its status column current as items finish. Start with `ai-proposals/codebase-review-2026-10.md`, which ranks what is left to do.
+Proposals live in `ai-proposals/`. Read the relevant one before you start, write a new one for any sizeable change, and keep its status column current as items finish. Start with `ai-proposals/003-codebase-review-2026-10.md`, which ranks what is left to do.
+
+### Proposal numbering
+
+Every proposal is named `NNN-name.md`: three digits, a hyphen, then a lower-case name made of letters, digits and hyphens, for example `007-locale-aware-dates.md`.
+
+- **Order:** the numbers run from `001` in the order the proposals were created, so a new proposal always takes the next number.
+- **No gaps and no duplicates.** `scripts/check-proposals.js` checks this, along with the name format. The test suite runs it against the real folder (`src/__tests__/checkProposals.test.js`), so a proposal that breaks the rules fails `npm test` and CI.
+- **Find the next number** with `npm run proposals:next` (it runs `node scripts/check-proposals.js --next` and prints, for example, `008`). Run it when you create the file, not before you start planning, because another branch may take the number first. It refuses to answer while the numbering is wrong.
+- **Check the numbering** with `npm run proposals:check`. It exits 1 and lists every problem.
+- **Never renumber a merged proposal.** Other documents, code comments and pull requests link to it by file name. The only time to rename is when two unmerged branches took the same number: whichever branch merges second runs `npm run proposals:next`, renames its file, and fixes its own references.
+- When you refer to another proposal, use its full numbered file name, such as `` `003-codebase-review-2026-10.md` ``.
 
 ## Style for text you write
 

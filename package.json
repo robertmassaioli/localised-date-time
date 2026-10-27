@@ -7,6 +7,8 @@
     "lint": "eslint src --ext .js,.jsx",
     "gen-options": "node ./generate-options.js",
     "test": "jest",
+    "proposals:check": "node scripts/check-proposals.js",
+    "proposals:next": "node scripts/check-proposals.js --next",
     "deploy:dev": "forge deploy -e development",
     "deploy:prod": "forge deploy -e production"
   },

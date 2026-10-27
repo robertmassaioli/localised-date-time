@@ -2,7 +2,7 @@
 
 ## Overview
 
-`moment` is in [maintenance mode](https://momentjs.com/docs/#/-project-status/), and `moment-timezone` ships its own copy of the timezone database. This proposal moves every use in `src/` to [Luxon](https://moment.github.io/luxon/#/) ([API docs](https://moment.github.io/luxon/api-docs/index.html)) and removes both packages. It closes item 4.3 of `codebase-review-2026-10.md`.
+`moment` is in [maintenance mode](https://momentjs.com/docs/#/-project-status/), and `moment-timezone` ships its own copy of the timezone database. This proposal moves every use in `src/` to [Luxon](https://moment.github.io/luxon/#/) ([API docs](https://moment.github.io/luxon/api-docs/index.html)) and removes both packages. It closes item 4.3 of `003-codebase-review-2026-10.md`.
 
 The rule for this work is that the macro shows the same text as before. The 93 existing tests are the spec. Where Luxon cannot give identical output, this document says so and lists the choice as a decision for the maintainer.
 
@@ -36,7 +36,7 @@ Tests that build moment objects:
 
 `adfExport.test.js` and `useDateMacroContext.test.js` do not import moment. They exercise the code through its public functions, so they check the port without edits.
 
-Also in scope: `package.json` and `package-lock.json` (add `luxon`, remove both moment packages). Out of scope: `src/timezones.js` and `generate-options.js`. The generator downloads a JSON file from GitHub and does not import moment. The README and the 4.3 row of `codebase-review-2026-10.md` get a small update. `AGENTS.md` is not on this branch (it is on `add-agents-md`). Its commands table says `gen-options` regenerates the list "from `moment-timezone` data", which stays true, and it could gain a line about `scripts/generate-tz-abbreviations.js`.
+Also in scope: `package.json` and `package-lock.json` (add `luxon`, remove both moment packages). Out of scope: `src/timezones.js` and `generate-options.js`. The generator downloads a JSON file from GitHub and does not import moment. The README and the 4.3 row of `003-codebase-review-2026-10.md` get a small update. `AGENTS.md` is not on this branch (it is on `add-agents-md`). Its commands table says `gen-options` regenerates the list "from `moment-timezone` data", which stays true, and it could gain a line about `scripts/generate-tz-abbreviations.js`.
 
 ---
 
@@ -139,7 +139,7 @@ The system timezone matters in a few places, because moment used local time for 
 | 7.3 | Repeat date changes near DST or month ends | Differential check of 40,000 random cases, plus the existing DST and leap-day tests |
 | 7.4 | Behaviour depends on the system timezone | The check runs under five system timezones (UTC, Sydney, New York, Auckland, Kolkata) |
 | 7.5 | Bundle size | Luxon is about 24 KB minified and gzipped and the table adds about 5 KB. The prebuilt `moment` and `moment-timezone` with data are about 58 KB, so the bundle should shrink |
-| 7.6 | A pinned dependency drifts | `luxon` is pinned with a caret range like the other dependencies. `improvements.md` #8 tracks version ranges |
+| 7.6 | A pinned dependency drifts | `luxon` is pinned with a caret range like the other dependencies. `002-improvements.md` #8 tracks version ranges |
 | 7.7 | The differing gap behaviour (section 4) | Called out for the maintainer and covered by a test |
 
 ### Test strategy
@@ -171,7 +171,7 @@ The system timezone matters in a few places, because moment used local time for 
 | 8.7 | Differential check against moment under five system timezones | ✅ Done |
 | 8.8 | Remove `moment` and `moment-timezone` from `package.json` and the lockfile | ✅ Done |
 | 8.9 | Mutation check, lint, tests, `forge lint` | ✅ Done |
-| 8.10 | Update the README (Luxon, the abbreviation generator) and `codebase-review-2026-10.md` item 4.3 | ✅ Done |
+| 8.10 | Update the README (Luxon, the abbreviation generator) and `003-codebase-review-2026-10.md` item 4.3 | ✅ Done |
 | 8.11 | Open the PR (#13), check CI | ✅ Done |
 
 ## Open questions for the maintainer

@@ -33,7 +33,7 @@ One pure function, `defaultTimeZoneOption(contextTimeZone, timeZones)`, in `src/
 | 2.2 | Wire into `non-repeating.jsx` | Call `useProductContext()` in `Config` and pass `defaultValue={defaultTimeZoneOption(context?.timezone, TimeZones)}`. | ✅ Done |
 | 2.3 | Wire into `repeating.jsx` | The same change. | ✅ Done |
 | 2.4 | README | Mention the default in the config table. | ✅ Done |
-| 2.5 | Review doc row | Add row 3.8 to `codebase-review-2026-10.md`. | ✅ Done |
+| 2.5 | Review doc row | Add row 3.8 to `003-codebase-review-2026-10.md`. | ✅ Done |
 
 ---
 
