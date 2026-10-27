@@ -1,23 +1,21 @@
 # Proposal: Locale-Aware Dates and Clocks (item 3.2)
 
-**Status as of 2026-10-27:** proposal for review. Nothing in this document is implemented. Item 3.2 of `codebase-review-2026-10.md` links here.
+**Status as of 2026-10-27:** proposal under review. Nothing in this document is implemented. Item 3.2 of `codebase-review-2026-10.md` links here. Decisions 1, 2 and 4 have been made and are recorded below.
 
 ## Summary
 
 The macro always prints dates in one English pattern, `ddd, MMM DD, YYYY h:mma z` (for example `Fri, Nov 15, 2024 3:00pm AEDT`). A viewer in Berlin sees English month names and an am/pm clock. This proposal formats dates in the viewer's locale and clock, using `Intl` through Luxon, and keeps the macro's existing look wherever no locale is known.
 
-## Decisions I need from you
+## Decisions
 
-Each has a recommendation. The numbers match the "Open questions" section.
-
-| # | Decision | Recommendation |
-|---|----------|----------------|
-| 1 | Keep today's exact English text for `en-US` viewers, or switch them to the `Intl` pattern? | Switch. Accept `Fri, Nov 15, 2024, 3:00 PM AEDT`, and keep the old pattern only where no locale is known (exports). |
-| 2 | Add a per-macro "Clock" setting (Auto, 12-hour, 24-hour)? | Yes, as a separate last PR. `en-GB` is the fallback for Australians, and `en-GB` is a 24-hour locale. |
-| 3 | Keep the English tz-database abbreviations (`AEDT`, `EST`) in every locale? | Yes. `Intl` gives `GMT+11` for Sydney in all 26 locales. |
-| 4 | Translate relative text ("in a day") with `Intl.RelativeTimeFormat`, accepting small wording changes in English? | Yes. |
-| 5 | Leave the NASA countdown (`T-1d4h`) alone? | Yes. |
-| 6 | What do exports show, given that Forge sends no viewer locale to `adfExport`? | The legacy English pattern, until a locale source is found. |
+| # | Decision | Status |
+|---|----------|--------|
+| 1 | `en-US` viewers: keep today's text, or switch to the `Intl` pattern? | **Decided: switch to the `Intl` pattern.** `Fri, Nov 15, 2024, 3:00 PM AEDT`. The old pattern stays only where no locale is known (exports). |
+| 2 | Clock setting for macro authors (Auto, 12-hour, 24-hour) | **Decided: yes, as a separate last PR, and a locale's own convention beats the author's setting.** An author who picks 12-hour still gets 24-hour for viewers whose locale does not use a 12-hour clock. Which locales count as flexible is open, see "The clock". |
+| 3 | Timezone names: `AEDT`, `GMT+11`, `UTC+11` or something else | **Open.** Six options with real examples are in "Timezone names in detail". |
+| 4 | Relative text ("in a day") | **Decided: use `Intl.RelativeTimeFormat` wording in every language.** English becomes "tomorrow", "1 hour ago", "now". |
+| 5 | NASA countdown (`T-1d4h`) | Open. Recommendation: leave it alone. |
+| 6 | Exports, given that Forge sends no viewer locale to `adfExport` | Open. Recommendation: keep the legacy English pattern. |
 
 ## Problem
 
@@ -87,8 +85,19 @@ formatDateTime(date, { locale, hourCycle })
 
 ### 2. The clock
 
-- Default: the locale's own cycle, which `Intl` applies when `hourCycle` is left out.
-- Optional override (see decision 2): `clock` in the macro config, `auto` (default), `12h` or `24h`, mapped to `hourCycle` `undefined`, `'h12'` or `'h23'`.
+The clock for a viewer comes from two inputs: the author's `clock` setting in the macro config (`auto`, `12h` or `24h`, default `auto`) and the viewer's locale. **The locale's convention wins.** Locales fall into three classes:
+
+| Locale class | Author `auto` | Author `12h` | Author `24h` |
+|---|---|---|---|
+| Always 24-hour (Intl default `h23`, no everyday 12-hour use) | 24-hour | 24-hour | 24-hour |
+| Always 12-hour (Intl default `h12`, no everyday 24-hour use) | 12-hour | 12-hour | 12-hour |
+| Flexible (both clocks in everyday use) | the locale default | 12-hour | 24-hour |
+
+So the author's setting only changes the display for flexible locales. This is the rule you described: a macro set to 12-hour still shows 24 hours to a viewer whose locale does not use a 12-hour clock.
+
+- Implementation: a pure `clockFor(locale, authorSetting)` returns the `hourCycle` to pass to the formatter (`undefined`, `'h12'` or `'h23'`), driven by one `FLEXIBLE_CLOCK_LOCALES` set. Everything not in the set follows the locale's `Intl` default.
+- Starting point for the set: `en-GB` only. It is the one Forge locale where both clocks are common, and it is where `en-AU` viewers land, because `en-AU` is not a Forge locale. `en-US`, `ko-KR` and `zh-TW` default to 12-hour, and the other 22 locales to 24-hour. Which locales belong in the set is an open question for you.
+- Without the setting (the first PR), every viewer simply gets the locale default.
 
 ### 3. Where the locale comes from
 
@@ -105,6 +114,50 @@ formatDateTime(date, { locale, hourCycle })
 ### 5. NASA countdown
 
 Unchanged (decision 5). `T-1d4h` is a convention that does not translate, and `Intl` narrow units do not suit it.
+
+## Timezone names in detail
+
+Decision 3 decides what the last part of a date reads, for example the `AEDT` in `Fri, Nov 15, 2024, 3:00 PM AEDT`. The six options below show real output for the same instant (3 pm in Sydney on 15 Nov 2024) in seven zones, from Node 22 (tz data 2025b).
+
+| Zone | A: our abbreviation | B: ours in English, `Intl` short elsewhere | C: `Intl` short | D: UTC offset | E: abbreviation and offset | F: `Intl` long name (en-US / de-DE) |
+|---|---|---|---|---|---|---|
+| Sydney | `AEDT` | en `AEDT`, de `GMT+11`, ja `GMT+11` | `GMT+11` in all four | `UTC+11` | `AEDT (UTC+11)` | Australian Eastern Daylight Time / Ostaustralische Sommerzeit |
+| New York | `EST` | en `EST`, de `GMT-5`, ja `GMT-5` | en-US `EST`, en-GB `GMT-5`, de `GMT-5`, ja `GMT-5` | `UTC-5` | `EST (UTC-5)` | Eastern Standard Time / Nordamerikanische Ostküsten-Normalzeit |
+| Chicago | `CST` | en `CST`, de `GMT-6`, ja `GMT-6` | en-US `CST`, en-GB `GMT-6`, de `GMT-6`, ja `GMT-6` | `UTC-6` | `CST (UTC-6)` | Central Standard Time / Nordamerikanische Zentral-Normalzeit |
+| Kolkata | `IST` | en `IST`, de `GMT+5:30`, ja `GMT+5:30` | `GMT+5:30` in all four | `UTC+5:30` | `IST (UTC+5:30)` | India Standard Time / Indische Normalzeit |
+| London | `GMT` | `GMT` | `GMT` in all four | `UTC+0` | `GMT (UTC+0)` | Greenwich Mean Time / Mittlere Greenwich-Zeit |
+| Tokyo | `JST` | en `JST`, de `GMT+9`, ja `JST` | en `GMT+9`, de `GMT+9`, ja `JST` | `UTC+9` | `JST (UTC+9)` | Japan Standard Time / Japanische Normalzeit |
+| Dubai | `+04` | en `+04`, de `GMT+4`, ja `GMT+4` | en-US `GMT+4`, en-GB `GST`, de `GMT+4`, ja `GMT+4` | `UTC+4` | `+04 (UTC+4)` | Gulf Standard Time / Golf-Zeit |
+
+### The options
+
+**A: our tz-database abbreviation in every locale (today, and my recommendation).** The abbreviation table from the Luxon migration is swapped into the timezone slot of each locale's layout.
+- For: short; the same text as today; the same in every locale, so a German and an English viewer reading one page see the same zone label; independent of the browser's ICU version.
+- Against: some abbreviations are ambiguous (`CST` is Central US, China and Cuba, `IST` is India, Ireland and Israel, `BST` is British and Bangladesh); they are English conventions inside a non-English sentence; zones the database only names with a number show `+04`; the table is a snapshot that needs regenerating.
+
+**B: our abbreviation in English locales, `Intl` short names elsewhere.**
+- For: matches local habit in English, and non-English viewers get their platform's wording.
+- Against: the same page reads differently by viewer language. `Intl` short names are mostly `GMT+11` style anyway, so non-English viewers lose the abbreviation that A keeps. Output depends on the browser's ICU data.
+
+**C: `Intl` short names everywhere.**
+- For: least code; the abbreviation table could be deleted from the display path.
+- Against: English viewers lose `AEDT` for `GMT+11`, and the result is inconsistent across locales. New York is `EST` in `en-US` but `GMT-5` in `en-GB`, and Dubai is `GST` in `en-GB` but `GMT+4` in `en-US`. It also changes with the browser.
+
+**D: a UTC offset in every locale** (`UTC+11`, `UTC-5`, `UTC+5:30`), built by us from the date's offset.
+- For: unambiguous (no `CST` or `IST` clash); the same in every language and browser; short; needs no table; a viewer can compare two macros at a glance.
+- Against: unfamiliar to people who think in `EST` or `AEDT`; it names an offset and not a zone, so `UTC+10` does not say whether it is Brisbane or Sydney in winter; a visible change for every viewer, including English.
+
+**E: abbreviation and offset** (`AEDT (UTC+11)`).
+- For: familiar and unambiguous together.
+- Against: long, and the date line already carries a weekday, a date and a time. In the `Localised Date/Time (With configured timezone)` and `UTC (With Localised Date/Time)` formats two of these appear on one line.
+
+**F: `Intl` long names** (`Australian Eastern Daylight Time`, `Ostaustralische Sommerzeit`).
+- For: fully translated and unambiguous.
+- Against: far too long for a lozenge, which holds one line; the wording changes with the browser's ICU version.
+
+### Recommendation
+
+A, for the least change and the most predictable text. If the ambiguity of `CST` and `IST` matters to your viewers, D is the cleanest fix, and E is the compromise if you want both. Switching later is cheap, because the choice sits in one place, the function that picks the `timeZoneName` part's text, and the tests list the expected zone text per option.
 
 ## Alternatives considered
 
@@ -136,13 +189,14 @@ No config migration is needed. Saved macros keep their settings.
 - `src/frontend/common.jsx`, `src/frontend/non-repeating.jsx`, `src/frontend/repeating.jsx`: pass the locale.
 - `src/adfExport.js`: no behaviour change. It passes no locale.
 - Tests: `dateTime.test.js`, `displayOptions.test.js`, `relativeTime.test.js`, `renderDateLozenge.test.js`, plus new cases below.
-- Only if decision 2 is yes: the config forms, `locales/*.json` (3 keys in each of 26 files), `README.md`.
+- In the last PR (decision 2): `clockFor` and the flexible-locale set, the config forms, `locales/*.json` (3 keys in each of 26 files), `README.md`.
 
 ## Test plan
 
 - **All 26 locales:** formatting never throws, contains the year, and contains the abbreviation in place of any `GMT` text. Normalise `U+202F` and `U+00A0` to a space before comparing.
 - **Pinned expectations** for a handful of locales (`en-US`, `en-GB`, `de-DE`, `ja-JP`, `ko-KR`, `zh-TW`, `is-IS`) at a fixed instant, so a layout surprise shows up.
 - **Clock:** `hourCycle` overrides give 12 and 24-hour output for the same locale, and the default follows the locale (23 h23 and 3 h12 over the 26).
+- **Clock rule (last PR):** `clockFor(locale, setting)` over all 26 locales and the three settings: a 24-hour locale ignores `12h`, a 12-hour locale ignores `24h`, and a flexible locale follows the setting.
 - **Legacy path:** no locale gives today's exact string. The existing assertions in `dateTime.test.js` and `displayOptions.test.js` stay.
 - **Zones:** `zoneAbbreviation` still replaces the zone in every layout, including ones with the zone first or in brackets, across DST changes.
 - **Relative time:** for each of 6 locales, the unit and value chosen at each threshold edge match today's output, and the text comes from `Intl.RelativeTimeFormat`.
@@ -163,7 +217,7 @@ No config migration is needed. Saved macros keep their settings.
 
 - **Browser ICU differences.** Chrome, Safari and Firefox ship different ICU versions, so strings can differ in small ways from Node 22 (punctuation, spaces). Tests pin Node's output only for the handful of locales listed, with spaces normalised.
 - **English users see a visible change** (decision 1). A release note should say so.
-- **Australian viewers.** `en-AU` is not a Forge locale, and `en-GB` is a 24-hour locale. An Australian account set to "English (UK)" gets a 24-hour clock unless the account reports `en-AU` or decision 2 ships.
+- **Australian viewers.** `en-AU` is not a Forge locale, so Australians land on `en-GB`, a 24-hour locale. Until the clock setting ships (last PR), an Australian account set to "English (UK)" gets a 24-hour clock unless the account reports `en-AU`. Item 4 in the work breakdown checks what it reports.
 - **The relative-time split touches ported moment logic** that took the Luxon migration a lot of checking. The thresholds do not change, and the existing differential tests stay.
 - **The 2 s `getTranslations` time on a deployed host.** This change adds no network call, so it is not affected. It is noted here because the formatter is gated on the same provider.
 
@@ -176,15 +230,13 @@ No config migration is needed. Saved macros keep their settings.
 | 3 | Split `relativeFromNow` and format with `Intl.RelativeTimeFormat` | M | ⬜ Pending |
 | 4 | Confirm what locale an Australian "English (UK)" account reports | XS | ⬜ Pending |
 | 5 | Export keeps the legacy pattern, with a test that says so | XS | ⬜ Pending |
-| 6 | Optional: macro `clock` setting, 3 keys in 26 locales, README | M | ⬜ Pending (decision 2) |
+| 6 | Macro `clock` setting (Auto, 12-hour, 24-hour), the `clockFor` locale rule, 3 keys in 26 locales, README | M | ⬜ Pending (decided: yes, last PR) |
 
-Suggested PRs: 1, 2 and 5 together, then 3, then 6 if approved.
+Suggested PRs: 1, 2 and 5 together, then 3, then 6.
 
 ## Open questions
 
-1. **English text.** Is it acceptable that `en-US` viewers see `Fri, Nov 15, 2024, 3:00 PM AEDT`? The alternative is a special case that keeps the old English pattern for `en-US`, which gives `en-US` a different format from every other locale.
-2. **Clock override.** Should authors be able to force 12 or 24 hours per macro? It adds a config field and 78 new strings (3 keys, 26 locales, machine-translated and needing the same review as before).
-3. **Abbreviations.** Is `AEDT` acceptable in a German or Japanese sentence? The alternative is `GMT+11`, which is unambiguous but longer and less familiar for the zones people read most.
-4. **Relative wording.** "tomorrow" and "now" are better language and a small change. Do you want the exact old English kept?
-5. **NASA letters.** `T-1d4h` stays in every language. Say if you want it localised.
-6. **Exports.** Is the legacy English pattern right for exports? A real fix needs a locale source, and I have not found one in the Confluence user APIs. I would add a spike item to look.
+1. **Timezone names (decision 3).** Pick A to F above.
+2. **Flexible clock locales (decision 2).** Is `en-GB` the only flexible locale, or should others join it? Every locale not in the set follows its own `Intl` default regardless of the author's setting.
+3. **NASA letters (decision 5).** `T-1d4h` stays in every language unless you want it localised.
+4. **Exports (decision 6).** Is the legacy English pattern right for exports? A real fix needs a locale source, and I have not found one in the Confluence user APIs. I would add a spike item to look.
