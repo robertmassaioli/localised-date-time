@@ -1,6 +1,6 @@
 # Proposal: Locale-Aware Dates and Clocks (item 3.2)
 
-**Status as of 2026-10-27:** proposal under review. Nothing in this document is implemented. Item 3.2 of `codebase-review-2026-10.md` links here. Decisions 1, 2 and 4 have been made and are recorded below.
+**Status as of 2026-10-27:** proposal under review. Nothing in this document is implemented. Item 3.2 of `codebase-review-2026-10.md` links here. Decisions 1, 2, 4, 5 and 6 are made and recorded below. Decision 3 (timezone names) is the only one still open.
 
 ## Summary
 
@@ -11,11 +11,11 @@ The macro always prints dates in one English pattern, `ddd, MMM DD, YYYY h:mma z
 | # | Decision | Status |
 |---|----------|--------|
 | 1 | `en-US` viewers: keep today's text, or switch to the `Intl` pattern? | **Decided: switch to the `Intl` pattern.** `Fri, Nov 15, 2024, 3:00 PM AEDT`. The old pattern stays only where no locale is known (exports). |
-| 2 | Clock setting for macro authors (Auto, 12-hour, 24-hour) | **Decided: yes, as a separate last PR, and a locale's own convention beats the author's setting.** An author who picks 12-hour still gets 24-hour for viewers whose locale does not use a 12-hour clock. Which locales count as flexible is open, see "The clock". |
+| 2 | Clock setting for macro authors (Auto, 12-hour, 24-hour) | **Decided: yes, as a separate last PR. A locale's own convention beats the author's setting, except in the flexible locales `en-GB` and `en-US`.** An author who picks 12-hour still gets 24-hour for viewers in a locale that does not use a 12-hour clock. See "The clock". |
 | 3 | Timezone names: `AEDT`, `GMT+11`, `UTC+11` or something else | **Open.** Six options with real examples are in "Timezone names in detail". |
 | 4 | Relative text ("in a day") | **Decided: use `Intl.RelativeTimeFormat` wording in every language.** English becomes "tomorrow", "1 hour ago", "now". |
-| 5 | NASA countdown (`T-1d4h`) | Open. Recommendation: leave it alone. |
-| 6 | Exports, given that Forge sends no viewer locale to `adfExport` | Open. Recommendation: keep the legacy English pattern. |
+| 5 | NASA countdown (`T-1d4h`) | **Decided: leave it alone.** It reads the same in every language. |
+| 6 | Exports, given that Forge sends no viewer locale to `adfExport` | **Decided: keep the legacy English pattern.** A spike item looks for a locale source in the Confluence user APIs. |
 
 ## Problem
 
@@ -91,12 +91,12 @@ The clock for a viewer comes from two inputs: the author's `clock` setting in th
 |---|---|---|---|
 | Always 24-hour (Intl default `h23`, no everyday 12-hour use) | 24-hour | 24-hour | 24-hour |
 | Always 12-hour (Intl default `h12`, no everyday 24-hour use) | 12-hour | 12-hour | 12-hour |
-| Flexible (both clocks in everyday use) | the locale default | 12-hour | 24-hour |
+| Flexible (`en-GB` and `en-US`) | the locale default (24-hour for en-GB, 12-hour for en-US) | 12-hour | 24-hour |
 
 So the author's setting only changes the display for flexible locales. This is the rule you described: a macro set to 12-hour still shows 24 hours to a viewer whose locale does not use a 12-hour clock.
 
 - Implementation: a pure `clockFor(locale, authorSetting)` returns the `hourCycle` to pass to the formatter (`undefined`, `'h12'` or `'h23'`), driven by one `FLEXIBLE_CLOCK_LOCALES` set. Everything not in the set follows the locale's `Intl` default.
-- Starting point for the set: `en-GB` only. It is the one Forge locale where both clocks are common, and it is where `en-AU` viewers land, because `en-AU` is not a Forge locale. `en-US`, `ko-KR` and `zh-TW` default to 12-hour, and the other 22 locales to 24-hour. Which locales belong in the set is an open question for you.
+- Decided set: `en-GB` and `en-US`. `en-GB` is where `en-AU` viewers land, because `en-AU` is not a Forge locale, and an author can pin it to either clock. An author can also set 24-hour for `en-US` viewers, who default to 12-hour. `ko-KR` and `zh-TW` also default to 12-hour but are not flexible, so they stay 12-hour whatever the author picks. The other 22 locales default to 24-hour and stay there.
 - Without the setting (the first PR), every viewer simply gets the locale default.
 
 ### 3. Where the locale comes from
@@ -229,14 +229,13 @@ No config migration is needed. Saved macros keep their settings.
 | 2 | Pass `locale` through `displayText`, `renderDateLozenge` and the macro views | S | ⬜ Pending |
 | 3 | Split `relativeFromNow` and format with `Intl.RelativeTimeFormat` | M | ⬜ Pending |
 | 4 | Confirm what locale an Australian "English (UK)" account reports | XS | ⬜ Pending |
-| 5 | Export keeps the legacy pattern, with a test that says so | XS | ⬜ Pending |
-| 6 | Macro `clock` setting (Auto, 12-hour, 24-hour), the `clockFor` locale rule, 3 keys in 26 locales, README | M | ⬜ Pending (decided: yes, last PR) |
+| 5 | Export keeps the legacy pattern, with a test that says so | XS | ⬜ Pending (decided) |
+| 6 | Macro `clock` setting (Auto, 12-hour, 24-hour), the `clockFor` locale rule with `en-GB` and `en-US` flexible, 3 keys in 26 locales, README | M | ⬜ Pending (decided, last PR) |
 
 Suggested PRs: 1, 2 and 5 together, then 3, then 6.
 
 ## Open questions
 
-1. **Timezone names (decision 3).** Pick A to F above.
-2. **Flexible clock locales (decision 2).** Is `en-GB` the only flexible locale, or should others join it? Every locale not in the set follows its own `Intl` default regardless of the author's setting.
-3. **NASA letters (decision 5).** `T-1d4h` stays in every language unless you want it localised.
-4. **Exports (decision 6).** Is the legacy English pattern right for exports? A real fix needs a locale source, and I have not found one in the Confluence user APIs. I would add a spike item to look.
+1. **Timezone names (decision 3).** Pick one of A to F in "Timezone names in detail". My recommendation is A.
+
+Everything else is decided.
