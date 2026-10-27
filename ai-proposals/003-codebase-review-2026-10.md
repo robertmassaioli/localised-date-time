@@ -4,7 +4,7 @@
 
 **Status as of 2026-10-27:** section 1 is done (PR #10). Section 2 is done except 2.6, the `npm audit` review, which is deferred on request (PR #11). In section 3, 3.3 (translations for all 26 locales, PR #15) and 3.8 (default config timezone, PR #16) are done. 4.3, the Luxon migration, is done (PR #13). 3.1 and 4.2 are won't do for now. The rest of sections 3 and 4 are pending. Status values: ✅ done, ⬜ pending or open, 📝 proposal written, ⛔ won't do.
 
-A full read of the Localised Date Macro codebase after the Forge dependency upgrade (`@forge/react` 12, `@forge/bridge` 7, `@forge/api` 8, `@forge/resolver` 2) and the `useConfig` fix. This document lists what is broken, what is risky, and what we could add. It continues `improvements.md`, which still has four pending items (#5, #7, #8, #9). Where an item here overlaps one of those, the table says so.
+A full read of the Localised Date Macro codebase after the Forge dependency upgrade (`@forge/react` 12, `@forge/bridge` 7, `@forge/api` 8, `@forge/resolver` 2) and the `useConfig` fix. This document lists what is broken, what is risky, and what we could add. It continues `002-improvements.md`, which still has four pending items (#5, #7, #8, #9). Where an item here overlaps one of those, the table says so.
 
 Evidence for each item comes from reading the source, running `npm run lint`, running `npm test` and running `npm audit --omit=dev` on `main` at `ef1990f`.
 
@@ -36,7 +36,7 @@ These are the first batch to fix. They are small, and the branch `codebase-revie
 | 2.5 | There is no CI. Item 1.1 would have been caught by one. | Add a GitHub Actions workflow that runs `npm ci`, `npm run lint` and `npm test`. `package-lock.json` records Artifactory download URLs that a public runner cannot reach, so the workflow rewrites the URL prefix to `registry.npmjs.org` before `npm ci`. I checked this on a clean copy with no Atlassian credentials. The first real run happens when the branch is pushed. | S | ✅ Done (batch 2) |
 | 2.6 | `npm audit --omit=dev` reports 12 vulnerabilities (3 moderate, 9 high), including a ProseMirror paste-handling XSS. They look like transitive dependencies of `@forge/react`. | Check whether the macro is exposed to any of them. Re-run after Forge releases. Deferred on request. | S | ⬜ Open (deferred) |
 | 2.7 | `package.json` has `"main": "index.js"`, which does not exist. The README still shows plain `forge deploy` and not `deploy:dev` and `deploy:prod`. | Remove `main`. Update the README commands. Done, and the README now mentions CI and `forge install --upgrade`. | XS | ✅ Done (batch 2) |
-| 2.8 | The lockfile pins `@atlaskit/adf-utils` at 20.9.78 because 20.9.79 needs a package the registry does not have yet. A fresh install without the lockfile can fail. | Revisit once the registry catches up. Overlaps `improvements.md` #8. The registry now has `tmp-editor-statsig` 246.0.0, and `adf-utils` resolves at 20.9.79 with no pin. | XS | ✅ Done (batch 2) |
+| 2.8 | The lockfile pins `@atlaskit/adf-utils` at 20.9.78 because 20.9.79 needs a package the registry does not have yet. A fresh install without the lockfile can fail. | Revisit once the registry catches up. Overlaps `002-improvements.md` #8. The registry now has `tmp-editor-statsig` 246.0.0, and `adf-utils` resolves at 20.9.79 with no pin. | XS | ✅ Done (batch 2) |
 
 ---
 
@@ -44,14 +44,14 @@ These are the first batch to fix. They are small, and the branch `codebase-revie
 
 | # | Idea | Notes | Effort | Status |
 |---|------|-------|--------|--------|
-| 3.1 | `TimePicker` for the time field, with 24-hour input | Removes the free-text format errors. Stored values stay in the existing "h:mm am/pm" form so saved macros keep working. Overlaps `improvements.md` #5. | S | ⛔ Won't do (for now) |
-| 3.2 | Format dates in the viewer's locale and clock | `displayText` always uses `ddd, MMM DD, YYYY h:mma z`, so a 24-hour locale still sees am/pm. `context.locale` is available. `Intl.DateTimeFormat` with the viewer's locale and timezone fixes it. | M | ✅ Done (see `locale-aware-dates.md`) |
-| 3.3 | Translate the UI strings | The macro titles and descriptions are translated. The config labels, descriptions, errors and display-format names are not. Also settle "Localised" versus "Localized" in the UI. `en-AU` is not a supported Forge locale, so `en-GB` stays the default fallback. | M | ✅ Done (PR `i18n-all-locales`, see `i18n-all-locales.md`) |
-| 3.4 | Monthly repetition | Overlaps `improvements.md` #9. | XS | ⬜ Pending |
+| 3.1 | `TimePicker` for the time field, with 24-hour input | Removes the free-text format errors. Stored values stay in the existing "h:mm am/pm" form so saved macros keep working. Overlaps `002-improvements.md` #5. | S | ⛔ Won't do (for now) |
+| 3.2 | Format dates in the viewer's locale and clock | `displayText` always uses `ddd, MMM DD, YYYY h:mma z`, so a 24-hour locale still sees am/pm. `context.locale` is available. `Intl.DateTimeFormat` with the viewer's locale and timezone fixes it. | M | ✅ Done (see `007-locale-aware-dates.md`) |
+| 3.3 | Translate the UI strings | The macro titles and descriptions are translated. The config labels, descriptions, errors and display-format names are not. Also settle "Localised" versus "Localized" in the UI. `en-AU` is not a supported Forge locale, so `en-GB` stays the default fallback. | M | ✅ Done (PR `i18n-all-locales`, see `005-i18n-all-locales.md`) |
+| 3.4 | Monthly repetition | Overlaps `002-improvements.md` #9. | XS | ⬜ Pending |
 | 3.5 | Richer tooltip | Show the original time, UTC, the relative time and the configured zone on hover, in addition to the chosen display format. | S | ⬜ Pending |
 | 3.6 | Past, happening-now and upcoming states | Use the `Lozenge` appearance to show which state an event is in. | S | ⬜ Pending |
 | 3.7 | More repeat options | "Until" end dates, specific weekdays, skipped occurrences. | M | ⬜ Pending |
-| 3.8 | Default the config Timezone to the editing user's timezone | See `default-timezone.md`. An untouched default may not be saved, which needs a check in Confluence. | XS | ✅ Done (branch `default-timezone`) |
+| 3.8 | Default the config Timezone to the editing user's timezone | See `006-default-timezone.md`. An untouched default may not be saved, which needs a check in Confluence. | XS | ✅ Done (branch `default-timezone`) |
 
 ---
 
@@ -61,15 +61,15 @@ These are the first batch to fix. They are small, and the branch `codebase-revie
 |---|---------|-----|--------|--------|
 | 4.1 | Both macros duplicate their Config forms and the display option lists. Only the hook was shared. | Pull the shared fields (Time, Date, Timezone, Display format) into one component. | M | ⬜ Pending |
 | 4.2 | `src/timezones.js` is a 600-line generated file that includes legacy aliases such as `Africa/Asmera` next to `Africa/Asmara`. | Use `Intl.supportedValuesOf('timeZone')` or `moment.tz.names()` and remove the file and `generate-options.js`. | S | ⛔ Won't do (for now). Re-evaluated on `main` after the Luxon migration: `Intl.supportedValuesOf('timeZone')` has 418 names, lacks `UTC`, `Asia/Kolkata`, `Europe/Kyiv` and `Asia/Kathmandu`, and uses the older CLDR names. A curated `timezones.js` would hide the 152 duplicate aliases, but that needs a check of how the config `Select` treats saved aliases first. |
-| 4.3 | `moment` is in maintenance mode. | Move to `Intl` or Luxon. Best done together with 3.2. | M | ✅ Done on branch `luxon-migration` (Luxon, see `luxon-migration.md`). 3.2 is still open |
-| 4.4 | Label associations on the config form (`improvements.md` #7). | See that document. | S | ⬜ Pending |
+| 4.3 | `moment` is in maintenance mode. | Move to `Intl` or Luxon. Best done together with 3.2. | M | ✅ Done on branch `luxon-migration` (Luxon, see `004-luxon-migration.md`). 3.2 is still open |
+| 4.4 | Label associations on the config form (`002-improvements.md` #7). | See that document. | S | ⬜ Pending |
 
 ---
 
 ## Suggested order
 
 1. Batch one: section 1. One small PR, already on `codebase-review-fixes`.
-2. Batch two: 2.1, 2.2, 2.5, 2.7 and `improvements.md` #8. Logging, export correctness, CI and hygiene.
+2. Batch two: 2.1, 2.2, 2.5, 2.7 and `002-improvements.md` #8. Logging, export correctness, CI and hygiene.
 3. Batch three: 2.3 and 2.4. Tests for the code most likely to break quietly.
 4. Features: 3.2 and 3.3 first, then 3.1 and 3.4.
 5. Refactors: 4.1 and 4.2 once the tests from batch three are in.

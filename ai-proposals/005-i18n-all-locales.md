@@ -4,7 +4,7 @@
 
 **Status as of 2026-10-26:** done in PR `i18n-all-locales`. Open risks that need the maintainer are marked ⬜ in section 7. Status values: ✅ done, ⬜ pending or open.
 
-This implements item 3.3 of `codebase-review-2026-10.md`. Every user-visible string moves into `locales/<code>.json` and gets a translation for each of the 26 locales on the [Forge supported locale codes](https://developer.atlassian.com/platform/forge/manifest-reference/forge-supported-locale-codes/) page. This change touches strings only. It adds no components and changes no styling. Date formatting stays as it is, because item 3.2 owns it.
+This implements item 3.3 of `003-codebase-review-2026-10.md`. Every user-visible string moves into `locales/<code>.json` and gets a translation for each of the 26 locales on the [Forge supported locale codes](https://developer.atlassian.com/platform/forge/manifest-reference/forge-supported-locale-codes/) page. This change touches strings only. It adds no components and changes no styling. Date formatting stays as it is, because item 3.2 owns it.
 
 References:
 
@@ -50,7 +50,7 @@ Tests supply a translator that reads `locales/en-GB.json`, so the English assert
 
 ## 3. Where the export gets the viewer's locale
 
-The `adfExport` payload carries `context.accountId` but no locale (see `adf-export.md`, confirmed by the existing test payload shape). The Confluence v2 `users-bulk` response has no locale field either (`timeZone` only, checked against the published OpenAPI document). `GET /wiki/rest/api/user/current` returns a locale for the calling user, but the export runs as the app and there is no documented way to call it as the viewer.
+The `adfExport` payload carries `context.accountId` but no locale (see `001-adf-export.md`, confirmed by the existing test payload shape). The Confluence v2 `users-bulk` response has no locale field either (`timeZone` only, checked against the published OpenAPI document). `GET /wiki/rest/api/user/current` returns a locale for the calling user, but the export runs as the app and there is no documented way to call it as the viewer.
 
 Plan: read `payload.context.locale` if Forge supplies it, and use the default locale `en-GB` otherwise. The result is that exports are translated only when Forge sends a locale, and English otherwise. This is a known gap, and it goes to the maintainer as a decision (see Risks). A failure to create a translator falls back to `en-GB`, so an export never breaks because of i18n.
 

@@ -4,7 +4,7 @@
  * clocks are in everyday use there, so the author's 12-hour or 24-hour setting applies to them alone.
  * Every other locale keeps its Intl default (23 of the 26 Forge locales are 24-hour, and ko-KR, zh-TW
  * are 12-hour), so a macro set to 12-hour still shows 24 hours to a German viewer.
- * See ai-proposals/locale-aware-dates.md.
+ * See ai-proposals/007-locale-aware-dates.md.
  */
 export const CLOCK_AUTO = 'auto';
 export const CLOCK_12_HOUR = '12h';
