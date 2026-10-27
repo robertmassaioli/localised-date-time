@@ -29,8 +29,10 @@ The macro exists to show a time in the viewer's own terms. It shows the right in
 
 ## What the platform gives us
 
-- The frontend knows the viewer's locale. `useProductContext().locale` has it (the maintainer's `en-US` shows up in the debug logs from the react-intl work). `MacroIntlProvider` already reads it, and `useIntl().locale` gives the locale Forge settled on. See the [supported locale codes](https://developer.atlassian.com/platform/forge/manifest-reference/forge-supported-locale-codes/).
-- `adfExport` does not get a locale. `payload.context` has `accountId` and no locale, and the Confluence `users-bulk` response has `timeZone` and no locale. Exports have used `en-GB` as a stand-in for the translations since the i18n work.
+- The frontend knows the viewer's locale. `useProductContext().locale` has it (the maintainer's account reports `en-US`). `MacroIntlProvider` reads it, and `useIntl().locale` gives the locale Forge settled on for translations. The [Forge locale page](https://developer.atlassian.com/platform/forge/manifest-reference/forge-supported-locale-codes/) says a user's locale comes from their browser language or their Atlassian account language.
+- **The context locale is not limited to the 26 translation locales.** `view.getContext()` runs `ensureLocale` from `@forge/i18n` and keeps the raw value when there is no mapping (the bridge comment says this avoids breaking changes). `en-US`, `en-GB` and `en-UK` map. `en-AU`, `de-AT`, `fr-CA` and `zh-HK` do not, so the macro receives them as they are. "Forge has no Australian locale" is true of the translation files only. Whether the platform ever sends `en-AU` for an Australian account is unconfirmed (work breakdown item 4).
+- Translations for a locale outside the 26 resolve through the manifest's `fallback.default`, which is `en-GB`. Formatting does not depend on that, because `Intl` accepts any valid locale tag.
+- `adfExport` does not get a locale. `payload.context` has `accountId` and no locale, and the Confluence `users-bulk` response has `timeZone` and no locale.
 - Luxon formats with `Intl` underneath: [`toLocaleParts`](https://moment.github.io/luxon/api-docs/index.html#datetimetolocaleparts) and [`toLocaleString`](https://moment.github.io/luxon/api-docs/index.html#datetimetolocalestring), see also the [Luxon formatting guide](https://moment.github.io/luxon/#/formatting).
 
 ## Findings
@@ -51,7 +53,19 @@ I probed Node 22 (tz data 2025b) with all 26 locales. Browsers may differ slight
 | `is-IS` | `fim., 14. nóv. 2024, GMT-5 – 23:00` |
 | `zh-TW` | `2024年11月14日 週四 下午11:00 [EST]` |
 
-**Timezone names.** `Intl` does not give tz-database abbreviations. Sydney is `GMT+11` in all 26 locales (`UTC+11` in `fi-FI` and `fr-FR`). New York is `EST` in only `en-US`, `cs-CZ`, `nl-NL`, `no-NO` and `zh-TW`, and `GMT-5` elsewhere. The abbreviation table from the Luxon migration exists for this reason.
+**Timezone names.** `Intl` does not give tz-database abbreviations in most locales. Sydney is `GMT+11` in all 26 Forge locales (`UTC+11` in `fi-FI` and `fr-FR`). New York is `EST` in only `en-US`, `cs-CZ`, `nl-NL`, `no-NO` and `zh-TW`, and `GMT-5` elsewhere. The abbreviation table from the Luxon migration exists for this reason.
+
+**Why `Intl` never gives `AEDT` for Australia.** The abbreviation depends on both the region and the language of the locale. With Node 22 (ICU 77.1, CLDR 47.0):
+
+| Zone | en-US | en-GB | en-AU | en-NZ | en-IN | en-CA | de-DE |
+|---|---|---|---|---|---|---|---|
+| Sydney | `GMT+11` | `GMT+11` | `AEDT` | `AEDT` | `GMT+11` | `AEDT` | `GMT+11` |
+| Perth | `GMT+8` | `GMT+8` | `AWST` | `AWST` | `GMT+8` | `AWST` | `GMT+8` |
+| Auckland | `GMT+13` | `GMT+13` | `NZDT` | `NZDT` | `GMT+13` | `GMT+13` | `GMT+13` |
+| Kolkata | `GMT+5:30` | `GMT+5:30` | `GMT+5:30` | `GMT+5:30` | `IST` | `IST` | `GMT+5:30` |
+| New York | `EST` | `GMT-5` | `GMT-5` | `GMT-5` | `GMT-5` | `EST` | `GMT-5` |
+
+`de-AU` (German, Australia) gives `GMT+11`, so the language matters as well. The reason is in the CLDR source data: a locale carries a short name for a time zone group only where that name is in everyday use. For 158 zone groups, `en` has short names for 8 (the North American zones, GMT and Atlantic), `en-GB` for 5 (the three European zones, GMT and Gulf) and `en-AU` for 7 (the Australian zones, Lord Howe, New Zealand and GMT). `Australia_Eastern` has `AET`, `AEST` and `AEDT` in `en-AU` only. When a locale has none, ICU falls back to the localized offset (`GMT+11`). I inferred that fallback from the outputs and did not read the ICU source. Forge has no `en-AU` translation locale, but the context can carry the raw `en-AU` (see above), and then `Intl` does give `AEDT`.
 
 **The abbreviation can be swapped in.** `DateTime.setLocale(locale).toLocaleParts(options)` returns the parts, including a `timeZoneName` part. Replacing that one part's value with `zoneAbbreviation(date)` keeps each locale's layout: `[AEDT]` in brackets for `zh-TW`, the zone first for `is-IS`. I checked this with a throwaway script. It gives, for 3 pm in Sydney:
 
@@ -96,14 +110,19 @@ The clock for a viewer comes from two inputs: the author's `clock` setting in th
 So the author's setting only changes the display for flexible locales. This is the rule you described: a macro set to 12-hour still shows 24 hours to a viewer whose locale does not use a 12-hour clock.
 
 - Implementation: a pure `clockFor(locale, authorSetting)` returns the `hourCycle` to pass to the formatter (`undefined`, `'h12'` or `'h23'`), driven by one `FLEXIBLE_CLOCK_LOCALES` set. Everything not in the set follows the locale's `Intl` default.
-- Decided set: `en-GB` and `en-US`. `en-GB` is where `en-AU` viewers land, because `en-AU` is not a Forge locale, and an author can pin it to either clock. An author can also set 24-hour for `en-US` viewers, who default to 12-hour. `ko-KR` and `zh-TW` also default to 12-hour but are not flexible, so they stay 12-hour whatever the author picks. The other 22 locales default to 24-hour and stay there.
+- Decided set: `en-GB` and `en-US`, and by the same reasoning every other English locale the context can carry (`en-AU`, `en-NZ` and so on). `en-AU` defaults to 12-hour in `Intl`, and an author can pin it to either clock. An Australian account that reports `en-GB` lands in the same class. An author can also set 24-hour for `en-US` viewers, who default to 12-hour. `ko-KR` and `zh-TW` also default to 12-hour but are not flexible, so they stay 12-hour whatever the author picks. The other 22 locales default to 24-hour and stay there.
 - Without the setting (the first PR), every viewer simply gets the locale default.
 
 ### 3. Where the locale comes from
 
-- Frontend: `renderDateLozenge` already takes `t`. It gains `locale`, read in the macro views from the same context that `MacroIntlProvider` loads. The provider already holds `context.locale` and Forge's resolved locale. I will log what an Australian "English (UK)" account reports before choosing between the raw `context.locale` and the resolved one. The raw value could be `en-AU`, which `Intl` knows and gives a 12-hour clock, while the resolved value is `en-GB`.
-- Locales `Intl` does not know fall back to the default locale (`en-GB`) through `Intl.DateTimeFormat.supportedLocalesOf`.
-- Exports: no locale. They keep the legacy English pattern (decision 6). If a locale source appears, the same `locale` option applies.
+Two locales exist and they answer different questions:
+
+- **The translation locale** (`result.locale` from `getTranslations`, one of the 26) picks the text files. It is what the macro already uses for messages.
+- **The formatting locale** picks the date layout, month names, clock and zone names. It is the raw `context.locale`, so that `en-AU` stays `en-AU` and gets `AEDT` and a 12-hour clock from `Intl`. If `Intl.DateTimeFormat.supportedLocalesOf(raw)` does not accept it, the formatting locale falls back to the translation locale.
+
+The frontend passes the formatting locale to `renderDateLozenge` from the same context that `MacroIntlProvider` loads. Locales `Intl` does not know fall back to the default locale (`en-GB`). The timezone abbreviation table still handles every locale that `Intl` gives `GMT+n`, which is all of them except where CLDR carries the regional name.
+
+Exports have no locale and keep the legacy English pattern (decision 6).
 
 ### 4. Relative time
 
@@ -217,7 +236,7 @@ No config migration is needed. Saved macros keep their settings.
 
 - **Browser ICU differences.** Chrome, Safari and Firefox ship different ICU versions, so strings can differ in small ways from Node 22 (punctuation, spaces). Tests pin Node's output only for the handful of locales listed, with spaces normalised.
 - **English users see a visible change** (decision 1). A release note should say so.
-- **Australian viewers.** `en-AU` is not a Forge locale, so Australians land on `en-GB`, a 24-hour locale. Until the clock setting ships (last PR), an Australian account set to "English (UK)" gets a 24-hour clock unless the account reports `en-AU`. Item 4 in the work breakdown checks what it reports.
+- **Australian viewers.** If their account reports `en-GB`, they get a 24-hour clock until the clock setting ships (last PR), and `AEDT` from our table. If it reports `en-AU`, `Intl` gives them `AEDT` and a 12-hour clock directly. Item 4 in the work breakdown finds out which.
 - **The relative-time split touches ported moment logic** that took the Luxon migration a lot of checking. The thresholds do not change, and the existing differential tests stay.
 - **The 2 s `getTranslations` time on a deployed host.** This change adds no network call, so it is not affected. It is noted here because the formatter is gated on the same provider.
 
@@ -228,7 +247,7 @@ No config migration is needed. Saved macros keep their settings.
 | 1 | `formatDateTime` with `toLocaleParts` and the abbreviation swap, plus tests for 26 locales | M | ⬜ Pending (awaiting review) |
 | 2 | Pass `locale` through `displayText`, `renderDateLozenge` and the macro views | S | ⬜ Pending |
 | 3 | Split `relativeFromNow` and format with `Intl.RelativeTimeFormat` | M | ⬜ Pending |
-| 4 | Confirm what locale an Australian "English (UK)" account reports | XS | ⬜ Pending |
+| 4 | Find what locale an Australian account reports. Set the browser language to English (Australia), then log `context.locale`. Repeat with the Atlassian account language set to English (UK) | XS | ⬜ Pending |
 | 5 | Export keeps the legacy pattern, with a test that says so | XS | ⬜ Pending (decided) |
 | 6 | Macro `clock` setting (Auto, 12-hour, 24-hour), the `clockFor` locale rule with `en-GB` and `en-US` flexible, 3 keys in 26 locales, README | M | ⬜ Pending (decided, last PR) |
 
