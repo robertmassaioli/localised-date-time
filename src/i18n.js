@@ -9,6 +9,39 @@ import { createIntl, createIntlCache } from 'react-intl';
 // Matches `default` in manifest.yml. en-AU is not a supported Forge locale, so en-GB serves Australian spelling.
 export const DEFAULT_LOCALE = 'en-GB';
 
+// The 26 locales Forge can load translation files for, https://developer.atlassian.com/platform/forge/manifest-reference/forge-supported-locale-codes/
+export const SUPPORTED_LOCALES = [
+  'zh-CN', 'zh-TW', 'cs-CZ', 'da-DK', 'nl-NL', 'en-US', 'en-GB', 'et-EE', 'fi-FI', 'fr-FR', 'de-DE', 'hu-HU', 'is-IS',
+  'it-IT', 'ja-JP', 'ko-KR', 'no-NO', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'tr-TR', 'es-ES', 'sv-SE'
+];
+
+// Locales that need a mapping the language rule cannot give, keyed by lower-case tag.
+const LOCALE_OVERRIDES = { 'en-uk': 'en-GB', 'zh-hk': 'zh-TW', 'zh-mo': 'zh-TW', nb: 'no-NO', nn: 'no-NO' };
+
+// Where a bare language has more than one supported locale, this is the one it maps to.
+const PREFERRED_FOR_LANGUAGE = { en: 'en-GB', pt: 'pt-BR', zh: 'zh-CN' };
+
+/**
+ * Maps the locale the platform reports to one that has translation files.
+ * `view.getContext()` only maps a handful of locales (Forge's `ensureLocale`) and passes the rest through unchanged,
+ * so the app can receive `en-AU`, `de-AT` or `fr-CA`. Without this step those would fall to the manifest's default
+ * locale, English. The order is: an exact match (ignoring case and `_` versus `-`), a known override, the same language
+ * (`en-AU` gives `en-GB`, `de-AT` gives `de-DE`), then the default.
+ */
+export function resolveLocale(locale) {
+  if (typeof locale !== 'string' || !locale) return DEFAULT_LOCALE;
+  const wanted = locale.replace(/_/g, '-').toLowerCase();
+  const exact = SUPPORTED_LOCALES.find(code => code.toLowerCase() === wanted);
+  if (exact) return exact;
+  if (LOCALE_OVERRIDES[wanted]) return LOCALE_OVERRIDES[wanted];
+  if (wanted.startsWith('zh-hant')) return 'zh-TW';
+  const language = wanted.split('-')[0];
+  return LOCALE_OVERRIDES[language]
+    ?? PREFERRED_FOR_LANGUAGE[language]
+    ?? SUPPORTED_LOCALES.find(code => code.toLowerCase().split('-')[0] === language)
+    ?? DEFAULT_LOCALE;
+}
+
 const cache = createIntlCache();
 
 /**

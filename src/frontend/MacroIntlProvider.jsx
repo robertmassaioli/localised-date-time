@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Spinner, useProductContext } from '@forge/react';
 import { i18n } from '@forge/bridge';
 import { IntlProvider } from 'react-intl';
-import { DEFAULT_LOCALE, flattenMessages, onIntlError } from '../i18n';
+import { DEFAULT_LOCALE, flattenMessages, onIntlError, resolveLocale } from '../i18n';
 
 /**
  * Gives the macro views and config panels a react-intl context for the viewer's locale.
@@ -21,7 +21,8 @@ export function MacroIntlProvider({ children }) {
   useEffect(() => {
     if (!hasContext) return undefined;
     let cancelled = false;
-    i18n.getTranslations(requestedLocale ?? null)
+    // Regional variants such as en-AU or de-AT have no file, so ask for the nearest locale that does
+    i18n.getTranslations(requestedLocale ? resolveLocale(requestedLocale) : null)
       .then(result => {
         if (!cancelled) setLoaded({ locale: result.locale, messages: flattenMessages(result.translations) });
       })

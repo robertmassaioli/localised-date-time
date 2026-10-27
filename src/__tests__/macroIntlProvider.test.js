@@ -70,11 +70,29 @@ describe('MacroIntlProvider', () => {
     expect(renderer.toJSON()).toMatch(/^Datum nicht konfiguriert|Das Datum/);
   });
 
-  test('formats with the locale Forge settled on', async () => {
-    mockContext = { locale: 'en-AU' };
-    mockGetTranslations.mockImplementation(async () => ({ locale: 'en-GB', translations: loadLocale('en-GB') }));
+  // view.getContext() passes locales it cannot map through unchanged, so en-AU can arrive here.
+  test.each([
+    ['en-AU', 'en-GB'],
+    ['de-AT', 'de-DE'],
+    ['fr-CA', 'fr-FR'],
+    ['pt', 'pt-BR']
+  ])('asks Forge for %s as %s', async (raw, expected) => {
+    mockContext = { locale: raw };
+    await mount();
+    expect(mockGetTranslations).toHaveBeenCalledTimes(1);
+    expect(mockGetTranslations).toHaveBeenCalledWith(expected);
+  });
+
+  test('shows translations in the language of a regional variant', async () => {
+    mockContext = { locale: 'de-AT' };
     const renderer = await mount();
-    expect(renderer.toJSON()).toMatch(/^Date not configured/);
+    expect(renderer.toJSON()).toMatch(/^Das Datum|^Datum/);
+  });
+
+  test('lets Forge use the view locale when the context has none', async () => {
+    mockContext = {};
+    await mount();
+    expect(mockGetTranslations).toHaveBeenCalledWith(null);
   });
 
   test('shows the message keys when the translations cannot be loaded', async () => {

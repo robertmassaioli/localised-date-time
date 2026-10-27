@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { createIntl } from 'react-intl';
-import { createTranslator, DEFAULT_LOCALE, flattenMessages } from '../i18n';
+import { createTranslator, DEFAULT_LOCALE, flattenMessages, resolveLocale, SUPPORTED_LOCALES } from '../i18n';
 import { displayOptionChoices, repetitionUnitChoices } from '../frontend/displayOptionChoices';
 import { FORMAT_DEFAULT, FORMAT_NASA_COUNTDOWN } from '../displayOptions';
 import { REPEAT_HOURLY, REPEAT_WEEKLY } from '../repetition';
@@ -60,6 +60,49 @@ describe('createTranslator', () => {
 });
 
 const LOCALE_CODES = fs.readdirSync(path.join(__dirname, '..', '..', 'locales')).map(name => name.replace(/\.json$/, '')).sort();
+
+describe('resolveLocale', () => {
+  test.each([
+    ['fr-FR', 'fr-FR'],
+    ['FR-fr', 'fr-FR'],
+    ['fr_FR', 'fr-FR'],
+    ['en-UK', 'en-GB'],
+    ['en-AU', 'en-GB'],
+    ['en-NZ', 'en-GB'],
+    ['en', 'en-GB'],
+    ['pt', 'pt-BR'],
+    ['pt-AO', 'pt-BR'],
+    ['zh', 'zh-CN'],
+    ['zh-HK', 'zh-TW'],
+    ['zh-Hant-HK', 'zh-TW'],
+    ['de-AT', 'de-DE'],
+    ['de-CH', 'de-DE'],
+    ['fr-CA', 'fr-FR'],
+    ['es-MX', 'es-ES'],
+    ['nb-NO', 'no-NO'],
+    ['nb', 'no-NO'],
+    ['nn', 'no-NO'],
+    ['xx-XX', 'en-GB'],
+    ['', 'en-GB'],
+    [undefined, 'en-GB'],
+    [null, 'en-GB'],
+    [42, 'en-GB']
+  ])('%p resolves to %p', (input, expected) => {
+    expect(resolveLocale(input)).toBe(expected);
+  });
+
+  test('every supported locale resolves to itself', () => {
+    for (const code of SUPPORTED_LOCALES) {
+      expect(resolveLocale(code)).toBe(code);
+    }
+  });
+
+  test('every resolved locale has a translation file', () => {
+    for (const input of ['en-AU', 'de-AT', 'fr-CA', 'zh-HK', 'pt', 'nb', 'xx-XX']) {
+      expect(LOCALE_CODES).toContain(resolveLocale(input));
+    }
+  });
+});
 
 describe('every locale formats with react-intl', () => {
   test('there is a file for each of the 26 Forge locales', () => {
