@@ -8,7 +8,7 @@ let mockContext;
 const mockGetTranslations = jest.fn();
 
 // The real @forge/react and @forge/bridge need the Forge runtime, which only exists in the browser.
-jest.mock('@forge/react', () => ({ useProductContext: () => mockContext }));
+jest.mock('@forge/react', () => ({ Spinner: 'Spinner', useProductContext: () => mockContext }));
 jest.mock('@forge/bridge', () => ({ i18n: { getTranslations: (...args) => mockGetTranslations(...args) } }));
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -39,11 +39,27 @@ describe('MacroIntlProvider', () => {
     warnSpy.mockRestore();
   });
 
-  test('renders nothing and loads nothing until the context has loaded', async () => {
+  // Rendering nothing here left the deployed macro on Forge's own loading spinner, so show a Spinner instead.
+  test('shows a spinner and loads nothing until the context has loaded', async () => {
     mockContext = undefined;
     const renderer = await mount();
-    expect(renderer.toJSON()).toBeNull();
+    expect(renderer.toJSON()).toMatchObject({ type: 'Spinner' });
     expect(mockGetTranslations).not.toHaveBeenCalled();
+  });
+
+  test('shows a spinner while the translations load, then the children', async () => {
+    mockContext = { locale: 'de-DE' };
+    let resolve;
+    mockGetTranslations.mockImplementation(() => new Promise(r => { resolve = r; }));
+    let renderer;
+    await act(async () => {
+      renderer = TestRenderer.create(<MacroIntlProvider><Probe /></MacroIntlProvider>);
+    });
+    expect(renderer.toJSON()).toMatchObject({ type: 'Spinner' });
+    await act(async () => {
+      resolve({ locale: 'de-DE', translations: loadLocale('de-DE') });
+    });
+    expect(typeof renderer.toJSON()).toBe('string');
   });
 
   test('asks Forge for only the viewer locale, once', async () => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useProductContext } from '@forge/react';
+import { Spinner, useProductContext } from '@forge/react';
 import { i18n } from '@forge/bridge';
 import { IntlProvider } from 'react-intl';
 import { DEFAULT_LOCALE, flattenMessages, onIntlError } from '../i18n';
@@ -8,7 +8,8 @@ import { DEFAULT_LOCALE, flattenMessages, onIntlError } from '../i18n';
  * Gives the macro views and config panels a react-intl context for the viewer's locale.
  * `i18n.getTranslations` fetches only that locale's file (plus its fallbacks), so no other locale is downloaded.
  * https://developer.atlassian.com/platform/forge/apis-reference/ui-api-bridge/i18n/
- * The provider renders no markup of its own. It renders nothing until the translations have loaded.
+ * The provider renders no markup of its own once loaded. While the translations load it renders a Spinner,
+ * because rendering nothing left the macro stuck on Forge's own loading spinner in a deployed app.
  * https://formatjs.github.io/docs/react-intl/api/#intlprovider
  */
 export function MacroIntlProvider({ children }) {
@@ -34,7 +35,8 @@ export function MacroIntlProvider({ children }) {
     };
   }, [hasContext, requestedLocale]);
 
-  if (!loaded) return null;
+  if (!loaded) return <Spinner />;
+
   return (
     <IntlProvider locale={loaded.locale} defaultLocale={DEFAULT_LOCALE} messages={loaded.messages} onError={onIntlError}>
       {children}
