@@ -76,3 +76,46 @@ export function formatDefault(date) {
   const meridiem = english.hour < 12 ? 'am' : 'pm';
   return `${english.toFormat('ccc, LLL dd, yyyy h:mm')}${meridiem} ${zoneAbbreviation(english)}`;
 }
+
+// The Intl parts that make up a date line. `timeZoneName` is replaced by our own abbreviation, see formatDateTime.
+const DATE_LINE_OPTIONS = {
+  weekday: 'short',
+  month: 'short',
+  day: '2-digit',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  timeZoneName: 'short'
+};
+
+/**
+ * Formats a date in the viewer's locale, for example "Fri, 15 Nov 2024, 15:00 AEDT" in en-GB or
+ * "Fr., 15. Nov. 2024, 15:00 AEDT" in de-DE. The layout, names and clock come from Intl.
+ *
+ * `Intl` gives zone names such as "GMT+11" in most locales, so the zone part is swapped for the
+ * tz-database abbreviation (AEDT, EST), which keeps each locale's layout, including zones in brackets
+ * or placed first. https://moment.github.io/luxon/api-docs/index.html#datetimetolocaleparts
+ *
+ * `hourCycle` ('h12' or 'h23') overrides the locale's own clock, see clock.js.
+ * Without a locale this is the legacy English pattern, which exports keep because Forge sends no viewer locale to them.
+ */
+export function formatDateTime(date, { locale, hourCycle } = {}) {
+  if (!date.isValid) {
+    return 'Invalid date';
+  }
+  if (!locale) {
+    return formatDefault(date);
+  }
+  try {
+    const abbreviation = zoneAbbreviation(date);
+    return date
+      .setLocale(locale)
+      .toLocaleParts({ ...DATE_LINE_OPTIONS, ...(hourCycle ? { hourCycle } : {}) })
+      .map(part => (part.type === 'timeZoneName' ? abbreviation : part.value))
+      .join('');
+  } catch (error) {
+    // A malformed locale tag makes Intl throw, so show the legacy pattern and not an error
+    console.warn(`[dateTime] could not format for locale "${locale}":`, error);
+    return formatDefault(date);
+  }
+}
