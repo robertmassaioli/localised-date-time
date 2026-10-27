@@ -25,10 +25,14 @@ describe('formatDateTime', () => {
     ['de-DE', 'Fr., 15. Nov. 2024, 15:00 AEDT'],
     ['ja-JP', '2024年11月15日(金) 15:00 AEDT'],
     ['ko-KR', '2024년 11월 15일 (금) 오후 3:00 AEDT'],
-    ['zh-TW', '2024年11月15日 週五 下午3:00 [AEDT]'],
     ['is-IS', 'fös., 15. nóv. 2024, AEDT – 15:00']
   ])('%s: %s', (locale, expected) => {
     expect(format(sydney, { locale })).toBe(expected);
+  });
+
+  // Node builds differ on whether ICU puts a space between the date and the weekday here, so the space is optional.
+  test('zh-TW: 2024年11月15日 週五 下午3:00 [AEDT]', () => {
+    expect(format(sydney, { locale: 'zh-TW' })).toMatch(/^2024年11月15日 ?週五 下午3:00 \[AEDT\]$/);
   });
 
   test('keeps the zone where each locale puts it', () => {
